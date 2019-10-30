@@ -1,0 +1,95 @@
+﻿<ContentDialog
+    x:Class="百度经验个人助手.ContentEditSettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:百度经验个人助手"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="辅助编辑工具箱 设置"
+    PrimaryButtonText="确定"
+    SecondaryButtonText="取消"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    HorizontalContentAlignment="Stretch">
+    <ContentDialog.Background>
+        <LinearGradientBrush>
+            <GradientStop Color="#BAF0" Offset="0"/>
+            <GradientStop Color="#B0FF" Offset="1"/>
+        </LinearGradientBrush>
+    </ContentDialog.Background>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid Padding="5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Margin="0,0,0,5">标题 → 部分简介</TextBlock>
+            <TextBox x:Name="TextBoxTitle2Brief" Grid.Row="1" PlaceholderText="输入格式串" Text="介绍在\1开发中，如何\2。应用场景："></TextBox>
+            <TextBlock Grid.Row="2" TextWrapping="Wrap" FontSize="12">特殊符号：\0是整个标题， \1，\2是空格、冒号分割前后部分，\3，\4是如何、怎么分割前后部分</TextBlock>
+        </Grid>
+        <Grid Grid.Row="1" Width="660" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.4*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" Padding="5" Margin="0,0,5,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="160"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0">标题关键词 → 工具</TextBlock>
+                <TextBox x:Name="TextBoxTitle2Tool" Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" PlaceholderText="输入格式串" Text="UWP=Visual Studio 2015"></TextBox>
+                <TextBlock Grid.Row="2" Margin="0,10,0,0">固定注意事项</TextBlock>
+                <TextBox x:Name="TextBoxAttention" Grid.Row="3" PlaceholderText="输入格式串" Text="如果遇到问题，可以在下方提问。"></TextBox>
+            </Grid>
+            <Grid Grid.Column="1" Padding="0,5,0,5">
+                <!--<Grid.Background>
+                    <SolidColorBrush Color="Black" Opacity="0.05"></SolidColorBrush>
+                </Grid.Background>
+                <TextBlock FontSize="32" Opacity="0.3" VerticalAlignment="Center" HorizontalAlignment="Center">备用区域</TextBlock>-->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="160"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Margin="0,0,0,0">标题关键词 → 分类</TextBlock>
+                <TextBox x:Name="TextBoxTitle2Category"  Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" PlaceholderText="输入格式串" Text="C#=2 1 5"></TextBox>
+                <CheckBox x:Name="CheckBoxCheckOrigin" Grid.Row="2" IsChecked="True" >自动勾选原创</CheckBox>
+                <CheckBox x:Name="CheckBoxAddStep" Grid.Row="3" IsChecked="True" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Stretch">自动添加</TextBlock>
+                        <TextBox x:Name="TextBoxAddStepCount" Margin="4,0,4,0" Text="3" InputScope="Number" VerticalAlignment="Stretch" FontSize="12" MinHeight="10" MinWidth="30" Padding="2"></TextBox>
+                        <TextBlock VerticalAlignment="Stretch">个步骤</TextBlock>
+                    </StackPanel>
+                </CheckBox>
+
+            </Grid>
+            <Grid x:Name="GridSteps" Grid.Column="2" Padding="5,5,0,5"  Margin="5,0,0,0" Opacity="0.4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="160"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Margin="0,0,0,0">部分固定步骤（不常用）</TextBlock>
+                <TextBox x:Name="TextBoxSteps"  Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" PlaceholderText="输入格式串" 
+                         Text="&lt;步骤1&gt;&#xA;首先，打开软件...&#xA;&lt;/步骤1&gt;&#xA;&lt;步骤2&gt;&#xA;&lt;/步骤2&gt;"/>
+                <CheckBox x:Name="CheckBoxSteps" Grid.Row="2" Click="CheckBoxSteps_Click">启用部分固定步骤</CheckBox>
+                <TextBlock Grid.Row="3" FontSize="12" TextWrapping="Wrap">⚠可用于编写系列教程。使用不当可能影响审核体现。</TextBlock>
+            </Grid>
+        </Grid>
+    </Grid>
+
+
+</ContentDialog>

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
+  <Identity Name="8684UNIONS.3039718ACF865" Publisher="CN=2D98E920-8988-41FF-A2C2-A34E07137B2A" Version="1.4.3.0" />
+  <mp:PhoneIdentity PhoneProductId="af21b038-491b-4505-a5e8-a9b7ee2c0b16" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Properties>
+    <DisplayName>百度经验个人助手</DisplayName>
+    <PublisherDisplayName>UNIONS</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="百度经验个人助手.App">
+      <uap:VisualElements DisplayName="百度经验个人助手" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="百度经验个人助手" BackgroundColor="deepSkyBlue">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
+        </uap:DefaultTile>
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="deepSkyBlue" />
+      </uap:VisualElements>
+      <uap:ApplicationContentUriRules>
+        <uap:Rule Match="https://jingyan.baidu.com/" Type="include" WindowsRuntimeAccess="all" />
+        <uap:Rule Match="https://jingyan.baidu.com/user/nuc/content?tab=exp&amp;expType=draft" Type="include" WindowsRuntimeAccess="all" />
+        <uap:Rule Match="https://jingyan.baidu.com/edit/content" Type="include" WindowsRuntimeAccess="all" />
+        <uap:Rule Match="http://jingyan.baidu.com/edit/content" Type="include" WindowsRuntimeAccess="all" />
+      </uap:ApplicationContentUriRules>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>
