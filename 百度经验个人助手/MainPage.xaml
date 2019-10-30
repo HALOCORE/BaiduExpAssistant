@@ -61,19 +61,32 @@
                     <Button VerticalAlignment="Center"
                             BorderThickness="0"
                             MinWidth="10" MinHeight="15"
+                            x:Name="buttonRewardGet"
+                            Padding="10,5,10,5" Content= "领取" Click="buttonRewardGet_Click" Margin="10,0,0,0">
+                        <Button.Background>
+                            <SolidColorBrush Color="#FF00A1FD"></SolidColorBrush>
+                        </Button.Background>
+                        <Button.Foreground>
+                            <SolidColorBrush Color="White"></SolidColorBrush>
+                        </Button.Foreground>
+                    </Button>
+                    <Button VerticalAlignment="Center"
+                            BorderThickness="0"
+                            MinWidth="10" MinHeight="15"
                             x:Name="buttonRewardLink"
                             Padding="5,0,5,0" Content= "🔗" Click="buttonRewardLink_Click">
                         <Button.Background>
                             <SolidColorBrush></SolidColorBrush>
                         </Button.Background>
                     </Button>
-                    <TextBlock  VerticalAlignment="Center" Padding="5,0,5,0" Text= "页面链接：" />
+                    <TextBlock  VerticalAlignment="Center" Padding="5,0,5,0" Text= "信息：" />
                     <TextBox
                         IsReadOnly="True"
                         HorizontalAlignment="Stretch" 
                         VerticalAlignment="Center"
                         FontSize="12"
-                       Text="{Binding PageUrl}" />
+                       Text="{Binding Info}" />
+                    
                 </StackPanel>
             </Grid>
         </DataTemplate>
@@ -504,8 +517,15 @@
                         × 请先获取某分类下的页</TextBlock>
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,3"
                                 HorizontalAlignment="Right">
-                            <ComboBox x:Name="comboCacheReward"
-                            Grid.Column="1" SelectedIndex="1" HorizontalAlignment="Stretch">
+                            <ComboBox x:Name="comboCacheRewardType" SelectedIndex="0" HorizontalAlignment="Stretch" Padding="8,5,0,7" MinWidth="50">
+                                <ComboBoxItem>
+                                    <TextBlock FontSize="10">优质</TextBlock>
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    <TextBlock FontSize="10">普通</TextBlock>
+                                </ComboBoxItem>
+                            </ComboBox>
+                            <ComboBox x:Name="comboCacheReward" SelectedIndex="1" HorizontalAlignment="Stretch" Padding="8,5,0,7" MinWidth="50">
                                 <ComboBoxItem>
                                     <TextBlock FontSize="10">全部</TextBlock>
                                 </ComboBoxItem>
@@ -540,7 +560,7 @@
                                     <TextBlock FontSize="10">时尚</TextBlock>
                                 </ComboBoxItem>
                             </ComboBox>
-                            <TextBox x:Name="textCacheRewardFromTo" Foreground="AliceBlue" FontSize="14" Text="0-2" Height="12">
+                            <TextBox x:Name="textCacheRewardFromTo" Foreground="AliceBlue" FontSize="14" MinWidth="50" Text="0-2" Height="12" Padding="4,3,4,5">
 
                             </TextBox>
                             <Button x:Name="buttonCacheReward" FontSize="14" Foreground="WhiteSmoke"

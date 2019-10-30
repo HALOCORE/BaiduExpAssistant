@@ -549,14 +549,14 @@ namespace 百度经验个人助手
 
         #region ##### 第B1步：悬赏更新 ##### ----------------------------------
 
-        public async Task UpdateReward(int pglow, int pghigh, int cid)
+        public async Task UpdateReward(int pglow, int pghigh, string tp, int cid)
         {
             ExpManager.rewardExps.Clear();
             for (int i = pglow; i <= pghigh; ++i)
             {
 
                 textRewardCacheState.Text = "正在获取第 " + i + " 页...";
-                await ExpManager.CookielessGetReward(cid, i);
+                await ExpManager.CookielessGetReward(tp, cid, i);
 
                 if (!ExpManager.ParseReward())
                 {
@@ -599,6 +599,15 @@ namespace 百度经验个人助手
             comboCacheReward.IsEnabled = false;
             textCacheRewardFromTo.IsEnabled = false;
 
+            string tp = "highquality";
+            string tpstr = ((TextBlock)comboCacheRewardType.SelectionBoxItem).Text;
+            switch (tpstr)
+            {
+                case "优质": tp = "highquality"; break;
+                case "普通": tp = "special"; break;
+                default: tp = "highquality"; break;
+            }
+
             int cid = 0;
             string cur = ((TextBlock)comboCacheReward.SelectionBoxItem).Text;
             switch (cur)
@@ -617,7 +626,7 @@ namespace 百度经验个人助手
                 default: cid = 0; break;
             }
             listViewSearchExps.ItemsSource = ExpManager.rewardExps;
-            await UpdateReward(low, high, cid);
+            await UpdateReward(low, high, tp, cid);
             textRewardCacheState.Text = string.Format("√ 已获取 {0} 的 {1}~{2} 页", cur, low, high);
 
             buttonCacheReward.IsEnabled = true;
@@ -849,6 +858,13 @@ namespace 百度经验个人助手
         private void buttonRewardLink_Click(object sender, RoutedEventArgs e)
         {
             Launcher.LaunchUriAsync(new Uri(((RewardExpEntry)((Button)sender).DataContext).PageUrl));
+        }
+
+        private void buttonRewardGet_Click(object sender, RoutedEventArgs e)
+        {
+            string queryId = ((RewardExpEntry)((Button)sender).DataContext).QueryId;
+            
+
         }
 
         private void StackPanel_Loaded(object sender, RoutedEventArgs e)
@@ -1100,5 +1116,6 @@ namespace 百度经验个人助手
             }
             HideLoading();
         }
+
     }
 }

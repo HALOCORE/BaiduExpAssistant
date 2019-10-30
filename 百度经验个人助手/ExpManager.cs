@@ -34,15 +34,22 @@ namespace 百度经验个人助手
 
     public class RewardExpEntry
     {
-        public RewardExpEntry(string name, decimal money, string pageUrl)
+        public RewardExpEntry(string name, decimal money, string pageUrl, string queryId)
         {
             Name = name;
             Money = money;
             PageUrl = pageUrl;
+            QueryId = queryId;
         }
         public string Name { get; set; }
         public decimal Money { get; set; }
         public string PageUrl { get; set; }
+        public string QueryId { get; set; }
+        public string Info { get
+            {
+                return "ID: " + QueryId + " 链接: " + PageUrl;
+            }
+        }
     }
 
     
@@ -100,8 +107,8 @@ namespace 百度经验个人助手
         public static string regexContentExpVote = "<span class=\"vote-count\">(\\d*?)</span>";
         public static string regexContentExpCollect = "<span class=\"favc-count\">(\\d*?)</span>";
         public static string regexContentExpDate = "<span class=\"f-date\">(.*?)</span>";
-        public static string regexRewardExpAll = "<span class=\"cash\" style=\".*?\">¥(.*?)" + 
-                                                 "</span><a class=\"title query-item-id\" target=\"_blank\" data-queryId=\".*?\">(.*?)</a>";
+        public static string regexRewardExpAll = "<span class=\"cash\" style=\".*?\">¥(.*?)" +
+                                                 "</span><a class=\"title query-item-id\"[^<]*? data-queryId=\"(.*?)\">(.*?)</a>";
 
         public static string urlPrefix = "https://jingyan.baidu.com";
         public static string[] requiredCookieNames =
@@ -446,9 +453,9 @@ namespace 百度经验个人助手
         #endregion
 
         #region 悬赏
-        public static async Task CookielessGetReward(int cid, int pg)
+        public static async Task CookielessGetReward(string tp, int cid, int pg)
         {
-            htmlRewardCurrentUrl = "https://jingyan.baidu.com/patch?cid=" + cid + "&pn=" + pg * 15;
+            htmlRewardCurrentUrl = "https://jingyan.baidu.com/patch?tab=" + tp + "&cid=" + cid + "&pn=" + pg * 15;
 
             htmlRewardCurrentPage = await ExpManager.CookiedGetUrl(
                 htmlRewardCurrentUrl,
@@ -462,13 +469,23 @@ namespace 百度经验个人助手
             foreach(Match m in mc)
             {
                 rewardExps.Add(new RewardExpEntry(
-                    m.Groups[2].Value,
+                    m.Groups[3].Value,
                     decimal.Parse(m.Groups[1].Value),
-                    htmlRewardCurrentUrl
+                    htmlRewardCurrentUrl,
+                    m.Groups[2].Value
                     ));
             }
             if (mc.Count > 0) return true;
             return false;
+        }
+        public static async Task CookiedGetReward(string queryId)
+        {
+            if(isCookieValid == false)
+            {
+                await ShowMessageDialog("领取功能需要设置Cookie", "领取操作不仅需要悬赏令ID, 还需要您的BDUSS. 请先设置Cookie.");
+                return;
+            }
+            //TODO: 领取逻辑
         }
         #endregion
 
