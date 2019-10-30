@@ -552,18 +552,42 @@ namespace 百度经验个人助手
         public async Task UpdateReward(int pglow, int pghigh, string tp, int cid)
         {
             ExpManager.rewardExps.Clear();
-            for (int i = pglow; i <= pghigh; ++i)
+            for (int i = pglow; i <= pghigh; )
             {
+                Task<bool> Task0 = ExpManager.CookielessGetReward(tp, cid, i);
+                string cacheStateText = "正在获取页码: " + i;
+                i++;
+                Task<bool> Task1 = null;
+                Task<bool> Task2 = null;
+                if (i <= pghigh)
+                {
+                    Task1 = ExpManager.CookielessGetReward(tp, cid, i);
+                    cacheStateText += ", " + i;
+                    i++;
+                }
+                if (i <= pghigh)
+                {
+                    Task2 = ExpManager.CookielessGetReward(tp, cid, i);
+                    cacheStateText += ", " + i;
+                    i++;
+                }
+                textRewardCacheState.Text = cacheStateText;
 
-                textRewardCacheState.Text = "正在获取第 " + i + " 页...";
-                await ExpManager.CookielessGetReward(tp, cid, i);
-
-                if (!ExpManager.ParseReward())
+                if (!(await Task0))
+                {
+                    break;
+                }
+                if (Task1 != null && !(await Task1))
+                {
+                    break;
+                }
+                if (Task2 != null && !(await Task2))
                 {
                     break;
                 }
             }
             isCacheReward = true;
+            await ShowMessageDialog("悬赏获取", "共获取 " + ExpManager.rewardExps.Count + " 条.");
             ShowControls();
         }
 
@@ -597,6 +621,7 @@ namespace 百度经验个人助手
             buttonCacheRewardProgress.Visibility = Visibility.Visible;
             buttonCacheRewardText.Visibility = Visibility.Collapsed;
             comboCacheReward.IsEnabled = false;
+            comboCacheRewardType.IsEnabled = false;
             textCacheRewardFromTo.IsEnabled = false;
 
             string tp = "highquality";
@@ -634,6 +659,7 @@ namespace 百度经验个人助手
             buttonCacheRewardProgress.Visibility = Visibility.Collapsed;
             buttonCacheRewardText.Visibility = Visibility.Visible;
             comboCacheReward.IsEnabled = true;
+            comboCacheRewardType.IsEnabled = true;
             textCacheRewardFromTo.IsEnabled = true;
         }
 
@@ -860,11 +886,12 @@ namespace 百度经验个人助手
             Launcher.LaunchUriAsync(new Uri(((RewardExpEntry)((Button)sender).DataContext).PageUrl));
         }
 
-        private void buttonRewardGet_Click(object sender, RoutedEventArgs e)
+        private async void buttonRewardGet_Click(object sender, RoutedEventArgs e)
         {
             string queryId = ((RewardExpEntry)((Button)sender).DataContext).QueryId;
-            
-
+            ShowLoading("领取请求...");
+            await ExpManager.CookiedGetReward(queryId);
+            HideLoading();
         }
 
         private void StackPanel_Loaded(object sender, RoutedEventArgs e)

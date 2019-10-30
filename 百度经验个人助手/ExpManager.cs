@@ -70,16 +70,15 @@ namespace 百度经验个人助手
         public static string newMainIndexHuDong;
         public static string newMainExpCount;
         public static string newMainPortraitUrl;
+        public static string newMainBdStoken; // not show to users. for reward request.
+        public static string newMainBdstt; // not show to users. for reward request.
         public static BitmapImage newMainPortrait;
 
         public static DataPack currentDataPack; // mains are set but not used
         public static string[] htmlContentPages;
         public static ObservableCollection<ContentExpEntry> contentExpsSearched;
 
-        
 
-        public static string htmlRewardCurrentPage;
-        public static string htmlRewardCurrentUrl;
         public static ObservableCollection<RewardExpEntry> rewardExps;
         public static ObservableCollection<RewardExpEntry> rewardExpsSearched;
 
@@ -92,6 +91,14 @@ namespace 百度经验个人助手
             await msgDialog.ShowAsync();
         }
 
+        private static async Task ShowDetailedError(string title, Exception e)
+        {
+            await ShowMessageDialog(title,
+                        "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误类型：" + e.GetType() + "\n错误信息：" +
+                        e.Message + "\n"
+                        + "");
+        }
+
 
         #region 常量字符串
         public static string regexMainUserName = "title=\"进入我的名片页\" rel=\"nofollow\">\n(.*?)\n</a>";
@@ -102,6 +109,8 @@ namespace 百度经验个人助手
         public static string regexMainIndexHuDong = "<span class=\"interact-value value\" style=\".*?\">(.*?)</span>";
         public static string regexMainExpCount = "<span class=\"exp-num\">(.*?)</span>";
         public static string regexMainPortraitUrl = "<div class=\"portrait-cover\">\n</div>\n<img src=\"(.*?)\" alt=\"";
+        public static string regexMainBdStoken = "\"BdStoken\"[ \\s]*:[\\s]*\"([\\d\\w]+)\"";
+        public static string regexMainBdstt = "\"bdstt\"[ \\s]*:[\\s]*\"([\\d\\w]+)\"";
         public static string regexContentExpTitleAndUrl = "<a class=\"f14\" target=\"_blank\" title=\"(.*?)\" href=\"(.*?)\">";
         public static string regexContentExpView = "<span class=\"view-count\">(\\d*?)</span>";
         public static string regexContentExpVote = "<span class=\"vote-count\">(\\d*?)</span>";
@@ -234,6 +243,7 @@ namespace 百度经验个人助手
         }
         private static async Task<bool> GetMainSubStep_ParseMain()
         {
+            isCookieValid = false;
             Match matchUname = Regex.Match(htmlMain, regexMainUserName);
             if (matchUname.Groups[1].Value == "" || matchUname.Groups[1].Value == null)
             {
@@ -265,6 +275,13 @@ namespace 百度经验个人助手
             Match matchPUrl = Regex.Match(htmlMain, regexMainPortraitUrl);
             newMainPortraitUrl = matchPUrl.Groups[1].Value;
 
+            Match matchBdStoken = Regex.Match(htmlMain, regexMainBdStoken);
+            newMainBdStoken = matchBdStoken.Groups[1].Value;
+
+            Match matchBdstt = Regex.Match(htmlMain, regexMainBdstt);
+            newMainBdstt = matchBdstt.Groups[1].Value;
+
+            isCookieValid = true;
             return true;
         }
 
@@ -453,25 +470,26 @@ namespace 百度经验个人助手
         #endregion
 
         #region 悬赏
-        public static async Task CookielessGetReward(string tp, int cid, int pg)
+        public static async Task<bool> CookielessGetReward(string tp, int cid, int pg)
         {
-            htmlRewardCurrentUrl = "https://jingyan.baidu.com/patch?tab=" + tp + "&cid=" + cid + "&pn=" + pg * 15;
+            string rewardUrl = "https://jingyan.baidu.com/patch?tab=" + tp + "&cid=" + cid + "&pn=" + pg * 15;
 
-            htmlRewardCurrentPage = await ExpManager.CookiedGetUrl(
-                htmlRewardCurrentUrl,
+            string rewardPage = await ExpManager.CookiedGetUrl(
+                rewardUrl,
                 "https://jingyan.baidu.com/"
             );
+
+            return ParseReward(rewardPage, rewardUrl);
         }
-        public static bool ParseReward()
+        private static bool ParseReward(string html, string pageUrl)
         {
-            string html = htmlRewardCurrentPage;
             MatchCollection mc = Regex.Matches(html, regexRewardExpAll);
             foreach(Match m in mc)
             {
                 rewardExps.Add(new RewardExpEntry(
                     m.Groups[3].Value,
                     decimal.Parse(m.Groups[1].Value),
-                    htmlRewardCurrentUrl,
+                    pageUrl,
                     m.Groups[2].Value
                     ));
             }
@@ -480,12 +498,50 @@ namespace 百度经验个人助手
         }
         public static async Task CookiedGetReward(string queryId)
         {
-            if(isCookieValid == false)
+            if (isCookieValid == false)
             {
                 await ShowMessageDialog("领取功能需要设置Cookie", "领取操作不仅需要悬赏令ID, 还需要您的BDUSS. 请先设置Cookie.");
                 return;
             }
-            //TODO: 领取逻辑
+            HttpResponseMessage response = null;
+            try
+            {
+                string url = "https://jingyan.baidu.com/patchapi/claimQuery?queryId=" 
+                    + queryId + "&token=" + newMainBdStoken + "&timestamp=" + newMainBdstt;
+                HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
+                req.Headers.Referer = new Uri("https://jingyan.baidu.com/patch");
+                // ----- not working -----
+                //KeyValuePair<string, string>[] urlParams = {
+                //    new KeyValuePair<string, string>("queryId", queryId),
+                //    new KeyValuePair<string, string>("token", newMainBdStoken),
+                //    new KeyValuePair<string, string>("timestamp", newMainBdstt)
+                //};
+                //req.Content = new FormUrlEncodedContent(urlParams) as IHttpContent;
+                response = await client.SendRequestAsync(req);
+                string respstr = response.Content.ToString().Replace(" ", "");
+                if(respstr.IndexOf("\"errno\":0") >= 0)
+                {
+                    respstr = "成功领取。请在 个人中心->悬赏经验->已领取 查看。";
+                }
+                else if(respstr.IndexOf("\"errno\":302") >= 0)
+                {
+                    respstr = "你可能已经领取过经验。领取不成功(302)。";
+                }
+                else if (respstr.IndexOf("\"errno\":2") >= 0)
+                {
+                    respstr = "身份验证失败，如果确定Cookie设定有效，可告知开发者 wang1223989563。错误码:2";
+                }
+                else
+                {
+                    respstr = "未知错误类型 (非302或2错误。可告知开发者 wang1223989563) \n错误信息: " + respstr;
+                }
+                await ShowMessageDialog("领取结果", respstr);
+                req.Dispose();
+            }
+            catch (COMException e)
+            {
+                await ShowDetailedError("领取未成功", e);
+            }
         }
         #endregion
 
