@@ -897,8 +897,15 @@ namespace 百度经验个人助手
         {
             string queryId = ((RewardExpEntry)((Button)sender).DataContext).QueryId;
             ShowLoading("领取请求...");
-            await ExpManager.CookiedGetReward(queryId);
+            bool isEnterEdit = await ExpManager.CookiedGetReward(queryId);
             HideLoading();
+            if (isEnterEdit)
+            {
+                buttonCenter_Click(sender, e);
+                // await Task.Delay(300);
+                JSCodeString.planToGoUrl = "https://jingyan.baidu.com/edit/content?queryId=" + queryId;
+                buttonMainPage_Click(sender, e);
+            }
         }
 
         private void StackPanel_Loaded(object sender, RoutedEventArgs e)
@@ -916,6 +923,7 @@ namespace 百度经验个人助手
 
 
         #region Helper
+
         private void buttonBack_Click(object sender, RoutedEventArgs e)
         {
             gridSecond.Visibility = Visibility.Collapsed;
@@ -940,19 +948,6 @@ namespace 百度经验个人助手
             //allowedUris.Add(new Uri("https://jingyan.baidu.com/user/nuc/content?tab=exp&expType=draft"));
             //allowedUris.Add(new Uri("https://jingyan.baidu.com/edit/content"));
             //webViewMain.AllowedScriptNotifyUris = allowedUris;
-
-            webViewMain.ScriptNotify += (o, args) =>
-            {
-                if (args.Value.StartsWith("DATA: "))
-                {
-                    string jsonData = args.Value.Substring(6);
-                    StorageManager.SaveAutoCompleteData("", jsonData);
-                }
-                else
-                {
-                    ShowMessageDialog(o.ToString(), args.Value); 
-                }
-            };
         }
 
         private void buttonDraft_Click(object sender, RoutedEventArgs e)

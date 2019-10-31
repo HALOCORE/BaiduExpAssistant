@@ -13,9 +13,14 @@ namespace 百度经验个人助手
 {
     public static class JSCodeString
     {
+        #region Special Info During Navigation
+        public static bool isCookieInsertSucceed = false;
+        public static string planToGoUrl = "";
+        #endregion
+
         #region WebView Set
         //每当一个Navigation完成看是否是主页（插入Cookie).
-        private static async void InsertCookieAndRefresh(
+        private static async Task InsertCookieAndRefresh(
             WebView sender,
             WebViewNavigationCompletedEventArgs e)
         {
@@ -25,9 +30,11 @@ namespace 百度经验个人助手
                 + "script.text = url;\r\n"
                 + "document.body.appendChild(script);";
 
-
-            if (sender.Source.AbsoluteUri.EndsWith("jingyan.baidu.com/"))
+            // Utility.ShowMessageDialog("InsertCookieAndRefresh", sender.Source.AbsoluteUri);
+            if (sender.Source.AbsoluteUri.EndsWith("jingyan.baidu.com/") || sender.Source.AbsoluteUri.EndsWith("jingyan.baidu.com"))
             {
+                isCookieInsertSucceed = false; //assume false.
+
                 if (string.IsNullOrEmpty(ExpManager.newMainUserName))
                 {
                     Utility.ShowMessageDialog("请返回设置有效的Cookie（请勿在此登录）", "当前Cookie信息无效，无法保持登录。请返回设置Cookie。\n请勿在此登录！");
@@ -39,9 +46,13 @@ namespace 百度经验个人助手
                     {
                         "document.documentElement.outerHTML;"
                     });
-
-                if (curCookie.Contains(ExpManager.newMainUserName)) return;
-
+                
+                if (curCookie.Contains(ExpManager.newMainUserName))
+                {
+                    isCookieInsertSucceed = true;
+                    App.currentMainPage.WebSetUpdate(true, true, true, true);
+                    return;
+                }
 
 
                 App.currentMainPage.ShowLoading("添加Cookie...");
@@ -65,9 +76,9 @@ namespace 百度经验个人助手
                 await sender.InvokeScriptAsync("eval", new string[] { js });
 
                 //相当于刷新页面了。e是事件参数。
+                // still assume isCookieInsertSucceed = false. 
+                // Make judgement when navigation complete and enter this function again
                 sender.Navigate(e.Uri);
-
-                App.currentMainPage.WebSetUpdate(true, true, true, true);
             }
 
 
@@ -77,10 +88,22 @@ namespace 百度经验个人助手
         public static void SetWebView(WebView webView)
         {
 
-            webView.NavigationCompleted += (view, args) =>
+            webView.NavigationCompleted += async (view, args) =>
             {
                 App.currentMainPage.HideLoading();
-                InsertCookieAndRefresh(view, args);
+                await InsertCookieAndRefresh(view, args);
+
+                // if plan to go somewhere, go. Currently include [the reward edit page]
+                // await Utility.ShowMessageDialog("debug: " + isCookieInsertSucceed.ToString(), planToGoUrl);
+                if (isCookieInsertSucceed && planToGoUrl != "")
+                {
+                    string url = planToGoUrl;
+                    planToGoUrl = "";
+                    App.currentMainPage.ShowLoading("前往 " + url + " ... ");
+                    webView.Navigate(new Uri(url));
+                }
+                
+                
             };
 
 
@@ -93,6 +116,20 @@ namespace 百度经验个人助手
 
 
                 ((WebView)sender).NavigateWithHttpRequestMessage(req);
+            };
+
+            webView.ScriptNotify += (o, args) =>
+            {
+                if (args.Value.StartsWith("DATA: "))
+                {
+                    string jsonData = args.Value.Substring(6);
+                    StorageManager.SaveAutoCompleteData("", jsonData);
+                    //Utility.ShowMessageDialog(o.ToString(), args.Value);
+                }
+                else
+                {
+                    Utility.ShowMessageDialog(o.ToString(), args.Value);
+                }
             };
         }
 

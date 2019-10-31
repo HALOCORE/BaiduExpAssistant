@@ -496,12 +496,12 @@ namespace 百度经验个人助手
             if (mc.Count > 0) return true;
             return false;
         }
-        public static async Task CookiedGetReward(string queryId)
+        public static async Task<bool> CookiedGetReward(string queryId)
         {
             if (isCookieValid == false)
             {
                 await ShowMessageDialog("领取功能需要设置Cookie", "领取操作不仅需要悬赏令ID, 还需要您的BDUSS. 请先设置Cookie.");
-                return;
+                return false;
             }
             HttpResponseMessage response = null;
             try
@@ -519,13 +519,16 @@ namespace 百度经验个人助手
                 //req.Content = new FormUrlEncodedContent(urlParams) as IHttpContent;
                 response = await client.SendRequestAsync(req);
                 string respstr = response.Content.ToString().Replace(" ", "");
-                if(respstr.IndexOf("\"errno\":0") >= 0)
+                bool isGetSucceed = false;
+                if (respstr.IndexOf("\"errno\":0") >= 0)
                 {
                     respstr = "成功领取。请在 个人中心->悬赏经验->已领取 查看。";
+                    isGetSucceed = true;
                 }
                 else if(respstr.IndexOf("\"errno\":302") >= 0)
                 {
                     respstr = "你可能已经领取过经验。领取不成功(302)。";
+                    //isGetSucceed = true;
                 }
                 else if (respstr.IndexOf("\"errno\":2") >= 0)
                 {
@@ -537,10 +540,12 @@ namespace 百度经验个人助手
                 }
                 await ShowMessageDialog("领取结果", respstr);
                 req.Dispose();
+                return isGetSucceed;
             }
             catch (COMException e)
             {
                 await ShowDetailedError("领取未成功", e);
+                return false;
             }
         }
         #endregion
