@@ -317,7 +317,7 @@ namespace 百度经验个人助手
             textVisitAll.Text = "总浏览：" + ExpManager.currentDataPack.contentExpsViewSum;
             textVoteAll.Text = "总投票：" + ExpManager.currentDataPack.contentExpsVoteSum;
             textCollectAll.Text = "总收藏：" + ExpManager.currentDataPack.contentExpsCollectSum;
-            textVisitRecent20.Text = "近20篇：" + ExpManager.currentDataPack.contentExpsView20;
+            textVisitRecent20.Text = "近20篇浏览：" + ExpManager.currentDataPack.contentExpsView20;
         }
 
         /// <summary>
@@ -674,6 +674,9 @@ namespace 百度经验个人助手
             string order;
             switch (((TextBlock)comboSearchOrderType.SelectionBoxItem).Text)
             {
+                case "最佳匹配":
+                    order = "match";
+                    break;
                 case "最高浏览量":
                     order = "view";
                     break;
@@ -714,6 +717,9 @@ namespace 百度经验个人助手
             string order;
             switch (((TextBlock)comboSearchRewardOrderType.SelectionBoxItem).Text)
             {
+                case "最佳匹配":
+                    order = "match";
+                    break;
                 case "最高赏金":
                     order = "money";
                     break;
@@ -723,7 +729,7 @@ namespace 百度经验个人助手
                 case "最靠前":
                     order = "new";
                     break;
-                default: order = "new"; break;
+                default: order = "match"; break;
             }
 
             int count;
@@ -837,6 +843,7 @@ namespace 百度经验个人助手
                 secondChart.DataSource = data;
                 listViewContentExps.ItemsSource = null;
                 listViewContentExps.ItemsSource = ExpManager.currentDataPack.contentExps;
+                textVisitAllIncrease.Text = "总浏览增量：" + (ExpManager.currentDataPack.contentExpsViewSum - StatManager.LastDateDataPack.contentExpsViewSum).ToString();
             }
             //buttonStatistic.IsEnabled = true;
         }

@@ -350,9 +350,10 @@
                     </Storyboard>
                 </StackPanel.Resources>
                 <TextBlock FontSize="24" x:Name="textVisitAll" Margin="20,5,20,5">未更新</TextBlock>
-                <TextBlock FontSize="20" x:Name="textVisitRecent20" Margin="20,5,20,5">近20篇: -</TextBlock>
-                <TextBlock FontSize="20" x:Name="textVoteAll" Margin="20,5,20,5">总投票: -</TextBlock>
-                <TextBlock FontSize="20" x:Name="textCollectAll" Margin="20,5,20,5">总收藏: -</TextBlock>
+                <TextBlock FontSize="18" x:Name="textVisitAllIncrease" Margin="20,5,20,5">总浏览增量: -</TextBlock>
+                <TextBlock FontSize="18" x:Name="textVisitRecent20" Margin="20,5,20,5">近20篇浏览: -</TextBlock>
+                <TextBlock FontSize="18" x:Name="textVoteAll" Margin="20,5,20,5">总投票: -</TextBlock>
+                <TextBlock FontSize="18" x:Name="textCollectAll" Margin="20,5,20,5">总收藏: -</TextBlock>
                 <Button x:Name="buttonOpenFolder" Padding="0" 
                     Margin="20,5,20,5" Click="buttonOpenFolder_Click"
                     BorderThickness="0">
@@ -411,7 +412,12 @@
                     </qc:SerialChart.Graphs>
                 </qc:SerialChart>
                 <StackPanel x:Name="StackPanelStatCover" Margin="0,40,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Opacity="0.7">
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="26">
+                    <StackPanel.Resources>
+                        <Storyboard x:Name="DataAnalysisHintStoryboard" >
+                            <DoubleAnimation Duration="0:0:1.2" From="0.3" To="1" RepeatBehavior="Forever" AutoReverse="True" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="textDataAnalysisHint" ></DoubleAnimation>
+                        </Storyboard>
+                    </StackPanel.Resources>
+                    <TextBlock x:Name="textDataAnalysisHint" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="26">
                         点击数据分析</TextBlock>
                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="22" Opacity="0.7">
                         计算浏览量增量</TextBlock>
@@ -445,7 +451,10 @@
                                 <ColumnDefinition Width="1*"/>
                             </Grid.ColumnDefinitions>
                             <ComboBox x:Name="comboSearchOrderType" 
-                                  Grid.Column="0" SelectedIndex="0" HorizontalAlignment="Stretch">
+                                  Grid.Column="0" SelectedIndex="1" HorizontalAlignment="Stretch">
+                                <ComboBoxItem>
+                                    <TextBlock FontSize="10">最佳匹配</TextBlock>
+                                </ComboBoxItem>
                                 <ComboBoxItem>
                                     <TextBlock FontSize="10">最高浏览量</TextBlock>
                                 </ComboBoxItem>
@@ -489,6 +498,9 @@
                             </Grid.ColumnDefinitions>
                             <ComboBox x:Name="comboSearchRewardOrderType"
                             Grid.Column="0" SelectedIndex="0" HorizontalAlignment="Stretch">
+                                <ComboBoxItem>
+                                    <TextBlock FontSize="10">最佳匹配</TextBlock>
+                                </ComboBoxItem>
                                 <ComboBoxItem>
                                     <TextBlock FontSize="10">最高赏金</TextBlock>
                                 </ComboBoxItem>

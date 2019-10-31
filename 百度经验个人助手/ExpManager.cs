@@ -574,6 +574,19 @@ namespace 百度经验个人助手
             {
                 //Do Nothing
             }
+            else if(order == "match")
+            {
+                Func<ContentExpEntry, int> sorter = (t) =>
+                {
+                    int matchCount = 0;
+                    foreach (string s in spieces)
+                    {
+                        if (t.ExpName.ToUpper().Contains(s)) matchCount += 1;
+                    }
+                    return (-matchCount);
+                };
+                ic = ic.OrderBy(sorter);
+            }
 
             contentExpsSearched.Clear();
 
@@ -605,11 +618,24 @@ namespace 百度经验个人助手
 
             if (order == "money")
                 ic = ic.OrderBy(t => -t.Money);
-            if (order == "short")
+            else if (order == "short")
                 ic = ic.OrderBy(t => t.Name.Length);
             else if (order == "new")
             {
                 //Do Nothing
+            }
+            else if(order == "match")
+            {
+                Func<RewardExpEntry, int> sorter = (t) =>
+                {
+                    int matchCount = 0;
+                    foreach (string s in spieces)
+                    {
+                        if (t.Name.ToUpper().Contains(s)) matchCount += 1;
+                    }
+                    return (- matchCount);
+                };
+                ic = ic.OrderBy(sorter);
             }
 
             rewardExpsSearched.Clear();
