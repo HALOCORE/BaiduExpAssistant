@@ -660,6 +660,22 @@ namespace 百度经验个人助手
 
         #endregion
 
+        private static void setVerifying(bool val)
+        {
+            if(val == true)
+            {
+                isVerifying = true; 
+                App.currentMainPage.ShowLoading("Verifying...");
+                Debug.WriteLine("# first task set isVerifying = true");
+            }
+            else
+            {
+                isVerifying = false;
+                App.currentMainPage.HideLoading();
+                Debug.WriteLine("# first task set isVerifying = false");
+            }
+        }
+
         //prepared private
         public static async Task<string> SimpleRequestUrl(string url, string referrer, string method="GET", bool thisVerifying=false)
         {
@@ -705,9 +721,8 @@ namespace 百度经验个人助手
                     {
                         if (!isVerifying || thisVerifying) // ------ first task will enter this and keep enter this until verified. ------
                         {
-                            isVerifying = true; // set verifying state.
-                            App.currentMainPage.ShowLoading("Verifying...");
-                            Debug.WriteLine("# first task set isVerifying = true");
+
+                            setVerifying(true); // set verifying state.
 
                             string verifyResp = "";
                             while (!verifyResp.Replace(" ", "").Contains("{\"errno\":0"))
@@ -717,7 +732,8 @@ namespace 百度经验个人助手
                                 var result = await authDialog.ShowAsync();
                                 if (result == ContentDialogResult.Primary || result == ContentDialogResult.None)
                                 {
-                                    return await SimpleRequestUrl(url, referrer, method, true);
+                                    setVerifying(false); // just believe users choice for now. if not working, another task might back to verifying state.
+                                    return await SimpleRequestUrl(url, referrer, method);
                                 }
                                 else if (result == ContentDialogResult.Secondary)
                                 {
@@ -726,9 +742,8 @@ namespace 百度经验个人助手
                                 }
                             }
                             await ShowMessageDialog("验证通过", "确定以继续.");
-                            isVerifying = false; // if succeed, cancel verifying state.
-                            App.currentMainPage.HideLoading();
-                            Debug.WriteLine("# first task set isVerifying = false");
+
+                            setVerifying(false); // if succeed, cancel verifying state.
                             return await SimpleRequestUrl(url, referrer, method);
                         }
                         else   //  ---------------------- other task will wait until the verifying thread finish. ----------------------
