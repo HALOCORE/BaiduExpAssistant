@@ -572,7 +572,7 @@
                                     <TextBlock FontSize="10">时尚</TextBlock>
                                 </ComboBoxItem>
                             </ComboBox>
-                            <TextBox x:Name="textCacheRewardFromTo" Foreground="AliceBlue" FontSize="14" MinWidth="50" Text="0-2" Height="12" Padding="4,3,4,5">
+                            <TextBox x:Name="textCacheRewardFromTo" Foreground="AliceBlue" FontSize="14" MinWidth="50" Text="0-100" Height="12" Padding="4,3,4,5">
 
                             </TextBox>
                             <Button x:Name="buttonCacheReward" FontSize="14" Foreground="WhiteSmoke"
@@ -598,8 +598,8 @@
                             <Setter Property="Foreground" Value="DimGray"></Setter>
                         </Style>
                     </StackPanel.Resources>
-                    <TextBlock FontSize="30" Margin="10">搜索悬赏请先设置</TextBlock>
-                    <TextBlock FontSize="20" Margin="10">获取按钮左边文本框输入起止页数</TextBlock>
+                    <TextBlock FontSize="30" Margin="10">搜索悬赏请先获取</TextBlock>
+                    <TextBlock FontSize="20" Margin="10">"获取"按钮左边文本框输入起止页数</TextBlock>
                     <TextBlock FontSize="20" Margin="10">举例：10-100表示10~100页</TextBlock>
                     <TextBlock FontSize="30" Margin="10">搜索多个关键词空格隔开</TextBlock>
                     <TextBlock FontSize="30" Margin="10">最后点击悬赏搜索</TextBlock>

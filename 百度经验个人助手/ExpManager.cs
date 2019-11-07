@@ -27,6 +27,7 @@ using HttpClient = Windows.Web.Http.HttpClient;
 using HttpMethod = Windows.Web.Http.HttpMethod;
 using HttpRequestMessage = Windows.Web.Http.HttpRequestMessage;
 using HttpResponseMessage = Windows.Web.Http.HttpResponseMessage;
+using System.Threading;
 
 namespace 百度经验个人助手
 {
@@ -56,6 +57,7 @@ namespace 百度经验个人助手
     public static class ExpManager
     {
         public static bool isCookieValid = false;
+        public static bool isVerifying = false;
 
         public static string cookie;
         public static HttpClient client;
@@ -196,7 +198,7 @@ namespace 百度经验个人助手
 
         private static async Task GetMainSubStep_CookiedGetMain()
         {
-            htmlMain = await ExpManager.CookiedGetUrl(
+            htmlMain = await ExpManager.SimpleRequestUrl(
                 "https://jingyan.baidu.com/user/nuc",
                 "https://jingyan.baidu.com/"
             );
@@ -209,7 +211,15 @@ namespace 百度经验个人助手
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, myUri);
             req.Headers.Host = new HostName(myUri.Host);
             req.Headers.Cookie.Clear();
-            HttpResponseMessage response = await client.SendRequestAsync(req);
+            HttpResponseMessage response = null;
+            try
+            {
+                response = await client.SendRequestAsync(req);
+            }
+            catch(COMException e)
+            {
+                //do nothing
+            }
 
             if (response == null)
             {
@@ -289,14 +299,8 @@ namespace 百度经验个人助手
         {
             await GetMainSubStep_CookiedGetMain();
             if (!await GetMainSubStep_ParseMain()) return false; //parse error
-            try
-            {
-                newMainPortrait = await GetMainSubStep_CookielessGetPic(newMainPortraitUrl);
-            }
-            catch (Exception)
-            {
-                await ShowMessageDialog("获取信息成功，但是无法获取用户头像。", "非关键问题，可以联系开发者寻求解决办法。"); 
-            }
+
+            newMainPortrait = await GetMainSubStep_CookielessGetPic(newMainPortraitUrl); //possible to be NULL, but MainPage will handle this.
             return true;
         }
 
@@ -338,7 +342,7 @@ namespace 百度经验个人助手
         //private static string thread4Ret;
         private static async Task GetContentsSubStep_CookiedGetContentPage(int pg, int threadID)
         {
-            string result = await ExpManager.CookiedGetUrl(
+            string result = await ExpManager.SimpleRequestUrl(
                 "https://jingyan.baidu.com/user/nucpage/content?tab=exp&expType=published&pn=" + pg * 20,
                 "https://jingyan.baidu.com/user/nuc"
             );
@@ -474,7 +478,7 @@ namespace 百度经验个人助手
         {
             string rewardUrl = "https://jingyan.baidu.com/patch?tab=" + tp + "&cid=" + cid + "&pn=" + pg * 15;
 
-            string rewardPage = await ExpManager.CookiedGetUrl(
+            string rewardPage = await ExpManager.SimpleRequestUrl(
                 rewardUrl,
                 "https://jingyan.baidu.com/"
             );
@@ -657,75 +661,112 @@ namespace 百度经验个人助手
         #endregion
 
         //prepared private
-        public static async Task<string> CookiedGetUrl(string url, string referrer)
+        public static async Task<string> SimpleRequestUrl(string url, string referrer, string method="GET", bool thisVerifying=false)
         {
             HttpResponseMessage response = null;
             try
             {
-                HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, new Uri(url));
+                HttpRequestMessage req = null;
+                if (method == "GET")
+                {
+                    req = new HttpRequestMessage(HttpMethod.Get, new Uri(url));
+                }
+                else
+                {
+                    req = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
+                }
                 req.Headers.Referer = new Uri(referrer);
                 response = await client.SendRequestAsync(req);
                 req.Dispose();
+
+                
+                if (response.StatusCode != HttpStatusCode.Ok)
+                {
+                    await ShowMessageDialog("意外情况，返回状态不是200 OK", "返回状态: " + response.StatusCode.ToString() + "\n请向开发者（1223989563@qq.com）反映.");
+                }
+
+                IHttpContent icont = response.Content;
+                IInputStream istream = await icont.ReadAsInputStreamAsync();
+
+                StreamReader reader = new StreamReader(istream.AsStreamForRead(), Encoding.UTF8);
+                string content = reader.ReadToEnd();
+                reader.Dispose();
+                istream.Dispose();
+                icont.Dispose();
+                response.Dispose();
+
+                return content;
             }
             catch (COMException e)
             {
                 if ((uint)e.HResult == 0x80072f76)
                 {
-                    await ShowMessageDialog("可能是被验证码阻挡。",
-                        "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误类型：" + e.GetType() + "\n错误信息：" +
+                    if (e.Message.Contains("邮件标头") || e.Message.ToUpper().Contains("REQUESTED HEADER"))
+                    {
+                        if (!isVerifying || thisVerifying) // ------ first task will enter this and keep enter this until verified. ------
+                        {
+                            isVerifying = true; // set verifying state.
+                            App.currentMainPage.ShowLoading("Verifying...");
+                            Debug.WriteLine("# first task set isVerifying = true");
+
+                            string verifyResp = "";
+                            while (!verifyResp.Replace(" ", "").Contains("{\"errno\":0"))
+                            {
+                                var authDialog = new ContentAuthenticationDialog();
+                                authDialog.imageUrl = "https://jingyan.baidu.com/common/getVerifyCaptcha?t=" + DateTime.UtcNow.Ticks.ToString();
+                                var result = await authDialog.ShowAsync();
+                                if (result == ContentDialogResult.Primary || result == ContentDialogResult.None)
+                                {
+                                    return await SimpleRequestUrl(url, referrer, method, true);
+                                }
+                                else if (result == ContentDialogResult.Secondary)
+                                {
+                                    string vurl = "https://jingyan.baidu.com/submit/antispam?method=verify&vcode=" + authDialog.verifyKey;
+                                    verifyResp = await SimpleRequestUrl(vurl, referrer, "POST", true);
+                                }
+                            }
+                            await ShowMessageDialog("验证通过", "确定以继续.");
+                            isVerifying = false; // if succeed, cancel verifying state.
+                            App.currentMainPage.HideLoading();
+                            Debug.WriteLine("# first task set isVerifying = false");
+                            return await SimpleRequestUrl(url, referrer, method);
+                        }
+                        else   //  ---------------------- other task will wait until the verifying thread finish. ----------------------
+                        {
+                            Debug.WriteLine("# Thread start waiting. Failed url is: " + url);
+                            while(isVerifying) await Task.Delay(500);
+                            Debug.WriteLine("# Thread waiting done. retry url: " + url);
+                            return await SimpleRequestUrl(url, referrer, method);
+                        }
+                    }
+                    await ShowMessageDialog("可能是被验证码阻挡，也可能是其它网络问题，程序结束。",
+                        "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误信息：\n\n" +
                         e.Message + "\n"
-                        + "如果是验证码问题，请不要立即点确定。请先打开浏览器，输入验证码。");
-
-                    await ShowMessageDialog("提示", "如果已经输入验证码，可以确认继续；\n如果发现Cookie已失效，继续并稍后以重新设置Cookie");
-
+                        + "如果是验证码问题，请先打开浏览器，输入验证码，稍后再打开本程序。\n验证码问题在中文版系统中已修复，因此这条消息不该看到。开发者需要知道您的错误信息（1223989563@qq.com）");
+                    Application.Current.Exit();
                 }
-                try
+                else if ((uint)e.HResult == 0x80072efd)
                 {
-                    HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, new Uri(url));
-                    req.Headers.Referer = new Uri(referrer);
-                    response = await client.SendRequestAsync(req);
-                    req.Dispose();
+                    await ShowMessageDialog("80072efd，系统网络故障，程序结束。",
+                        "\n错误信息：\n\n" + e.Message + "\n请百度80072efd寻找解决办法。该故障和系统网络设置有关。");
+                    Application.Current.Exit();
                 }
-                catch (COMException e2)
+                else if ((uint)e.HResult == 0x80072eff)
                 {
-                    if ((uint)e2.HResult == 0x80072f76)
-                    {
-                        await ShowMessageDialog("错误未解决。",
-                            "错误类型：" + e2.GetType() + "\n错误信息：" + e2.Message + "\n持续网络故障。为避免故障扩大，程序将结束。可检查网络/jingyan.baidu.com，稍后再启动。");
-                        Application.Current.Exit();
-                    }
-                    if ((uint)e2.HResult == 0x80072efd)
-                    {
-                        await ShowMessageDialog("错误未解决。80072efd，系统网络故障",
-                            "错误类型：" + e2.GetType() + "\n错误信息：" + e2.Message + "\n请百度80072efd寻找解决办法。该故障和系统网络设置有关。可能是被国产安全软件乱优化造成。\n持续网络故障。为避免故障扩大，程序将结束。可检查网络，稍后再启动。");
-                        Application.Current.Exit();
-                    }
-                    client.Dispose();
-                    await ShowMessageDialog("未知故障。可能是网络问题", "错误类型：" + e2.GetType() + "\n错误信息：" + e2.Message);
-                    throw new COMException(e2.Message);
+                    await ShowMessageDialog("80072eff，网络正常，请求超时（服务器不可达）",
+                        "请确认能够访问 jingyan.baidu.com，关闭此对话框会重试失败的请求。\n错误信息：\n\n" + e.Message);
+                    return await SimpleRequestUrl(url, referrer, method);
                 }
+
+                await ShowMessageDialog("网络故障，错误信息请留意", "关闭此提示框，程序收集错误信息后自动结束。\n错误信息：\n\n" + e.Message);
+                throw e;
             }
 
-            if (response == null)
+            if(response == null)
             {
-                return "RESPONSE NULL";
+                await ShowMessageDialog("未解决故障", "网络请求失败. 关闭此此提示框，程序收集错误信息后自动结束。");
+                throw new IOException("Get No Response.");
             }
-            
-            if (response.StatusCode != HttpStatusCode.Ok)
-            {
-                return response.StatusCode.ToString();
-            }
-            IHttpContent icont = response.Content;
-            IInputStream istream = await icont.ReadAsInputStreamAsync();
-
-            StreamReader reader = new StreamReader(istream.AsStreamForRead(), Encoding.UTF8);
-            string content = reader.ReadToEnd();
-            reader.Dispose();
-            istream.Dispose();
-            icont.Dispose();
-            response.Dispose();
-
-            return content;
         }
 
         public static async Task<string> CookiedPostForm(string url, string referrer, KeyValuePair<string,string>[] keyValues)

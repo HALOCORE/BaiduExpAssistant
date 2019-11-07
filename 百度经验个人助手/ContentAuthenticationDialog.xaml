@@ -7,18 +7,19 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title=""
-    PrimaryButtonText="进入开发者模式"
-    SecondaryButtonText="取消"
+    PrimaryButtonText="重试 (我已验证通过)"
+    SecondaryButtonText="验证"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
     RequestedTheme="Dark" Loaded="ContentDialog_Loaded"
     >
 
-    <Grid Width="400" Height="150">
+    <Grid Width="400" Height="180">
         <StackPanel>
-            <TextBlock Margin="5">百度ID:</TextBlock>
-            <TextBox Margin="5" x:Name="textId" IsReadOnly="True"></TextBox>
-            <TextBlock Margin="5">Key:</TextBlock>
+            <TextBlock Margin="5">请输入验证码</TextBlock>
+            <Image x:Name="verifyImage" Height="70">
+            </Image>
+            <TextBlock Margin="5">验证码:</TextBlock>
             <TextBox Margin="5" x:Name="textKey" TextChanged="textKey_TextChanged"></TextBox>
         </StackPanel>
     </Grid>

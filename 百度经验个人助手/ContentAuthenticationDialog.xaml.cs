@@ -11,6 +11,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 // “内容对话框”项模板在 http://go.microsoft.com/fwlink/?LinkId=234238 上进行了说明
@@ -32,16 +33,17 @@ namespace 百度经验个人助手
         {
         }
 
-        public string inputKey;
+        public string imageUrl;
+        public string verifyKey;
 
         private void ContentDialog_Loaded(object sender, RoutedEventArgs e)
         {
-            textId.Text = ExpManager.currentDataPack.mainUserName;
+            verifyImage.Source = new BitmapImage(new Uri(imageUrl));
         }
 
         private void textKey_TextChanged(object sender, TextChangedEventArgs e)
         {
-            inputKey = textKey.Text;
+            verifyKey = textKey.Text;
         }
     }
 }

@@ -111,14 +111,14 @@ namespace 百度经验个人助手
 
             ShowLoading("读取设置...");
             bool isSettingsRead = await StorageManager.ReadSettings();
-            if (StorageManager.AppSettings.isFirstIn || StorageManager.AppSettings.version != "1.4.3")
+            if (StorageManager.AppSettings.isFirstIn || StorageManager.AppSettings.version != "1.4.6")
             {
                 ContentNewDialog cnd = new ContentNewDialog();
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
                 if (cdr2 == ContentDialogResult.Secondary)
                 {
                     StorageManager.AppSettings.isFirstIn = false;
-                    StorageManager.AppSettings.version = "1.4.3";
+                    StorageManager.AppSettings.version = "1.4.6";
                 }
                 ShowLoading("更新设置...");
                 
@@ -187,7 +187,7 @@ namespace 百度经验个人助手
             HelpStoryboard.Begin();
             OpenFolderStoryboard.Begin();
 
-            ShowLoading("读取Cookie...");
+            ShowLoading("读取Cookie..."); //TODO: 这里有一个cookie文件损坏就一直读取的bug. 修一下.
             string cookieGet = await StorageManager.GetCookieTry();
             if (cookieGet != null)
             {
@@ -381,16 +381,9 @@ namespace 百度经验个人助手
         /// <returns>Cookie是否成功使用</returns>
         public async Task<bool> UpdateMain()
         {
-            try
-            {
-                ShowLoading("联网获取个人主页...");
-                if (!await ExpManager.GetMain()) return false;
-            }
-            catch (Exception e)
-            {
-                await ShowMessageDialog("程序出错. 可能是没有网络。","异常代码: " + string.Format("{0:X}",e.HResult) + "\n描述信息" + e.Message);
-                App.Current.Exit();
-            }
+            ShowLoading("联网获取个人主页...");
+            if (!await ExpManager.GetMain()) return false;
+            
             ShowLoading("读取个人上次数据...");
             await UpdateMainSubStep_InitDataPacks();
             HideLoading();
@@ -608,9 +601,9 @@ namespace 百度经验个人助手
                 Int32.TryParse(ss[0], out high);
             }
             if (low < 0) low = 0;
-            if (high - low > 300)
+            if (high - low > 1000)
             {
-                await ShowMessageDialog("Warning", "一次超过300页耗时过长，而且总共满400页会要求输入验证码。\n请保证获取页数小于300。程序若闪退请打开网页输入验证码。");
+                await ShowMessageDialog("Warning", "页数过多，需要输入很多次验证码. 请降低页数");
                 return;
             }
 
