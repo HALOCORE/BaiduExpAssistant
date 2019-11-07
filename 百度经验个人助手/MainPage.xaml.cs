@@ -111,14 +111,14 @@ namespace 百度经验个人助手
 
             ShowLoading("读取设置...");
             bool isSettingsRead = await StorageManager.ReadSettings();
-            if (StorageManager.AppSettings.isFirstIn || StorageManager.AppSettings.version != "1.4.6")
+            if (StorageManager.AppSettings.isFirstIn || StorageManager.AppSettings.version != "1.4.9")
             {
                 ContentNewDialog cnd = new ContentNewDialog();
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
                 if (cdr2 == ContentDialogResult.Secondary)
                 {
                     StorageManager.AppSettings.isFirstIn = false;
-                    StorageManager.AppSettings.version = "1.4.6";
+                    StorageManager.AppSettings.version = "1.4.9";
                 }
                 ShowLoading("更新设置...");
                 
@@ -186,6 +186,7 @@ namespace 百度经验个人助手
             ShowControls(); 
             HelpStoryboard.Begin();
             OpenFolderStoryboard.Begin();
+            DataAnalysisHintStoryboard.Begin();
 
             ShowLoading("读取Cookie..."); //TODO: 这里有一个cookie文件损坏就一直读取的bug. 修一下.
             string cookieGet = await StorageManager.GetCookieTry();
@@ -317,7 +318,7 @@ namespace 百度经验个人助手
             textVisitAll.Text = "总浏览：" + ExpManager.currentDataPack.contentExpsViewSum;
             textVoteAll.Text = "总投票：" + ExpManager.currentDataPack.contentExpsVoteSum;
             textCollectAll.Text = "总收藏：" + ExpManager.currentDataPack.contentExpsCollectSum;
-            textVisitRecent20.Text = "近20篇浏览：" + ExpManager.currentDataPack.contentExpsView20;
+            //textVisitRecent20.Text = "近20篇浏览：" + ExpManager.currentDataPack.contentExpsView20;
         }
 
         /// <summary>
@@ -794,7 +795,8 @@ namespace 百度经验个人助手
             isThisTimeAnalysed = true;
             ShowControls();
 
-            mainChart.DataSource = ExpManager.currentDataPack.contentExps;
+            StatManager.CondenseExps(ExpManager.currentDataPack.contentExps);
+            mainChart.DataSource = StatManager.CondensedExps;
             secondChart.Visibility = Visibility.Collapsed;
             mainChart.Visibility = Visibility.Visible;
             StackPanelStatCover.Visibility = Visibility.Collapsed;
@@ -817,7 +819,9 @@ namespace 百度经验个人助手
                 return;
             }
 
+            ShowLoading("读取文件...");
             StatManager.DataPacksSelected = await StorageManager.ReadHistoryDataPacks(sdf.selectedFiles);
+            HideLoading();
 
             if (StatManager.LastDateDataPack != null)
             {
@@ -825,18 +829,36 @@ namespace 百度经验个人助手
                 {
                     await ShowMessageDialog("选择今天的数据可能使分析无效", "您选择的历史数据是今天的数据。可能得到全0的作差结果。");
                 }
+                ShowLoading("计算中...");
                 await StatManager.Calc(StatManager.LastDateDataPack.contentExps,
                     ExpManager.currentDataPack.contentExps);
                 data = StatManager.DeltaExps;
+                HideLoading();
             }
-            if (data != null)
+            if (data != null) //to check if calc is done.
             {
                 secondChart.Visibility = Visibility.Visible;
                 mainChart.Visibility = Visibility.Collapsed;
-                secondChart.DataSource = data;
+
+                StatManager.CondenseDeltaExps();
+                secondChart.DataSource = StatManager.CondensedDeltaExps;
+
                 listViewContentExps.ItemsSource = null;
                 listViewContentExps.ItemsSource = ExpManager.currentDataPack.contentExps;
                 textVisitAllIncrease.Text = "总浏览增量：" + (ExpManager.currentDataPack.contentExpsViewSum - StatManager.LastDateDataPack.contentExpsViewSum).ToString();
+
+                StatManager.CalcDeltaExpsRecentAverage(50);
+                textVisitRecent20.Text = "近50篇平均增量：" + StatManager.DeltaExpsRecentAverage.ToString("F2");
+                try
+                {
+                    StatManager.CalcDeltaExpsOneYearIncrease();
+                    textVisitOneYearIncrease.Text = "一年内经验增量：" + StatManager.DeltaExpsOneYearInc;
+                }
+                catch(Exception e)
+                {
+                    await ShowMessageDialog("计算一年内浏览增量失败", "可通知开发者 1223989563@qq.com");
+                }
+                UpdateTile();
             }
             //buttonStatistic.IsEnabled = true;
         }

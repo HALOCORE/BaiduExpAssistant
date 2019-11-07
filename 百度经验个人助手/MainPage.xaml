@@ -350,10 +350,11 @@
                     </Storyboard>
                 </StackPanel.Resources>
                 <TextBlock FontSize="24" x:Name="textVisitAll" Margin="20,5,20,5">未更新</TextBlock>
-                <TextBlock FontSize="18" x:Name="textVisitAllIncrease" Margin="20,5,20,5">总浏览增量: -</TextBlock>
-                <TextBlock FontSize="18" x:Name="textVisitRecent20" Margin="20,5,20,5">近20篇浏览: -</TextBlock>
-                <TextBlock FontSize="18" x:Name="textVoteAll" Margin="20,5,20,5">总投票: -</TextBlock>
-                <TextBlock FontSize="18" x:Name="textCollectAll" Margin="20,5,20,5">总收藏: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textVisitAllIncrease" Margin="22,3,20,3" Foreground="LightGray">总浏览增量: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textVisitOneYearIncrease" Margin="22,3,20,3" Foreground="LightGray">一年内经验增量: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textVisitRecent20" Margin="22,3,20,3" Foreground="LightGray">近50篇平均增量: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textVoteAll" Margin="22,3,20,3" Foreground="LightGray">总投票: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textCollectAll" Margin="22,3,20,3" Foreground="LightGray">总收藏: -</TextBlock>
                 <Button x:Name="buttonOpenFolder" Padding="0" 
                     Margin="20,5,20,5" Click="buttonOpenFolder_Click"
                     BorderThickness="0">
@@ -385,7 +386,7 @@
                         <SolidColorBrush Opacity="0" Color="Black"/>
                     </qc:SerialChart.PlotAreaBackground>
                     <qc:SerialChart.Graphs>
-                        <qc:AreaGraph Title="访问" ValueMemberPath="View"/>
+                        <qc:ColumnGraph Title="访问" ValueMemberPath="View"/>
                         <!--ValueMemberPath="Visits" />-->
                         <qc:LineGraph Title="投票" ValueMemberPath="Vote"/>
                         <!--ValueMemberPath="PageViews" />-->
@@ -405,7 +406,7 @@
                         <SolidColorBrush Opacity="0" Color="Black"/>
                     </qc:SerialChart.PlotAreaBackground>
                     <qc:SerialChart.Graphs>
-                        <qc:AreaGraph Title="访问增量" ValueMemberPath="View"/>
+                        <qc:ColumnGraph Title="访问增量" ValueMemberPath="View"/>
                         <!--ValueMemberPath="Visits" />-->
                         <qc:LineGraph Title="投票增量" ValueMemberPath="Vote"/>
                         <!--ValueMemberPath="PageViews" />-->
@@ -414,7 +415,7 @@
                 <StackPanel x:Name="StackPanelStatCover" Margin="0,40,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Opacity="0.7">
                     <StackPanel.Resources>
                         <Storyboard x:Name="DataAnalysisHintStoryboard" >
-                            <DoubleAnimation Duration="0:0:1.2" From="0.3" To="1" RepeatBehavior="Forever" AutoReverse="True" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="textDataAnalysisHint" ></DoubleAnimation>
+                            <DoubleAnimation Duration="0:0:1.8" From="0.3" To="1" RepeatBehavior="Forever" AutoReverse="True" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="textDataAnalysisHint" ></DoubleAnimation>
                         </Storyboard>
                     </StackPanel.Resources>
                     <TextBlock x:Name="textDataAnalysisHint" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="26">
