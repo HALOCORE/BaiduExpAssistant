@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:gif="using:XamlAnimatedGif"
     mc:Ignorable="d"
-    Title="1.4.9 新功能"
+    Title="1.5.0 新功能"
     PrimaryButtonText="关闭"
     SecondaryButtonText="不再显示"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
@@ -19,11 +19,29 @@
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
             <GradientStop Color="Orange"  Offset="0.7"/>
-            <GradientStop Color="Ivory"/>
+            <GradientStop Color="LightPink"/>
         </LinearGradientBrush>
     </ContentDialog.Background>
     <Grid Width="600" Height="350" Margin="20">
         <ListView HorizontalContentAlignment="Stretch">
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="8" >
+                            <TextBlock FontSize="26" Margin="5">Bug修复，增加雷区检测</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">修复了关于验证码的更多bug ( ╯□╰ )，应该能用了。增加了雷区检测。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem>
+                <TextBlock FontSize="20">版本日志：1.4.6版本增加功能</TextBlock>
+            </ListViewItem>
             <ListViewItem HorizontalContentAlignment="Stretch">
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>

@@ -46,14 +46,16 @@ namespace 百度经验个人助手
         public decimal Money { get; set; }
         public string PageUrl { get; set; }
         public string QueryId { get; set; }
-        public string Info { get
+        public string Info
+        {
+            get
             {
                 return "ID: " + QueryId + " 链接: " + PageUrl;
             }
         }
     }
 
-    
+
     public static class ExpManager
     {
         public static bool isCookieValid = false;
@@ -64,7 +66,7 @@ namespace 百度经验个人助手
         public static string htmlMain;
 
         //always show the newest Main Inf
-        public static string newMainUserName;       
+        public static string newMainUserName;
         public static string newMainIndexHuiXiang;
         public static string newMainIndexYiuZhi;
         public static string newMainIndexYuanChuang;
@@ -84,22 +86,6 @@ namespace 百度经验个人助手
         public static ObservableCollection<RewardExpEntry> rewardExps;
         public static ObservableCollection<RewardExpEntry> rewardExpsSearched;
 
-
-        private static async Task ShowMessageDialog(string title, string message)
-        {
-            var msgDialog = new Windows.UI.Popups.MessageDialog(message) { Title = title };
-            //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定", uiCommand => { this.textUserName.Text = $"您点击了：{uiCommand.Label}"; }));
-            //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("取消", uiCommand => { this.textUserName.Text = $"您点击了：{uiCommand.Label}"; }));
-            await msgDialog.ShowAsync();
-        }
-
-        private static async Task ShowDetailedError(string title, Exception e)
-        {
-            await ShowMessageDialog(title,
-                        "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误类型：" + e.GetType() + "\n错误信息：" +
-                        e.Message + "\n"
-                        + "");
-        }
 
 
         #region 常量字符串
@@ -155,7 +141,7 @@ namespace 百度经验个人助手
             rewardExps = new ObservableCollection<RewardExpEntry>();
             rewardExpsSearched = new ObservableCollection<RewardExpEntry>();
 
-            
+
         }
 
         /// <summary>
@@ -192,7 +178,7 @@ namespace 百度经验个人助手
             return true;
         }
 
-        
+
 
         #region ---获取Html---
 
@@ -216,7 +202,7 @@ namespace 百度经验个人助手
             {
                 response = await client.SendRequestAsync(req);
             }
-            catch(COMException e)
+            catch (Exception e)
             {
                 //do nothing
             }
@@ -257,9 +243,9 @@ namespace 百度经验个人助手
             Match matchUname = Regex.Match(htmlMain, regexMainUserName);
             if (matchUname.Groups[1].Value == "" || matchUname.Groups[1].Value == null)
             {
-                await ShowMessageDialog("获得异常的用户名信息",
+                await Utility.ShowMessageDialog("获得异常的用户名信息",
                     matchUname.Groups[0].Value.ToString() + "\n" + matchUname.Groups[1].Value.ToString()
-                    +"\n很可能是所填写的Cookie中不含有效的BDUSS（方法1），或者填写的BDUSS无效（方法2）。\n如果都不是，那这是意外的问题，可以截图并联系开发者：1223989563@qq.com。");
+                    + "\n很可能是所填写的Cookie中不含有效的BDUSS（方法1），或者填写的BDUSS无效（方法2）。\n如果都不是，那这是意外的问题，可以截图并联系开发者：1223989563@qq.com。");
                 return false;
             }
             newMainUserName = matchUname.Groups[1].Value;
@@ -330,11 +316,11 @@ namespace 百度经验个人助手
             currentDataPack.contentExpsCount = Int32.Parse(newMainExpCount);
             currentDataPack.contentPagesCount = (currentDataPack.contentExpsCount + 19) / 20;
             htmlContentPages = new string[currentDataPack.contentPagesCount];
-            
+
         }
 
 
-        
+
         //private static string thread0Ret;
         //private static string thread1Ret;
         //private static string thread2Ret;
@@ -349,9 +335,11 @@ namespace 百度经验个人助手
 
             lock (htmlContentPages)//not sure is necessary
             {
-                //Debug.WriteLine(Task.CurrentId + " : 成功进入htmlContentPages锁定区域");
+#if DEBUG
+                Debug.WriteLine(Task.CurrentId + " : 成功进入htmlContentPages锁定区域");
+#endif
                 htmlContentPages[pg] = result;
-               
+
             }
             //if (htmlContentPages[pg] == "FAILED") return false;
             //return true;
@@ -424,17 +412,17 @@ namespace 百度经验个人助手
             itemShow.ItemsSource = currentDataPack.contentExps;
 
             int pagesCount = ExpManager.currentDataPack.contentPagesCount;
-             
+
             //并行任务数是5
             int onceTasksGoal = 5;
-            for (int i = 0; i < pagesCount; i+= onceTasksGoal)//每次增加3个任务
+            for (int i = 0; i < pagesCount; i += onceTasksGoal)//每次增加3个任务
             {
                 textShow.Text = String.Format("更新中 ({0}/{1})", i, ExpManager.currentDataPack.contentPagesCount);
 
                 int currentTasksCount = Math.Min(onceTasksGoal, pagesCount - i); //获取当前的任务数
-                
 
-                //await ShowMessageDialog("开始新建线程", "页号码 i=" + i + ",  建立" + currentTasksCount + "个");
+
+                //await Utility.ShowMessageDialog("开始新建线程", "页号码 i=" + i + ",  建立" + currentTasksCount + "个");
                 Task Task0 = GetContentsSubStep_CookiedGetContentPage(i, 0);
                 Task Task1 = null;
                 Task Task2 = null;
@@ -449,9 +437,9 @@ namespace 百度经验个人助手
                 if (Task2 != null) await Task2;
                 if (Task3 != null) await Task3;
                 if (Task4 != null) await Task4;
-                //await ShowMessageDialog("线程等待完成","i="+i);
+                //await Utility.ShowMessageDialog("线程等待完成","i="+i);
 
-                for (int j = i; j< i + currentTasksCount; ++j)
+                for (int j = i; j < i + currentTasksCount; ++j)
                 {
                     if (htmlContentPages[j] == "FAILED") return false;  //如果获取出错，返回失败
                 }
@@ -460,7 +448,7 @@ namespace 百度经验个人助手
                 {
                     if (!GetContentsSubStep_ParseContentPage(j))
                     {
-                        await ShowMessageDialog("意外问题", "数据获取成功但是解析失败。获取页 " + i + " 无要寻找的经验条目，或者Baidu经验页面有调整。"
+                        await Utility.ShowMessageDialog("意外问题", "数据获取成功但是解析失败。获取页 " + i + " 无要寻找的经验条目，或者Baidu经验页面有调整。"
                                                         + "\n一般情况下，这是一个容易解决的问题，看到此对话框可以截图给开发者并询问解决方法。");
                         return false;
                     }
@@ -488,7 +476,7 @@ namespace 百度经验个人助手
         private static bool ParseReward(string html, string pageUrl)
         {
             MatchCollection mc = Regex.Matches(html, regexRewardExpAll);
-            foreach(Match m in mc)
+            foreach (Match m in mc)
             {
                 rewardExps.Add(new RewardExpEntry(
                     m.Groups[3].Value,
@@ -504,13 +492,13 @@ namespace 百度经验个人助手
         {
             if (isCookieValid == false)
             {
-                await ShowMessageDialog("领取功能需要设置Cookie", "领取操作不仅需要悬赏令ID, 还需要您的BDUSS. 请先设置Cookie.");
+                await Utility.ShowMessageDialog("领取功能需要设置Cookie", "领取操作不仅需要悬赏令ID, 还需要您的BDUSS. 请先设置Cookie.");
                 return false;
             }
             HttpResponseMessage response = null;
             try
             {
-                string url = "https://jingyan.baidu.com/patchapi/claimQuery?queryId=" 
+                string url = "https://jingyan.baidu.com/patchapi/claimQuery?queryId="
                     + queryId + "&token=" + newMainBdStoken + "&timestamp=" + newMainBdstt;
                 HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
                 req.Headers.Referer = new Uri("https://jingyan.baidu.com/patch");
@@ -529,7 +517,7 @@ namespace 百度经验个人助手
                     respstr = "成功领取。请在 个人中心->悬赏经验->已领取 查看。";
                     isGetSucceed = true;
                 }
-                else if(respstr.IndexOf("\"errno\":302") >= 0)
+                else if (respstr.IndexOf("\"errno\":302") >= 0)
                 {
                     respstr = "你可能已经领取过经验。领取不成功(302)。";
                     //isGetSucceed = true;
@@ -542,13 +530,22 @@ namespace 百度经验个人助手
                 {
                     respstr = "未知错误类型 (非302或2错误。可告知开发者 wang1223989563) \n错误信息: " + respstr;
                 }
-                await ShowMessageDialog("领取结果", respstr);
+
+                bool enterEditor = false;
+                if (isGetSucceed)
+                {
+                    enterEditor = await Utility.ShowConfirmDialog("领取成功", respstr + "\n是否进入编辑器?", "进入编辑器", "取消");
+                }
+                else{
+                    await Utility.ShowMessageDialog("领取不成功", respstr);
+                }
+                
                 req.Dispose();
-                return isGetSucceed;
+                return enterEditor;
             }
-            catch (COMException e)
+            catch (Exception e)
             {
-                await ShowDetailedError("领取未成功", e);
+                await Utility.ShowDetailedError("领取未成功", e);
                 return false;
             }
         }
@@ -573,17 +570,17 @@ namespace 百度经验个人助手
             };
             IEnumerable<ContentExpEntry> ic = currentDataPack.contentExps.Where(selector);
 
-            if(order == "view")
+            if (order == "view")
                 ic = ic.OrderBy(t => -t.View);
             else if (order == "viewinc")
                 ic = ic.OrderBy(t => -t.ViewIncrease);
-            else if(order == "collect")
+            else if (order == "collect")
                 ic = ic.OrderBy(t => -t.Collect);
             else if (order == "new")
             {
                 //Do Nothing
             }
-            else if(order == "match")
+            else if (order == "match")
             {
                 Func<ContentExpEntry, int> sorter = (t) =>
                 {
@@ -633,7 +630,7 @@ namespace 百度经验个人助手
             {
                 //Do Nothing
             }
-            else if(order == "match")
+            else if (order == "match")
             {
                 Func<RewardExpEntry, int> sorter = (t) =>
                 {
@@ -642,7 +639,7 @@ namespace 百度经验个人助手
                     {
                         if (t.Name.ToUpper().Contains(s)) matchCount += 1;
                     }
-                    return (- matchCount);
+                    return (-matchCount);
                 };
                 ic = ic.OrderBy(sorter);
             }
@@ -662,22 +659,26 @@ namespace 百度经验个人助手
 
         private static void setVerifying(bool val)
         {
-            if(val == true)
+            if (val == true)
             {
-                isVerifying = true; 
+                isVerifying = true;
                 App.currentMainPage.ShowLoading("Verifying...");
+#if DEBUG
                 Debug.WriteLine("# first task set isVerifying = true");
+#endif
             }
             else
             {
                 isVerifying = false;
                 App.currentMainPage.HideLoading();
+#if DEBUG
                 Debug.WriteLine("# first task set isVerifying = false");
+#endif
             }
         }
 
         //prepared private
-        public static async Task<string> SimpleRequestUrl(string url, string referrer, string method="GET", bool thisVerifying=false)
+        public static async Task<string> SimpleRequestUrl(string url, string referrer, string method = "GET", bool thisVerifying = false)
         {
             HttpResponseMessage response = null;
             try
@@ -695,10 +696,10 @@ namespace 百度经验个人助手
                 response = await client.SendRequestAsync(req);
                 req.Dispose();
 
-                
+
                 if (response.StatusCode != HttpStatusCode.Ok)
                 {
-                    await ShowMessageDialog("意外情况，返回状态不是200 OK", "返回状态: " + response.StatusCode.ToString() + "\n请向开发者（1223989563@qq.com）反映.");
+                    await Utility.ShowMessageDialog("意外情况，返回状态不是200 OK", "返回状态: " + response.StatusCode.ToString() + "\n请向开发者（1223989563@qq.com）反映.");
                 }
 
                 IHttpContent icont = response.Content;
@@ -713,7 +714,7 @@ namespace 百度经验个人助手
 
                 return content;
             }
-            catch (COMException e)
+            catch (Exception e)
             {
                 if ((uint)e.HResult == 0x80072f76)
                 {
@@ -741,20 +742,24 @@ namespace 百度经验个人助手
                                     verifyResp = await SimpleRequestUrl(vurl, referrer, "POST", true);
                                 }
                             }
-                            await ShowMessageDialog("验证通过", "确定以继续.");
+                            await Utility.ShowMessageDialog("验证通过", "确定以继续.");
 
                             setVerifying(false); // if succeed, cancel verifying state.
                             return await SimpleRequestUrl(url, referrer, method);
                         }
                         else   //  ---------------------- other task will wait until the verifying thread finish. ----------------------
                         {
+#if DEBUG
                             Debug.WriteLine("# Thread start waiting. Failed url is: " + url);
-                            while(isVerifying) await Task.Delay(500);
+#endif
+                            while (isVerifying) await Task.Delay(500);
+#if DEBUG
                             Debug.WriteLine("# Thread waiting done. retry url: " + url);
+#endif
                             return await SimpleRequestUrl(url, referrer, method);
                         }
                     }
-                    await ShowMessageDialog("可能是被验证码阻挡，也可能是其它网络问题，程序结束。",
+                    await Utility.ShowMessageDialog("可能是被验证码阻挡，也可能是其它网络问题，程序结束。",
                         "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误信息：\n\n" +
                         e.Message + "\n"
                         + "如果是验证码问题，请先打开浏览器，输入验证码，稍后再打开本程序。\n验证码问题在中文版系统中已修复，因此这条消息不该看到。开发者需要知道您的错误信息（1223989563@qq.com）");
@@ -762,35 +767,35 @@ namespace 百度经验个人助手
                 }
                 else if ((uint)e.HResult == 0x80072efd)
                 {
-                    await ShowMessageDialog("80072efd，系统网络故障，程序结束。",
+                    await Utility.ShowMessageDialog("80072efd，系统网络故障，程序结束。",
                         "\n错误信息：\n\n" + e.Message + "\n请百度80072efd寻找解决办法。该故障和系统网络设置有关。");
                     Application.Current.Exit();
                 }
                 else if ((uint)e.HResult == 0x80072eff)
                 {
-                    await ShowMessageDialog("80072eff，网络正常，请求超时（服务器不可达）",
+                    await Utility.ShowMessageDialog("80072eff，网络正常，请求超时（服务器不可达）",
                         "请确认能够访问 jingyan.baidu.com，关闭此对话框会重试失败的请求。\n错误信息：\n\n" + e.Message);
                     return await SimpleRequestUrl(url, referrer, method);
                 }
 
-                await ShowMessageDialog("网络故障，错误信息请留意", "关闭此提示框，程序收集错误信息后自动结束。\n错误信息：\n\n" + e.Message);
+                await Utility.ShowMessageDialog("网络故障，错误信息请留意", "关闭此提示框，程序收集错误信息后自动结束。\n错误信息：\n\n" + e.Message);
                 throw e;
             }
 
-            if(response == null)
+            if (response == null)
             {
-                await ShowMessageDialog("未解决故障", "网络请求失败. 关闭此此提示框，程序收集错误信息后自动结束。");
+                await Utility.ShowMessageDialog("未解决故障", "网络请求失败. 关闭此此提示框，程序收集错误信息后自动结束。");
                 throw new IOException("Get No Response.");
             }
         }
 
-        public static async Task<string> CookiedPostForm(string url, string referrer, KeyValuePair<string,string>[] keyValues)
+        public static async Task<string> CookiedPostForm(string url, string referrer, KeyValuePair<string, string>[] keyValues)
         {
             //HttpResponseMessage response = null;
             try
             {
                 HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
-                
+
                 HttpFormUrlEncodedContent cont = new HttpFormUrlEncodedContent(keyValues);
 
                 req.Content = cont;
@@ -799,15 +804,15 @@ namespace 百度经验个人助手
 
                 HttpResponseMessage hc = await client.SendRequestAsync(req);
 
-                //await ShowMessageDialog("响应", hc.Content.ToString());
+                //await Utility.ShowMessageDialog("响应", hc.Content.ToString());
 
                 req.Dispose();
 
                 return hc.Content.ToString();
-                
-                
+
+
             }
-            catch (COMException e)
+            catch (Exception e)
             {
 
                 return "Cannot get response";
@@ -816,6 +821,6 @@ namespace 百度经验个人助手
 
 
 
-      
+
     }
 }

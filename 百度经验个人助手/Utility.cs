@@ -35,6 +35,24 @@ namespace 百度经验个人助手
             var msgDialog = new Windows.UI.Popups.MessageDialog(message) { Title = title };
             await msgDialog.ShowAsync();
         }
+
+        public static async Task<bool> ShowConfirmDialog(string title, string message, string ok = "确认", string cancel = "取消")
+        {
+            var msgDialog = new Windows.UI.Popups.MessageDialog(message) { Title = title };
+            bool isConfirmed = false;
+            msgDialog.Commands.Add(new Windows.UI.Popups.UICommand(ok, uiCommand => { isConfirmed = true; }));
+            msgDialog.Commands.Add(new Windows.UI.Popups.UICommand(cancel, uiCommand => { isConfirmed = false; }));
+            await msgDialog.ShowAsync();
+            return isConfirmed;
+        }
+
+        public static async Task ShowDetailedError(string title, Exception e)
+        {
+            await ShowMessageDialog(title,
+                        "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误类型：" + e.GetType() + "\n错误信息：" +
+                        e.Message + "\n"
+                        + "");
+        }
     }
 
 }

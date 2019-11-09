@@ -111,14 +111,14 @@ namespace 百度经验个人助手
 
             ShowLoading("读取设置...");
             bool isSettingsRead = await StorageManager.ReadSettings();
-            if (StorageManager.AppSettings.isFirstIn || StorageManager.AppSettings.version != "1.4.9")
+            if (StorageManager.AppSettings.isFirstIn || StorageManager.AppSettings.version != "1.5.0")
             {
                 ContentNewDialog cnd = new ContentNewDialog();
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
                 if (cdr2 == ContentDialogResult.Secondary)
                 {
                     StorageManager.AppSettings.isFirstIn = false;
-                    StorageManager.AppSettings.version = "1.4.9";
+                    StorageManager.AppSettings.version = "1.5.0";
                 }
                 ShowLoading("更新设置...");
                 
@@ -177,7 +177,7 @@ namespace 百度经验个人助手
             }
             catch (Exception e)
             {
-                await ShowMessageDialog("非关键异常","自动背景图更换失败，请联系开发者\n" + e.Message);
+                await Utility.ShowMessageDialog("非关键异常","自动背景图更换失败，请联系开发者\n" + e.Message);
             }
 
 
@@ -197,7 +197,7 @@ namespace 百度经验个人助手
                 bool getSucceed = await UpdateMain();
                 if (!getSucceed)
                 {
-                    await ShowMessageDialog("主页获取不成功", "如果不是网络问题，那可能是BDUSS已经失效。（是否有退出登录操作？）");
+                    await Utility.ShowMessageDialog("主页获取不成功", "如果不是网络问题，那可能是BDUSS已经失效。（是否有退出登录操作？）");
                 }
                 HideLoading();
             }
@@ -220,21 +220,8 @@ namespace 百度经验个人助手
         {
             if (err)
             {
-                ShowMessageDialog("意外异常（请联系开发者）", errMsg);
+                Utility.ShowMessageDialog("意外异常（请联系开发者）", errMsg);
             }
-        }
-
-        /// <summary>
-        /// 显示消息框
-        /// </summary>
-        /// <param name="title">标题</param>
-        /// <param name="message">信息</param>
-        private async Task ShowMessageDialog(string title, string message)
-        {
-            var msgDialog = new Windows.UI.Popups.MessageDialog(message) { Title = title };
-            //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定", uiCommand => { this.textUserName.Text = $"您点击了：{uiCommand.Label}"; }));
-            //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("取消", uiCommand => { this.textUserName.Text = $"您点击了：{uiCommand.Label}"; }));
-            await msgDialog.ShowAsync();
         }
 
         #endregion
@@ -348,12 +335,12 @@ namespace 百度经验个人助手
             int initStat = await StorageManager.InitUserFolder(ExpManager.newMainUserName); //Get user. Init StorageManager
             //if (initStat == -1)
             //{
-            //    await ShowMessageDialog("异常", "更新旧版本数据出现异常。已忽略。\n新数据文件存储至用户名文件夹下，旧数据可自行删除。");
+            //    await Utility.ShowMessageDialog("异常", "更新旧版本数据出现异常。已忽略。\n新数据文件存储至用户名文件夹下，旧数据可自行删除。");
             //    await Launcher.LaunchFolderAsync(StorageManager.StorageFolder);
             //}
             //else if (initStat > 0)
             //{
-            //    await ShowMessageDialog("数据自动更新", string.Format("自动更新旧版本数据文件 {0} 个\n新数据文件存储至用户名文件夹下，旧数据可自行删除。", initStat));
+            //    await Utility.ShowMessageDialog("数据自动更新", string.Format("自动更新旧版本数据文件 {0} 个\n新数据文件存储至用户名文件夹下，旧数据可自行删除。", initStat));
             //    await Launcher.LaunchFolderAsync(StorageManager.StorageFolder);
             //}
             DataPack latestDataPack = await StorageManager.ReadRecentDataPack();
@@ -425,7 +412,7 @@ namespace 百度经验个人助手
             HideLoading();
             if (cdr == ContentDialogResult.None)
             {
-                ShowMessageDialog("设置取消", "设置取消，保持原状。");
+                Utility.ShowMessageDialog("设置取消", "设置取消，保持原状。");
                 buttonSetCookie.IsEnabled = true;
                 buttonSetCookieProgress.IsActive = false;
                 buttonSetCookieProgress.Visibility = Visibility.Collapsed;
@@ -434,7 +421,7 @@ namespace 百度经验个人助手
             }
             if (scd.userInputCookie.Trim() == "")
             {
-                ShowMessageDialog("输入为空", "设置取消，保持原状。");
+                Utility.ShowMessageDialog("输入为空", "设置取消，保持原状。");
                 buttonSetCookie.IsEnabled = true;
                 buttonSetCookieProgress.IsActive = false;
                 buttonSetCookieProgress.Visibility = Visibility.Collapsed;
@@ -448,7 +435,7 @@ namespace 百度经验个人助手
 
             if (!isCookieOK)
             {
-                ShowMessageDialog("Cookie添加", ExpManager.setcookieFailedInfo);
+                Utility.ShowMessageDialog("Cookie添加", ExpManager.setcookieFailedInfo);
                 buttonSetCookie.IsEnabled = true;
                 buttonSetCookieProgress.IsActive = false;
                 buttonSetCookieProgress.Visibility = Visibility.Collapsed;
@@ -465,7 +452,7 @@ namespace 百度经验个人助手
             {
                 await StorageManager.SaveCookie(ExpManager.cookie);
                 buttonSetCookieText.Text = "√ Cookie";
-                await ShowMessageDialog("设置完成", "Cookie有效，可以更新信息了。\n点击头像链接到个人中心。");
+                await Utility.ShowMessageDialog("设置完成", "Cookie有效，可以更新信息了。\n点击头像链接到个人中心。");
 
 
                 ContentTipsDialog scd3 = new ContentTipsDialog();
@@ -473,7 +460,7 @@ namespace 百度经验个人助手
             }
             else
             {
-                ShowMessageDialog("验证Cookie", "Cookie无效，请重新设置");
+                Utility.ShowMessageDialog("验证Cookie", "Cookie无效，请重新设置");
             }
 
             HideLoading();
@@ -522,7 +509,7 @@ namespace 百度经验个人助手
 
                 UpdateTile();
 
-                //ShowMessageDialog("更新完成", "点击 \"✅ 本次已更新\" 打开数据所在文件夹：\n" + StorageManager.StorageFolder.Path);
+                //Utility.ShowMessageDialog("更新完成", "点击 \"✅ 本次已更新\" 打开数据所在文件夹：\n" + StorageManager.StorageFolder.Path);
 
                 textDate.Text = "✅ 本次已更新";
                 textDate.Foreground = new SolidColorBrush(Color.FromArgb(255,120,230,120));
@@ -534,7 +521,7 @@ namespace 百度经验个人助手
             }
             else
             {
-                await ShowMessageDialog("更新出现问题, 应用需要重新启动", "如果频繁出现，那就是情况1，请联系开发者改换算法。\n可能的原因：\n1. 并发网络请求不稳定（重启应用）\n2. 要输入验证码（输入验证码再重启应用）\n3. 用户中途退出登录（重新设置Cookie）\n");
+                await Utility.ShowMessageDialog("更新出现问题, 应用需要重新启动", "如果频繁出现，那就是情况1，请联系开发者改换算法。\n可能的原因：\n1. 并发网络请求不稳定（重启应用）\n2. 要输入验证码（输入验证码再重启应用）\n3. 用户中途退出登录（重新设置Cookie）\n");
                 App.Current.Exit();
             }
         }
@@ -581,7 +568,7 @@ namespace 百度经验个人助手
                 }
             }
             isCacheReward = true;
-            await ShowMessageDialog("悬赏获取", "共获取 " + ExpManager.rewardExps.Count + " 条.");
+            await Utility.ShowMessageDialog("悬赏获取", "共获取 " + ExpManager.rewardExps.Count + " 条.");
             ShowControls();
         }
 
@@ -604,7 +591,7 @@ namespace 百度经验个人助手
             if (low < 0) low = 0;
             if (high - low > 1000)
             {
-                await ShowMessageDialog("Warning", "页数过多，需要输入很多次验证码. 请降低页数");
+                await Utility.ShowMessageDialog("Warning", "页数过多，需要输入很多次验证码. 请降低页数");
                 return;
             }
 
@@ -815,7 +802,7 @@ namespace 百度经验个人助手
 
             if (sdf.selectedFiles.Count == 0)
             {
-                await ShowMessageDialog("无选择文件", "您当前未选择任何历史文件。无分析。");
+                await Utility.ShowMessageDialog("无选择文件", "您当前未选择任何历史文件。无分析。");
                 return;
             }
 
@@ -827,7 +814,7 @@ namespace 百度经验个人助手
             {
                 if (StatManager.LastDateDataPack.date.Date == DateTime.Today.Date)
                 {
-                    await ShowMessageDialog("选择今天的数据可能使分析无效", "您选择的历史数据是今天的数据。可能得到全0的作差结果。");
+                    await Utility.ShowMessageDialog("选择今天的数据可能使分析无效", "您选择的历史数据是今天的数据。可能得到全0的作差结果。");
                 }
                 ShowLoading("计算中...");
                 await StatManager.Calc(StatManager.LastDateDataPack.contentExps,
@@ -856,7 +843,7 @@ namespace 百度经验个人助手
                 }
                 catch(Exception e)
                 {
-                    await ShowMessageDialog("计算一年内浏览增量失败", "可通知开发者 1223989563@qq.com");
+                    await Utility.ShowMessageDialog("计算一年内浏览增量失败", "可通知开发者 1223989563@qq.com");
                 }
                 UpdateTile();
             }
@@ -950,7 +937,7 @@ namespace 百度经验个人助手
         {
             if (string.IsNullOrEmpty(ExpManager.cookie))
             {
-                ShowMessageDialog("请先设置Cookie", "设置Cookie完成后，可以保持登录进入编辑器。\n禁止在此暴露账号密码进行登陆。");
+                Utility.ShowMessageDialog("请先设置Cookie", "设置Cookie完成后，可以保持登录进入编辑器。\n禁止在此暴露账号密码进行登陆。");
                 return;
             }
             ShowLoading("访问jingyan.baidu.com...");
@@ -977,15 +964,21 @@ namespace 百度经验个人助手
             webViewMain.Navigate(new Uri("https://jingyan.baidu.com/edit/content"));
         }
 
-        private void buttonTestMine_Click(object sender, RoutedEventArgs e)
+        private async void buttonTestMine_Click(object sender, RoutedEventArgs e)
         {
-            string js =
-                "function(p,a,c,k,e,d){e=function(c){return(c<a?\"\":e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!\'\'.replace(/^/,String)){while(c--)d[e(c)]=k[c]||e(c);k=[function(e){return d[e]}];e=function(){return\'\\\\w+\'};c=1;};while(c--)if(k[c])p=p.replace(new RegExp(\'\\\\b\'+e(c)+\'\\\\b\',\'g\'),k[c]);return p;}(\'5 D(v){7 1Z G(5(N,1S){6 h=1s.1T(\"h\");d(h.P){h.1p=5(){d(h.P==\"1Q\"||h.P==\"1R\"){h.1p=O;N()}}}t{h.1N=N};h.1M=v;1s.1P.1O(h)})};(5(f){6 F=[];d(1U 20!==\"5\"){F.l(\"//1C.1B.s/1k/3.2.1/1k.1A\")};G.1t(F.c(5(e){7 D(e)})).1z(5(){G.1t([\"//1C.1B.s/I/3.1.0/I.1A\"].c(5(1D){7 D(1D)})).1z(f)})})(5(){6 C=\"【1l】\";6 n={};M(22,4);5 M(9,r){6 1r=$(\".23 p, 21.1W\").c(5(i,e){7 e.1V}).1Y().1X([$(\"[1H=R]\").1I()]).1J(5(e,i){7 e.A()}).y(\",\");I.1L(`<x 1o=\"L\">1K</x><x 1o=\"Z\"></x>`.A(),{1G:0,1F:[\\\'2n\\\']"
-                +",2p:5(k,2q){M(22,4)}});6 b=1m(1r,9,r);d(b.j<2){b.l(C)};$.15.16(O,b.c(5(e,i){7 $.14({v:\\\'//J.K.s/10/11\\\',13:{R:e}})})).18(5(){1v=1d.1e.c.1f(1c,5(e,i){7 e[0]});6 1w=b.c(5(e,i){7 e.2r(\\\'【1l】\\\',\\\'\\\')});6 B=[];1v.1b(5(e,i){d(e&&e.1a!=0){B.l(1w[i])}});d(B.j==0){2m(5(){$(\"#L\").U(\"2u\")},2o)}t{B.1b(5(u,i){n[u]=[];6 9=12;6 17=1x(u,9);$.15.16(O,17.c(5(e,i){7 $.14({v:\\\'//J.K.s/10/11\\\',13:{R:e}})})).18(5(){19=1d.1e.c.1f(1c,5(e,i){7 e[0]});H=19.c(5(e,i){7(e&&e.1a!=0)?\\\'1\\\':\\\'0\\\'}).y(\"\");2s.2x(H);w=1j(H);d(!w.Q){W();7};6 m=w.m;6 o=w.o;1h(6 i=0;i<m.j;i++){6 k=m[i];6 z=o[i];d(9+1-z>0){6 X=u.E(k-9+z,9+1-z);n[u].l(X)}t{};W()}})})}})};5 W(){$(\"#L\").U(`2w${Y.1g(n).j}2y`);$(\"#Z\").U(`${Y.1g(n).c(5(e,i){7`<p><q T=\"V:1y\">2t：</q>${e}</p><p><q T=\"V:1y\">2v：</q>${n[e].j>0?n[e].c(5(1E){7`<q T=\"V:2l;\">${1E}</q>`})" 
-                + ".y(\"  \"):\\\'29，28<a 2b=\"25://J.K.s/24/27\" 26=\"2c\">2i</a>2k\\\'}</p>`;}).y(\"\")}`);};5 1x(8,9){8=8.A();1i=\"】\".r(9)+8+\"】\".r(9);6 b=[];1h(6 i=1;i<8.j+9;i++){b.l(1i.E(i,9))};7 b;};5 1j(8){6 S=8.2e(/1+/g);d(!S){7{Q:2d}};6 o=S.c(5(e,i){7 e.j});6 1n=\"0\"+8;6 m=[];6 k=0;1u(1q){k=1n.2g(\\\'2f\\\',k);d(k==-1){2j}t{m.l(k);k++}};7{o:o,m:m,Q:1q}};5 1m(8,9,r){8=8.A();6 b=[];1u(8.j>9){b.l(8.2h(0,9));8=8.E(9-r,2a)};d(8.j>0){b.l(8)};b=b.c(5(e,i){d(e.j<12){7 e+C}t{7 e}});7 b}});\',62,159,\'|||||function|var|return|str|perlen||arr|map|if||||script||length|index|push|indexs|sentences|lens||span|repeat|com|else|sentence|url|indexAndLen|div|join|len|trim|invalides|fill|loadScript|substr|jss|Promise|mine_str|layer|jingyan|baidu|status|firstCheck|resolve|null|readyState|find|title|matchs|style|html|color|show|mine_word|Object|contents"
-                +"|common|isTitleValid||data|ajax|when|apply|toCheck|done|results2|errno|forEach|arguments|Array|prototype|call|keys|for|str2|getIndexAndLen|jquery|填充字符|splite|str1|id|onreadystatechange|true|allText|document|all|while|results|reduction|splite2|orange|then|js|bootcss|cdn|e2|e3|btn|shade|name|val|filter|检测中|alert|src|onload|appendChild|body|loaded|complete|reject|createElement|typeof|innerText|normal|concat|toArray|new|jQuery|strong||editor|edit|http|target|content|请在|多个敏感词|999999|href|_0|false|match|01|indexOf|substring|新草稿页面|break|手动把这句话填入标题以精确检测|red|setTimeout|重新检测|200|yes|layero|replace|console|所在句子|检测通过|词汇|检测到|log|句话含敏感词\'.split(\'|\'),0,{})";
-
-
+            ShowLoading("运行JS...");
+            try
+            {
+                await JSCodeString.RunJss(webViewMain, new string[] {JSCodeString.JsPrependErrorReport});
+                await Task.Delay(200);
+                await JSCodeString.RunJss(webViewMain, new string[] {JSCodeString.Errable(JSCodeString.JsMineDetect, "雷区检测载入...", "雷区检测开始运行. Thanks to 孢子真好玩") });
+            }
+            catch (Exception e2)
+            {
+                await Utility.ShowMessageDialog("雷区检测失败", "当前页面可能不是编辑器页面");
+                //await Utility.ShowDetailedError("详细信息", e2);
+            }
+            HideLoading();
         }
 
         private void buttonTestBroswer_Click(object sender, RoutedEventArgs e)
@@ -995,7 +988,7 @@ namespace 百度经验个人助手
             //必须使用ms -appx-web:
             //webViewMain.ScriptNotify += (o, args) =>
             //{
-            //    ShowMessageDialog(o.ToString(), args.Value);
+            //    Utility.ShowMessageDialog(o.ToString(), args.Value);
             //};
             //webViewMain.Navigate(new Uri("ms-appx-web:///Assets/code/test01.html"));
         }
@@ -1020,7 +1013,7 @@ namespace 百度经验个人助手
             }
             catch (Exception)
             {
-                await ShowMessageDialog("添加失败", "当前页面可能不是编辑器页面");
+                await Utility.ShowMessageDialog("添加失败", "当前页面可能不是编辑器页面");
             }
             HideLoading();
         }
@@ -1100,7 +1093,7 @@ namespace 百度经验个人助手
             }
             catch (Exception ee)
             {
-                await ShowMessageDialog("自动填写出现问题", "当前页面可能不是编辑器页面，或者设置有问题（含有特殊字符，或者设置格式错误）");
+                await Utility.ShowMessageDialog("自动填写出现问题", "当前页面可能不是编辑器页面，或者设置有问题（含有特殊字符，或者设置格式错误）");
             }
             HideLoading();
         }
@@ -1109,7 +1102,7 @@ namespace 百度经验个人助手
         {
             //await JSCodeString.AddCssUri(webViewMain, "ms-appx-web:///Assets/code/test01.css");
             //await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/jquery.autocompleter.js");
-            //await ShowMessageDialog("添加完毕", "添加完毕");
+            //await Utility.ShowMessageDialog("添加完毕", "添加完毕");
         }
 
         public static string GetTransString(string input)
@@ -1156,7 +1149,7 @@ namespace 百度经验个人助手
             }
             catch (Exception ee)
             {
-                await ShowMessageDialog("加载 [自动补全] 出现问题", "当前页面可能不是编辑器页面。"); // ee.GetType().ToString() + '\n' +  ee.Message);
+                await Utility.ShowMessageDialog("加载 [自动补全] 出现问题", "当前页面可能不是编辑器页面。"); // ee.GetType().ToString() + '\n' +  ee.Message);
             }
             HideLoading();
         }
