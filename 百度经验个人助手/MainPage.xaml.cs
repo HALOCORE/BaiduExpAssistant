@@ -791,26 +791,26 @@ namespace 百度经验个人助手
 
             if (r == ContentDialogResult.Secondary || r == ContentDialogResult.None) return;
 
-            if (sdf.selectedFiles.Count == 0)
+            if (sdf.selectedFile == null)
             {
-                await Utility.ShowMessageDialog("无选择文件", "您当前未选择任何历史文件。无分析。");
+                await Utility.ShowMessageDialog("无选择文件", "您当前未选择作差文件。无分析。");
                 Utility.LogEvent("NO_StatisticNoSelected");
                 return;
             }
 
             ShowLoading("读取文件...");
-            StatManager.DataPacksSelected = await StorageManager.ReadHistoryDataPacks(sdf.selectedFiles);
+            StatManager.DataPackSingleSelected = await StorageManager.ReadHistoryDataPackSingle(sdf.selectedFile);
             HideLoading();
 
-            if (StatManager.LastDateDataPack != null)
+            if (StatManager.DataPackSingleSelected != null)
             {
-                if (StatManager.LastDateDataPack.date.Date == DateTime.Today.Date)
+                if (StatManager.DataPackSingleSelected.date.Date == DateTime.Today.Date)
                 {
                     await Utility.ShowMessageDialog("选择今天的数据可能使分析无效", "您选择的历史数据是今天的数据。可能得到全0的作差结果。");
                     Utility.LogEvent("NO_StatisticTodaySelected");
                 }
                 ShowLoading("计算中...");
-                await StatManager.Calc(StatManager.LastDateDataPack.contentExps,
+                await StatManager.Calc(StatManager.DataPackSingleSelected.contentExps,
                     ExpManager.currentDataPack.contentExps);
                 data = StatManager.DeltaExps;
                 HideLoading();
@@ -825,7 +825,7 @@ namespace 百度经验个人助手
 
                 listViewContentExps.ItemsSource = null;
                 listViewContentExps.ItemsSource = ExpManager.currentDataPack.contentExps;
-                textVisitAllIncrease.Text = "总浏览增量：" + (ExpManager.currentDataPack.contentExpsViewSum - StatManager.LastDateDataPack.contentExpsViewSum).ToString();
+                textVisitAllIncrease.Text = "总浏览增量：" + (ExpManager.currentDataPack.contentExpsViewSum - StatManager.DataPackSingleSelected.contentExpsViewSum).ToString();
 
                 StatManager.CalcDeltaExpsRecentAverage(50);
                 textVisitRecent20.Text = "近50篇平均增量：" + StatManager.DeltaExpsRecentAverage.ToString("F2");

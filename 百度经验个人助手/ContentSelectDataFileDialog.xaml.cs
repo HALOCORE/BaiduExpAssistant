@@ -24,22 +24,42 @@ namespace 百度经验个人助手
     {
 
         private ObservableCollection<StorageFile> _dataFiles;
-
+        
+        public bool isSingleFile = true;
         public ObservableCollection<StorageFile> selectedFiles;
+        public StorageFile selectedFile;
 
-        public ContentSelectDataFileDialog(IReadOnlyList<StorageFile> dataFiles)
+        public ContentSelectDataFileDialog(IReadOnlyList<StorageFile> dataFiles, bool isSingleFile = true)
         {
             this.InitializeComponent();
+            this.isSingleFile = isSingleFile;
+
+            if (isSingleFile)
+            {
+                this.Title = "选择一个用于作差的历史数据文件";
+            }
+            else
+            {
+                this.Title = "选择任意个数历史数据文件";
+            }
+
             _dataFiles = new ObservableCollection<StorageFile>();
             foreach (StorageFile sf in dataFiles)
             {
                 _dataFiles.Add(sf);
             }
-            listViewAllFiles.ItemsSource = _dataFiles;
 
-            selectedFiles = new ObservableCollection<StorageFile>();
-            listViewSelectedFiles.ItemsSource = selectedFiles;
-
+            if (this.isSingleFile)
+            {
+                listViewAllFilesSingle.ItemsSource = _dataFiles;
+                selectedFile = null;
+            }
+            else
+            {
+                listViewAllFiles.ItemsSource = _dataFiles;
+                selectedFiles = new ObservableCollection<StorageFile>();
+                listViewSelectedFiles.ItemsSource = selectedFiles;
+            }
         }
 
         
@@ -53,12 +73,25 @@ namespace 百度经验个人助手
 
         private void listViewAllFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (listViewAllFiles.SelectedItem != null)
+            if (!isSingleFile)
             {
-                StorageFile sf = listViewAllFiles.SelectedItem as StorageFile;
-                if (!selectedFiles.Contains(sf))
-                    selectedFiles.Add(sf);
+                if (listViewAllFiles.SelectedItem != null)
+                {
+                    StorageFile sf = listViewAllFiles.SelectedItem as StorageFile;
+                    if (!selectedFiles.Contains(sf))
+                        selectedFiles.Add(sf);
+                }
             }
+            else
+            {
+                if (listViewAllFilesSingle.SelectedItem != null)
+                {
+                    StorageFile sf = listViewAllFilesSingle.SelectedItem as StorageFile;
+                    selectedFile = sf;
+                    textCurrentSelect.Text = "当前选择：" + sf.Name;
+                }
+            }
+            
                 
         }
 

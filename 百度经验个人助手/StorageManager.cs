@@ -654,6 +654,15 @@ namespace 百度经验个人助手
             return await _currentUserFolder.GetFilesAsync();
         }
 
+
+        public static async Task<DataPack> ReadHistoryDataPackSingle(StorageFile file)
+        {
+            ObservableCollection<StorageFile> files = new ObservableCollection<StorageFile>();
+            files.Add(file);
+            ObservableCollection<DataPack> tempDataPacks = await ReadHistoryDataPacks(files);
+            return tempDataPacks[0];
+        }
+
         //读出历史数据包返回
         public static async Task<ObservableCollection<DataPack>> ReadHistoryDataPacks(ObservableCollection<StorageFile> files)
         {

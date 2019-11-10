@@ -31,12 +31,24 @@ namespace 百度经验个人助手
         {
             get
             {
+                if (_dataPacksSelected == null) return null;
+
                 if (_dataPacksSelected.Count > 0)
                     return _dataPacksSelected.Last();
 
                 return null;
             }
         }
+
+
+        private static DataPack _dataPackSingleSelected;
+        public static DataPack DataPackSingleSelected
+        {
+            get { return _dataPackSingleSelected; }
+            set { _dataPackSingleSelected = value; }
+        }
+
+        
 
         //需要总共datapack计数和索引
         //需要构建主数据绘图数据
