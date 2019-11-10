@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -266,17 +267,22 @@ namespace 百度经验个人助手
 
             string[] urlSeperator = { ".com/" };
 
+            Hashtable h = new Hashtable();
+            foreach(ContentExpEntry ets in _expsNew)
+            {
+                string key = ets.Url.Split(urlSeperator, StringSplitOptions.None)[1];
+                h.Add(key, ets);
+            }
+
             foreach (ContentExpEntry ets in _expsOld)   //对于历史数据中的每个经验条目
             {
-                IEnumerable<ContentExpEntry> ic = _expsNew.Where(
-                    t => t.Url.Split(urlSeperator, StringSplitOptions.None)[1] == ets.Url.Split(urlSeperator, StringSplitOptions.None)[1] 
-                    && t.ExpName == ets.ExpName); //寻找经验名称相等的条目
-                    //&& t.Date == ets.Date
+                string key = ets.Url.Split(urlSeperator, StringSplitOptions.None)[1];
+                ContentExpEntry ft = null;
+                if (h.Contains(key)) ft = (ContentExpEntry)h[key];
 
-                if (ic.Any())
+                if (ft != null)
                 {
                     string shortName;
-                    ContentExpEntry ft = ic.First();    //ft即所寻获的条目
                     if (ft.ExpName.Length > 10)
                         shortName = ft.ExpName.Substring(0, 10) + "...";
                     else shortName = ft.ExpName;
