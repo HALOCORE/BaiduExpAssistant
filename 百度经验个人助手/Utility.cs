@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Services.Store.Engagement;
 
 namespace 百度经验个人助手
 {
     public static class Utility
     {
+
+        public static void LogEvent(string evt)
+        {
+            StoreServicesCustomEventLogger logger = StoreServicesCustomEventLogger.GetDefault();
+            logger.Log(evt);
+        }
+
         public static string Transferred(string input)
         {
             input = input.Replace("&", "&amp;");

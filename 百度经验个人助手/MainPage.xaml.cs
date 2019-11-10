@@ -135,6 +135,7 @@ namespace 百度经验个人助手
             if (Window.Current.Bounds.Width < 1100)
             {
                 textUserName.Text = "您的窗口过窄";
+                Utility.LogEvent("InitWarn_WindowTooNarrow");
             }
             Uri[] uris =
             {
@@ -178,6 +179,7 @@ namespace 百度经验个人助手
             catch (Exception e)
             {
                 await Utility.ShowMessageDialog("非关键异常","自动背景图更换失败，请联系开发者\n" + e.Message);
+                Utility.LogEvent("InitWarn_BackgroundFailed");
             }
 
 
@@ -198,6 +200,7 @@ namespace 百度经验个人助手
                 if (!getSucceed)
                 {
                     await Utility.ShowMessageDialog("主页获取不成功", "如果不是网络问题，那可能是BDUSS已经失效。（是否有退出登录操作？）");
+                    Utility.LogEvent("InitFailed_InvalidBDUSS");
                 }
                 HideLoading();
             }
@@ -208,23 +211,6 @@ namespace 百度经验个人助手
 
 
         }
-
-        #region Utilities实用函数
-
-        /// <summary>
-        /// 检查err，如果为false弹窗。
-        /// </summary>
-        /// <param name="err"></param>
-        /// <param name="errMsg"></param>
-        public void _Error_Check(bool err, string errMsg)
-        {
-            if (err)
-            {
-                Utility.ShowMessageDialog("意外异常（请联系开发者）", errMsg);
-            }
-        }
-
-        #endregion
 
 
         #region 显示状态更新
@@ -305,6 +291,7 @@ namespace 百度经验个人助手
             textVisitAll.Text = "总浏览：" + ExpManager.currentDataPack.contentExpsViewSum;
             textVoteAll.Text = "总投票：" + ExpManager.currentDataPack.contentExpsVoteSum;
             textCollectAll.Text = "总收藏：" + ExpManager.currentDataPack.contentExpsCollectSum;
+            textVisitAllIncrease.Text = "总浏览增量: (点击数据分析)";
             //textVisitRecent20.Text = "近20篇浏览：" + ExpManager.currentDataPack.contentExpsView20;
         }
 
@@ -453,7 +440,7 @@ namespace 百度经验个人助手
                 await StorageManager.SaveCookie(ExpManager.cookie);
                 buttonSetCookieText.Text = "√ Cookie";
                 await Utility.ShowMessageDialog("设置完成", "Cookie有效，可以更新信息了。\n点击头像链接到个人中心。");
-
+                Utility.LogEvent("YES_SetCookieSucceed");
 
                 ContentTipsDialog scd3 = new ContentTipsDialog();
                 await scd3.ShowAsync();
@@ -461,6 +448,7 @@ namespace 百度经验个人助手
             else
             {
                 Utility.ShowMessageDialog("验证Cookie", "Cookie无效，请重新设置");
+                Utility.LogEvent("NO_SetCookieFailed");
             }
 
             HideLoading();
@@ -510,6 +498,7 @@ namespace 百度经验个人助手
                 UpdateTile();
 
                 //Utility.ShowMessageDialog("更新完成", "点击 \"✅ 本次已更新\" 打开数据所在文件夹：\n" + StorageManager.StorageFolder.Path);
+                Utility.LogEvent("YES_UpdateExpSucceed");
 
                 textDate.Text = "✅ 本次已更新";
                 textDate.Foreground = new SolidColorBrush(Color.FromArgb(255,120,230,120));
@@ -522,6 +511,7 @@ namespace 百度经验个人助手
             else
             {
                 await Utility.ShowMessageDialog("更新出现问题, 应用需要重新启动", "如果频繁出现，那就是情况1，请联系开发者改换算法。\n可能的原因：\n1. 并发网络请求不稳定（重启应用）\n2. 要输入验证码（输入验证码再重启应用）\n3. 用户中途退出登录（重新设置Cookie）\n");
+                Utility.LogEvent("ASSERT_UpdateExpNull");
                 App.Current.Exit();
             }
         }
@@ -634,6 +624,7 @@ namespace 百度经验个人助手
             listViewSearchExps.ItemsSource = ExpManager.rewardExps;
             await UpdateReward(low, high, tp, cid);
             textRewardCacheState.Text = string.Format("√ 已获取 {0} 的 {1}~{2} 页", cur, low, high);
+            Utility.LogEvent("YES_CacheRewardSucceed");
 
             buttonCacheReward.IsEnabled = true;
             buttonCacheRewardProgress.IsActive = false;
@@ -803,6 +794,7 @@ namespace 百度经验个人助手
             if (sdf.selectedFiles.Count == 0)
             {
                 await Utility.ShowMessageDialog("无选择文件", "您当前未选择任何历史文件。无分析。");
+                Utility.LogEvent("NO_StatisticNoSelected");
                 return;
             }
 
@@ -815,6 +807,7 @@ namespace 百度经验个人助手
                 if (StatManager.LastDateDataPack.date.Date == DateTime.Today.Date)
                 {
                     await Utility.ShowMessageDialog("选择今天的数据可能使分析无效", "您选择的历史数据是今天的数据。可能得到全0的作差结果。");
+                    Utility.LogEvent("NO_StatisticTodaySelected");
                 }
                 ShowLoading("计算中...");
                 await StatManager.Calc(StatManager.LastDateDataPack.contentExps,
@@ -840,10 +833,12 @@ namespace 百度经验个人助手
                 {
                     StatManager.CalcDeltaExpsOneYearIncrease();
                     textVisitOneYearIncrease.Text = "一年内经验增量：" + StatManager.DeltaExpsOneYearInc;
+                    Utility.LogEvent("YES_StatisticCalcAllSucceed");
                 }
                 catch(Exception e)
                 {
                     await Utility.ShowMessageDialog("计算一年内浏览增量失败", "可通知开发者 1223989563@qq.com");
+                    Utility.LogEvent("NO_StatisticCalcOneYearFailed");
                 }
                 UpdateTile();
             }
@@ -903,6 +898,7 @@ namespace 百度经验个人助手
             HideLoading();
             if (isEnterEdit)
             {
+                Utility.LogEvent("YES_GetRewardEnterEdit");
                 buttonCenter_Click(sender, e);
                 // await Task.Delay(300);
                 JSCodeString.planToGoUrl = "https://jingyan.baidu.com/edit/content?queryId=" + queryId;
@@ -967,6 +963,7 @@ namespace 百度经验个人助手
         private async void buttonTestMine_Click(object sender, RoutedEventArgs e)
         {
             ShowLoading("运行JS...");
+            Utility.LogEvent("OK_TestMineCalled");
             try
             {
                 await JSCodeString.RunJss(webViewMain, new string[] {JSCodeString.JsPrependErrorReport});
@@ -1007,6 +1004,7 @@ namespace 百度经验个人助手
         private async void buttonBigPicture_Click(object sender, RoutedEventArgs e)
         {
             ShowLoading("运行JS...");
+            Utility.LogEvent("OK_BigPictureCalled");
             try
             {
                 await JSCodeString.RunJs(webViewMain, JSCodeString.JsAddPictureBox);
@@ -1041,6 +1039,7 @@ namespace 百度经验个人助手
         private async void buttonAutoFill_Click(object sender, RoutedEventArgs e)
         {
             ShowLoading("自动填写...");
+            Utility.LogEvent("OK_AutoFillCalled");
             try
             {
                 await JSCodeString.RunJs(
@@ -1119,6 +1118,7 @@ namespace 百度经验个人助手
 
         private async void buttonAutoComplete_Click(object sender, RoutedEventArgs e)
         {
+            Utility.LogEvent("OK_AutoCompleteCalled");
             ShowLoading("初始化...");
             try
             {

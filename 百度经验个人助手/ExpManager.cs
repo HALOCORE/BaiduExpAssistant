@@ -448,6 +448,7 @@ namespace 百度经验个人助手
                 {
                     if (!GetContentsSubStep_ParseContentPage(j))
                     {
+                        Utility.LogEvent("ERROR_ParseContentFailed");
                         await Utility.ShowMessageDialog("意外问题", "数据获取成功但是解析失败。获取页 " + i + " 无要寻找的经验条目，或者Baidu经验页面有调整。"
                                                         + "\n一般情况下，这是一个容易解决的问题，看到此对话框可以截图给开发者并询问解决方法。");
                         return false;
@@ -514,20 +515,24 @@ namespace 百度经验个人助手
                 bool isGetSucceed = false;
                 if (respstr.IndexOf("\"errno\":0") >= 0)
                 {
+                    Utility.LogEvent("YES_TakeRewardSucceed");
                     respstr = "成功领取。请在 个人中心->悬赏经验->已领取 查看。";
                     isGetSucceed = true;
                 }
                 else if (respstr.IndexOf("\"errno\":302") >= 0)
                 {
+                    Utility.LogEvent("OK_TakeRewardAlready");
                     respstr = "你可能已经领取过经验。领取不成功(302)。";
                     //isGetSucceed = true;
                 }
                 else if (respstr.IndexOf("\"errno\":2") >= 0)
                 {
+                    Utility.LogEvent("ERROR_TakeRewardInvalid");
                     respstr = "身份验证失败，如果确定Cookie设定有效，可告知开发者 wang1223989563。错误码:2";
                 }
                 else
                 {
+                    Utility.LogEvent("ERROR_TakeRewardUnknown" + respstr);
                     respstr = "未知错误类型 (非302或2错误。可告知开发者 wang1223989563) \n错误信息: " + respstr;
                 }
 
@@ -545,6 +550,7 @@ namespace 百度经验个人助手
             }
             catch (Exception e)
             {
+                Utility.LogEvent("ERROR_TakeRewardException");
                 await Utility.ShowDetailedError("领取未成功", e);
                 return false;
             }
@@ -699,6 +705,7 @@ namespace 百度经验个人助手
 
                 if (response.StatusCode != HttpStatusCode.Ok)
                 {
+                    Utility.LogEvent("ERROR_ResponseNot200-" + response.StatusCode);
                     await Utility.ShowMessageDialog("意外情况，返回状态不是200 OK", "返回状态: " + response.StatusCode.ToString() + "\n请向开发者（1223989563@qq.com）反映.");
                 }
 
@@ -724,6 +731,7 @@ namespace 百度经验个人助手
                         {
 
                             setVerifying(true); // set verifying state.
+                            Utility.LogEvent("OK_VerifyingState");
 
                             string verifyResp = "";
                             while (!verifyResp.Replace(" ", "").Contains("{\"errno\":0"))
@@ -742,6 +750,7 @@ namespace 百度经验个人助手
                                     verifyResp = await SimpleRequestUrl(vurl, referrer, "POST", true);
                                 }
                             }
+                            Utility.LogEvent("YES_VerifySucceed");
                             await Utility.ShowMessageDialog("验证通过", "确定以继续.");
 
                             setVerifying(false); // if succeed, cancel verifying state.
@@ -759,6 +768,7 @@ namespace 百度经验个人助手
                             return await SimpleRequestUrl(url, referrer, method);
                         }
                     }
+                    Utility.LogEvent("ERROR_Unresolved-0x80072f76");
                     await Utility.ShowMessageDialog("可能是被验证码阻挡，也可能是其它网络问题，程序结束。",
                         "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误信息：\n\n" +
                         e.Message + "\n"
@@ -767,25 +777,22 @@ namespace 百度经验个人助手
                 }
                 else if ((uint)e.HResult == 0x80072efd)
                 {
+                    Utility.LogEvent("WARN-Exit-0x80072efd");
                     await Utility.ShowMessageDialog("80072efd，系统网络故障，程序结束。",
                         "\n错误信息：\n\n" + e.Message + "\n请百度80072efd寻找解决办法。该故障和系统网络设置有关。");
                     Application.Current.Exit();
                 }
                 else if ((uint)e.HResult == 0x80072eff)
                 {
-                    await Utility.ShowMessageDialog("80072eff，网络正常，请求超时（服务器不可达）",
+                    Utility.LogEvent("WARN-Exit-0x80072eff");
+                    await Utility.ShowMessageDialog("80072eff，网络有连接，百度经验无响应",
                         "请确认能够访问 jingyan.baidu.com，关闭此对话框会重试失败的请求。\n错误信息：\n\n" + e.Message);
                     return await SimpleRequestUrl(url, referrer, method);
                 }
 
+                Utility.LogEvent("ERROR-UNEXPECTED:" + e.HResult.ToString());
                 await Utility.ShowMessageDialog("网络故障，错误信息请留意", "关闭此提示框，程序收集错误信息后自动结束。\n错误信息：\n\n" + e.Message);
                 throw e;
-            }
-
-            if (response == null)
-            {
-                await Utility.ShowMessageDialog("未解决故障", "网络请求失败. 关闭此此提示框，程序收集错误信息后自动结束。");
-                throw new IOException("Get No Response.");
             }
         }
 

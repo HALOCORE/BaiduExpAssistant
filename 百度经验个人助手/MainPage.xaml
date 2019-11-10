@@ -173,7 +173,7 @@
             Stretch="UniformToFill"/>
     </Page.Background>
     <Grid>
-        <Grid x:Name="gridMain" Visibility="Collapsed" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid x:Name="gridMain" Visibility="Visible" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="230"/>
@@ -349,12 +349,12 @@
                         <DoubleAnimation Duration="0:0:1.5" From="0.3" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="buttonOpenFolder" ></DoubleAnimation>
                     </Storyboard>
                 </StackPanel.Resources>
-                <TextBlock FontSize="24" x:Name="textVisitAll" Margin="20,5,20,5">未更新</TextBlock>
-                <TextBlock FontSize="17" x:Name="textVisitAllIncrease" Margin="22,3,20,3" Foreground="LightGray">总浏览增量: -</TextBlock>
-                <TextBlock FontSize="17" x:Name="textVisitOneYearIncrease" Margin="22,3,20,3" Foreground="LightGray">一年内经验增量: -</TextBlock>
-                <TextBlock FontSize="17" x:Name="textVisitRecent20" Margin="22,3,20,3" Foreground="LightGray">近50篇平均增量: -</TextBlock>
-                <TextBlock FontSize="17" x:Name="textVoteAll" Margin="22,3,20,3" Foreground="LightGray">总投票: -</TextBlock>
-                <TextBlock FontSize="17" x:Name="textCollectAll" Margin="22,3,20,3" Foreground="LightGray">总收藏: -</TextBlock>
+                <TextBlock FontSize="24" x:Name="textVisitAll" Margin="20,5,0,5">未更新</TextBlock>
+                <TextBlock FontSize="17" x:Name="textVisitAllIncrease" Margin="22,3,0,3" Foreground="LightGray">总浏览增量: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textVisitOneYearIncrease" Margin="22,3,0,3" Foreground="LightGray">一年内经验增量: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textVisitRecent20" Margin="22,3,0,3" Foreground="LightGray">近50篇平均增量: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textVoteAll" Margin="22,3,0,3" Foreground="LightGray">总投票: -</TextBlock>
+                <TextBlock FontSize="17" x:Name="textCollectAll" Margin="22,3,0,3" Foreground="LightGray">总收藏: -</TextBlock>
                 <Button x:Name="buttonOpenFolder" Padding="0" 
                     Margin="20,5,20,5" Click="buttonOpenFolder_Click"
                     BorderThickness="0">
@@ -576,7 +576,7 @@
                             <TextBox x:Name="textCacheRewardFromTo" Foreground="AliceBlue" FontSize="14" MinWidth="50" Text="0-100" Height="12" Padding="4,3,4,5">
 
                             </TextBox>
-                            <Button x:Name="buttonCacheReward" FontSize="14" Foreground="WhiteSmoke"
+                            <Button x:Name="buttonCacheReward" FontSize="15" Foreground="WhiteSmoke" Background="DeepSkyBlue" Opacity="0.7"
                            Margin="0,0,0,0" Click="buttonCacheReward_Click"     
                            >
                                 <StackPanel>
@@ -600,7 +600,7 @@
                         </Style>
                     </StackPanel.Resources>
                     <TextBlock FontSize="30" Margin="10">搜索悬赏请先获取</TextBlock>
-                    <TextBlock FontSize="20" Margin="10">"获取"按钮左边文本框输入起止页数</TextBlock>
+                    <TextBlock FontSize="20" Margin="10">"获取"按钮左边输入起止页数</TextBlock>
                     <TextBlock FontSize="20" Margin="10">举例：10-100表示10~100页</TextBlock>
                     <TextBlock FontSize="30" Margin="10">搜索多个关键词空格隔开</TextBlock>
                     <TextBlock FontSize="30" Margin="10">最后点击悬赏搜索</TextBlock>
@@ -638,7 +638,7 @@
 
         </Grid>
 
-        <Grid x:Name="gridSecond" Visibility="Visible" Background="White" Opacity="1">
+        <Grid x:Name="gridSecond" Visibility="Collapsed" Background="White" Opacity="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="1*"/>
@@ -716,7 +716,7 @@
                             <GradientStop Color="#FF58D8A3" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
-                    雷区检测</Button>
+                    雷区检测：</Button>
                 <Button x:Name="buttonBigPicture" Click="buttonBigPicture_Click">
                     <Button.Background>
                         <LinearGradientBrush>
