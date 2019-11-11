@@ -733,18 +733,18 @@
                     </Button.Background>
                     自动补全 [Beta]
                 </Button>
-                <Button x:Name="buttonDIY" Click="buttonDIY_Click" Visibility="Collapsed">
+                <Button x:Name="buttonDIY" Click="buttonDIY_Click" Visibility="Visible">
                     <Button.Background>
                         <LinearGradientBrush>
                             <GradientStop Color="#BBFFA500"/>
                             <GradientStop Color="#CCFF69B4" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
-                    自定义 [Alpha]
+                    自定义 [Beta]
                 </Button>
                 <Grid Opacity="0.2" Visibility="Collapsed">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="1.8*"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>

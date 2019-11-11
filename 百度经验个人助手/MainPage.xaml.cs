@@ -118,14 +118,14 @@ namespace 百度经验个人助手
 
             ShowLoading("读取设置...");
             bool isSettingsRead = await StorageManager.ReadSettings();
-            if (StorageManager.AppSettings.isFirstIn || StorageManager.AppSettings.version != "1.5.0")
+            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != "1.5.0")
             {
                 ContentNewDialog cnd = new ContentNewDialog();
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
                 if (cdr2 == ContentDialogResult.Secondary)
                 {
-                    StorageManager.AppSettings.isFirstIn = false;
-                    StorageManager.AppSettings.version = "1.5.0";
+                    StorageManager.appSettings.isFirstIn = false;
+                    StorageManager.appSettings.version = "1.5.0";
                 }
                 ShowLoading("更新设置...");
                 
@@ -138,6 +138,9 @@ namespace 百度经验个人助手
 
             ShowLoading("读取Edit设置...");
             await StorageManager.ReadEditSettings();
+
+            ShowLoading("读取DIY功能设置...");
+            await StorageManager.ReadDIYToolsSettings();
 
             if (Window.Current.Bounds.Width < 1100)
             {

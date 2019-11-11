@@ -9,6 +9,7 @@
     Title="自定义功能 (测试版，更新可能删除数据)"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    SecondaryButtonText="初始化"
     CloseButtonText="关闭"
     CloseButtonClick="ContentDialog_CloseButtonClick"
     HorizontalContentAlignment="Stretch" BorderBrush="#FFCC2973">
@@ -35,27 +36,57 @@
         </Grid.BorderBrush>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"></ColumnDefinition>
-            <ColumnDefinition Width="1.5*"></ColumnDefinition>
+            <ColumnDefinition Width="1.2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <ListView Grid.Column="0" Background="#19000000" Margin="0,0,5,0">
+        <ListView x:Name="listViewDIYTools" Background="#11000000" Grid.Column="0" Margin="0,0,5,0">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Margin" Value="6,3,6,3"/>
+                    <Setter Property="Background" Value="#66ffeedd"/>
+                </Style>
+    
+            </ListView.ItemContainerStyle>
+    
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid HorizontalAlignment="Stretch">
-                        <TextBlock HorizontalAlignment="Stretch" 
-                               VerticalAlignment="Center"
-                               Padding="5,0,5,0" Text="{Binding ExpName}" />
-                        <StackPanel HorizontalAlignment="Right" 
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                            <TextBlock Padding="5,0,5,0" Text= "{Binding ViewIncState}" 
-                                   Foreground= "{Binding ViewIncColor}" />
-                            <TextBlock Padding="5,0,5,0" Text= "👁‍🗨" />
-                            <TextBlock Padding="5,0,5,0" Text= "{Binding View}" />
-                            <TextBlock Padding="5,0,5,0" Text= "📈" />
-                            <TextBlock Padding="5,0,5,0" Text= "{Binding Vote}" />
-                            <TextBlock Padding="5,0,5,0" Text= "❤" />
-                            <TextBlock Padding="5,0,5,0" Text= "{Binding Collect}" />
-                        </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="173"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <SymbolIcon Symbol="Flag"/>
+                        </Grid>
+                        <Grid Grid.Column="1" Margin="10,8,8,5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Grid.Row="0" HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Center" FontSize="16" Padding="5,0,5,0" Text="{Binding Name}" />
+                                <TextBlock Padding="5,0,5,0" Foreground="White" FontSize="12" VerticalAlignment="Center" Opacity="1" Text= "{Binding ShowTrigType}" />
+                            </StackPanel>
+                            <Grid Grid.Row="1" Margin="0,2,0,5" HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                                <TextBlock Padding="5,0,5,0" FontSize="10" TextWrapping="Wrap" Text= "{Binding ShowNote}" />
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Column="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="buttonTempEditDIYEntry" Background="DarkOrange" Foreground="White" Click="buttonTempEditDIYEntry_Click">
+                                    <SymbolIcon Symbol="Edit"/>
+                                </Button>
+                                <Button x:Name="buttonTempDeleteDIYEntry" Grid.Column="1" Background="SlateGray" Foreground="White" Click="buttonTempDeleteDIYEntry_Click">
+                                    <SymbolIcon Symbol="Delete"/>
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -107,14 +138,14 @@
                 <TextBlock Margin="4,4,4,4" Width="80" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">说明:</TextBlock>
                 <TextBox x:Name="textBoxDIYEntryNote" Grid.Column="1" PlaceholderText="在此输入补充说明（可选）" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="0,0,0,0"/>
             </Grid>
-            <TextBox x:Name="textBoxDIYEntryCode" Grid.Row="4" ScrollViewer.VerticalScrollMode="Auto" PlaceholderText="在此输入 Javascript 代码" Margin="0,5,0,0"></TextBox>
+            <TextBox x:Name="textBoxDIYEntryCode" Grid.Row="4" AcceptsReturn="True" InputScope="NativeScript" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Auto" PlaceholderText="在此输入 Javascript 代码" Margin="0,5,0,0"></TextBox>
             <Grid Grid.Row="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="buttonClearDIYEntry" HorizontalAlignment="Stretch" Background="#33CF5501" Click="buttonClearDIYEntry_Click">清除</Button>
-                <Button x:Name="buttonSaveDIYEntry" Grid.Column="1" HorizontalAlignment="Stretch" Background="#7FDC6DCD">创建 / 保存</Button>
+                <Button x:Name="buttonSaveDIYEntry" Grid.Column="1" HorizontalAlignment="Stretch" Background="#7FDC6DCD" Click="buttonSaveDIYEntry_Click">创建 / 保存</Button>
             </Grid>
 
         </Grid>
