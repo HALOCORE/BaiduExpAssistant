@@ -751,7 +751,7 @@ namespace 百度经验个人助手
                                 }
                             }
                             Utility.LogEvent("YES_VerifySucceed");
-                            await Utility.ShowMessageDialog("验证通过", "确定以继续.");
+                            App.currentMainPage.ShowNotify("验证通过", "所有中断的请求将会重新发送.");
 
                             setVerifying(false); // if succeed, cancel verifying state.
                             return await SimpleRequestUrl(url, referrer, method);

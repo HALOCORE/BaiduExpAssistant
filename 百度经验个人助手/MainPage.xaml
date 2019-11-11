@@ -173,7 +173,7 @@
             Stretch="UniformToFill"/>
     </Page.Background>
     <Grid>
-        <Grid x:Name="gridMain" Visibility="Visible" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid x:Name="gridMain" Visibility="Collapsed" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="230"/>
@@ -638,7 +638,7 @@
 
         </Grid>
 
-        <Grid x:Name="gridSecond" Visibility="Collapsed" Background="White" Opacity="1">
+        <Grid x:Name="gridSecond" Visibility="Visible" Background="White" Opacity="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="1*"/>
@@ -658,10 +658,9 @@
                         <Setter Property="Foreground" Value="Black"></Setter>
                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
-                        <Setter Property="Padding" Value="14"/>
+                        <Setter Property="Padding" Value="14,12,14,12"/>
                         <Setter Property="Margin" Value="5"></Setter>
                         <Setter Property="FontSize" Value="18"></Setter>
-                        
                     </Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Foreground" Value="Black"/>
@@ -694,8 +693,8 @@
                 <Button x:Name="buttonAutoFill" HorizontalContentAlignment="Stretch" Click="buttonAutoFill_Click">
                     <Button.Background>
                         <LinearGradientBrush>
-                            <GradientStop Color="LawnGreen"/>
-                            <GradientStop Color="Orange" Offset="0.70"/>
+                            <GradientStop Color="#BB7CFC00"/>
+                            <GradientStop Color="#DD58D8A3" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
                     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -712,27 +711,36 @@
                 <Button Visibility="Visible" x:Name="buttonTestMine"  Click="buttonTestMine_Click">
                     <Button.Background>
                         <LinearGradientBrush>
-                            <GradientStop Color="LawnGreen"/>
-                            <GradientStop Color="#FF58D8A3" Offset="0.70"/>
+                            <GradientStop Color="#BB7CFC00"/>
+                            <GradientStop Color="#DD58D8A3" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
-                    雷区检测：</Button>
+                    雷区检测</Button>
                 <Button x:Name="buttonBigPicture" Click="buttonBigPicture_Click">
                     <Button.Background>
                         <LinearGradientBrush>
-                            <GradientStop Color="LawnGreen"/>
-                            <GradientStop Color="#FF58D8A3" Offset="0.70"/>
+                            <GradientStop Color="#BB7CFC00"/>
+                            <GradientStop Color="#DD58D8A3" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
                     大图片框</Button>
                 <Button x:Name="buttonAutoComplete" Click="buttonAutoComplete_Click">
                     <Button.Background>
                         <LinearGradientBrush>
-                            <GradientStop Color="Orange"/>
-                            <GradientStop Color="HotPink" Offset="0.70"/>
+                            <GradientStop Color="#BBFFA500"/>
+                            <GradientStop Color="#CCFF69B4" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
                     自动补全 [Beta]
+                </Button>
+                <Button x:Name="buttonDIY" Click="buttonDIY_Click" Visibility="Collapsed">
+                    <Button.Background>
+                        <LinearGradientBrush>
+                            <GradientStop Color="#BBFFA500"/>
+                            <GradientStop Color="#CCFF69B4" Offset="0.70"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                    自定义 [Alpha]
                 </Button>
                 <Grid Opacity="0.2" Visibility="Collapsed">
                     <Grid.ColumnDefinitions>
@@ -778,11 +786,8 @@
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.7">
                     5. 自动添加n个空白步骤
                 </TextBlock>
-                <TextBlock FontSize="20" Foreground="Gray" Opacity="0.65">
-                    6. 部分固定步骤填写（不常用）
-                </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
-                    雷区检测
+                    雷区检测：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.75">
                     Thanks to 孢子真好玩
@@ -794,15 +799,11 @@
                     1. 便于看图编写步骤
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.8">
-                    2. 悬浮置顶
+                    2. 悬浮置顶，可拖拽移动
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.7">
-                    3. 可拖拽移动
+                    3. 可调整大小
                 </TextBlock>
-                <TextBlock FontSize="20" Foreground="Gray" Opacity="0.65">
-                    4. 可调整大小
-                </TextBlock>
-
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
                     自动补全（Beta）：
                 </TextBlock>
@@ -818,14 +819,57 @@
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.7">
                     4. 也可键盘↑↓/鼠标点击选择条目
                 </TextBlock>
-                <TextBlock FontSize="20" Foreground="Gray" Opacity="0.65">
-                    5. 与Alpha相比，多处改进
-                </TextBlock>
             </StackPanel>
             
             <WebView x:Name="webViewMain" Grid.Column="1"></WebView>
         </Grid>
 
+        <Grid x:Name="GridNotify" Width="Auto" Grid.Column="0" Grid.ColumnSpan="3"
+              VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,00"  Visibility="Collapsed">
+            <Grid.Resources>
+                <Storyboard x:Name="StoryBoardNotify">
+                    <DoubleAnimationUsingKeyFrames
+                        Storyboard.TargetName="GridNotify"
+                        Storyboard.TargetProperty="Opacity"
+                        Duration="0:0:3">
+                        <DoubleAnimationUsingKeyFrames.KeyFrames>
+                            <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                            <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="0.7"/>
+                            <LinearDoubleKeyFrame KeyTime="0:0:0.5" Value="1"/>
+                            <LinearDoubleKeyFrame KeyTime="0:0:2" Value="1"/>
+                            <LinearDoubleKeyFrame KeyTime="0:0:3" Value="0"/>
+                        </DoubleAnimationUsingKeyFrames.KeyFrames>
+                    </DoubleAnimationUsingKeyFrames>
+
+                    <ObjectAnimationUsingKeyFrames  
+                        Storyboard.TargetName="GridNotify"
+                        Storyboard.TargetProperty="Visibility"
+                        Duration="0:0:4">
+                        <ObjectAnimationUsingKeyFrames.KeyFrames>
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="Visible"/>
+                            <DiscreteObjectKeyFrame KeyTime="0:0:3.5" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames.KeyFrames>
+                    </ObjectAnimationUsingKeyFrames>
+                </Storyboard>
+            </Grid.Resources>
+            <Border CornerRadius="25" BorderThickness="0" Padding="25,8,55,8">
+                <Border.Background>
+                    <SolidColorBrush Color="Black" Opacity="0.85"></SolidColorBrush>
+                </Border.Background>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <SymbolIcon x:Name="SymbolIconNotify" Symbol="Accept" Foreground="White" Margin="8" Width="45"/>
+                    <StackPanel>
+                        <TextBlock x:Name="TextBlockNotifyMain" Margin="3" FontSize="26" Foreground="White" VerticalAlignment="Center">
+                                这是一条消息通知
+                        </TextBlock>
+                        <TextBlock Grid.Row="1" Margin="3,0,3,5" x:Name="TextBlockNotifyMessage" FontSize="15" Foreground="White" VerticalAlignment="Center">
+                                这是一条消息通知的详细信息，一些补充说说明
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+        
         <Grid x:Name="GridLoading" Visibility="Collapsed" Opacity="0.8">
             <Grid.Background>
                 <SolidColorBrush Color="Black"/>

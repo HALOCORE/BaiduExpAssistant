@@ -6,13 +6,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="✔使用技巧（网页链接）"
+    Title="使用技巧（网页链接）"
     IsSecondaryButtonEnabled="False"
     PrimaryButtonText="确定"
     SecondaryButtonText="反馈"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     Width="400"
-    Height="400"
+    Height="430"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
     >
 <ContentDialog.Background>
@@ -25,7 +25,7 @@
 
         </LinearGradientBrush>
 </ContentDialog.Background>
-    <Grid Margin="10" >
+    <Grid Margin="2,10,2,10" >
         <StackPanel>
             <StackPanel.Resources>
                 <Style TargetType="Button">

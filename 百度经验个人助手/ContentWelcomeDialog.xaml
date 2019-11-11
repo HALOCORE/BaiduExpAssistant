@@ -11,6 +11,7 @@
     SecondaryButtonText="老司机通道"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    BorderBrush="AliceBlue"
     >
     <ContentDialog.Background>
         <LinearGradientBrush>

@@ -12,15 +12,16 @@
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
     Width="770"
-    Height="520"
+    Height="526"
     HorizontalAlignment="Center"
+    BorderBrush="Black"
     >
     <ContentDialog.Background>
         <LinearGradientBrush>
             <LinearGradientBrush.Transform>
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
-            <GradientStop Color="LightSlateGray" Offset="0.7"/>
+            <GradientStop Color="#FF99ADC1" Offset="0.7"/>
             <GradientStop Color="{ThemeResource SystemAltMediumHighColor}"/>
 
         </LinearGradientBrush>
@@ -54,14 +55,14 @@
                 </Style>
             </StackPanel.Resources>
             <TextBlock FontSize="12" FontStyle="Oblique" Margin="5">BDUSS是Baidu临时唯一身份凭证。</TextBlock>
-            <TextBlock FontSize="12" FontStyle="Oblique" Margin="5">失效前不可公开。从获取处退出登录重置。</TextBlock>
+            <TextBlock FontSize="12" FontStyle="Oblique" Margin="5">失效前不可公开。从获取处退出登录/修改密码以重置。</TextBlock>
             
             <TextBox x:Name="way2bdussText" FontSize="14" Margin="0,5,0,5" PlaceholderText="请粘贴 BDUSS" InputScope="NativeScript"/>
             
         </StackPanel>
         <StackPanel Grid.Column="0" Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2">
-            <TextBlock Margin="5,15,5,4" FontSize="20">设置帮助 （有问题可联系开发者）</TextBlock>
-            <TextBlock Margin="5,15,5,4" FontSize="20" VerticalAlignment="Bottom" Foreground="WhiteSmoke" >✒建议按照动画演示设置Cookie</TextBlock>
+            <TextBlock Margin="5,15,5,4" FontSize="20">设置帮助</TextBlock>
+            <TextBlock Margin="30,15,5,4" FontSize="20" VerticalAlignment="Bottom" Foreground="DarkSlateGray" >✒建议按照动画演示设置Cookie</TextBlock>
         </StackPanel>
         <Grid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"  Padding="10">
             <Grid.ColumnDefinitions>
@@ -80,15 +81,11 @@
             </Grid.Background>
             <StackPanel>
                 <TextBlock FontSize="13" Margin="5,5,5,2">获取Cookie的办法可以点击查看经验：</TextBlock>
-                <Button 
-                    FontSize="12" Margin="5,5,5,0" 
-                    Click="Button_Click_2">
-                    · QQ浏览器如何获取百度经验Cookie?
-                </Button>
-                <Button FontSize="12" Margin="5,0,5,0" Click="Button_Click_1">· Edge浏览器如何获取百度经验Cookie?</Button>
-                <Button FontSize="12" Margin="5,0,5,0" Click="Button_Click">· IE浏览器如何获取百度经验Cookie?</Button>
-                <Button FontSize="12" Margin="5,0,5,0" Click="Button_Click_4">· 火狐浏览器如何获取百度经验Cookie?</Button>
-                <Button FontSize="12" Margin="5,0,5,5" Click="Button_Click_3">· 360浏览器如何获取百度经验Cookie?</Button>
+                <Button Width="240" HorizontalContentAlignment="Left" FontSize="12" Margin="5,5,5,0" Click="Button_Click_2">· QQ浏览器如何获取百度经验Cookie?</Button>
+                <Button Width="240" HorizontalContentAlignment="Left" FontSize="12" Margin="5,0,5,0" Click="Button_Click_1">· Edge浏览器如何获取百度经验Cookie?</Button>
+                <Button Width="240" HorizontalContentAlignment="Left" FontSize="12" Margin="5,0,5,0" Click="Button_Click">· IE浏览器如何获取百度经验Cookie?</Button>
+                <Button Width="240" HorizontalContentAlignment="Left" FontSize="12" Margin="5,0,5,0" Click="Button_Click_4">· 火狐浏览器如何获取百度经验Cookie?</Button>
+                <Button Width="240" HorizontalContentAlignment="Left" FontSize="12" Margin="5,0,5,5" Click="Button_Click_3">· 360浏览器如何获取百度经验Cookie?</Button>
             </StackPanel>
             <StackPanel Grid.Column="1">
                 <TextBlock FontSize="14" Margin="5,3,5,2" TextWrapping="Wrap" Foreground="DarkRed">最好使用常用浏览器获取，不要使用在线填写密码获取的方法，不要在第三方工具暴露个人账号密码。在Baidu官方网站或者APP之外的任何地方填写账号密码都是危险的行为。</TextBlock>
@@ -98,7 +95,7 @@
                     如果你对Cookie不了解，请仔细按照有关经验的步骤一步步来，帮助中的并没有多余的内容。
                 </TextBlock>
                 <TextBlock FontSize="14" Margin="5,3,5,2" TextWrapping="Wrap" Foreground="DimGray">
-                    如果仍有问题，在百度经验回享计划交流群（254880947）里，可以询问已经设置好的用户以及开发者，也可以等待更新。    
+                    如果仍有问题，在百度经验官方群（254880947）里，可以询问已经设置好的用户以及开发者。    
                 </TextBlock>
 
             </StackPanel>

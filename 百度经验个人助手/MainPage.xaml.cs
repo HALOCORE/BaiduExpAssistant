@@ -63,6 +63,13 @@ namespace 百度经验个人助手
             GridLoading.Visibility = Visibility.Collapsed;
         }
 
+        public void ShowNotify(string title, string message, Symbol symbol = Symbol.Accept)
+        {
+            SymbolIconNotify.Symbol = symbol;
+            TextBlockNotifyMain.Text = title;
+            TextBlockNotifyMessage.Text = message;
+            StoryBoardNotify.Begin();
+        }
 
         //更新磁贴的方法
         private void UpdateTile()
@@ -399,7 +406,7 @@ namespace 百度经验个人助手
             HideLoading();
             if (cdr == ContentDialogResult.None)
             {
-                Utility.ShowMessageDialog("设置取消", "设置取消，保持原状。");
+                ShowNotify("设置取消", "Cookie设置取消，保持原状。", Symbol.Comment);
                 buttonSetCookie.IsEnabled = true;
                 buttonSetCookieProgress.IsActive = false;
                 buttonSetCookieProgress.Visibility = Visibility.Collapsed;
@@ -408,7 +415,7 @@ namespace 百度经验个人助手
             }
             if (scd.userInputCookie.Trim() == "")
             {
-                Utility.ShowMessageDialog("输入为空", "设置取消，保持原状。");
+                ShowNotify("设置无效", "Cookie输入为空，保持原状。", Symbol.Cancel);
                 buttonSetCookie.IsEnabled = true;
                 buttonSetCookieProgress.IsActive = false;
                 buttonSetCookieProgress.Visibility = Visibility.Collapsed;
@@ -498,6 +505,7 @@ namespace 百度经验个人助手
                 UpdateTile();
 
                 //Utility.ShowMessageDialog("更新完成", "点击 \"✅ 本次已更新\" 打开数据所在文件夹：\n" + StorageManager.StorageFolder.Path);
+                ShowNotify("更新完成", "点击数据分析以计算增量");
                 Utility.LogEvent("YES_UpdateExpSucceed");
 
                 textDate.Text = "✅ 本次已更新";
@@ -558,7 +566,7 @@ namespace 百度经验个人助手
                 }
             }
             isCacheReward = true;
-            await Utility.ShowMessageDialog("悬赏获取", "共获取 " + ExpManager.rewardExps.Count + " 条.");
+            ShowNotify("悬赏获取完成", "共获取 " + ExpManager.rewardExps.Count + " 条.");
             ShowControls();
         }
 
@@ -999,6 +1007,7 @@ namespace 百度经验个人助手
             buttonAutoFill.IsEnabled = isEdit;
             buttonBigPicture.IsEnabled = isEdit;
             buttonAutoComplete.IsEnabled = isEdit;
+            buttonDIY.IsEnabled = isEdit;
         }
 
         private async void buttonBigPicture_Click(object sender, RoutedEventArgs e)
@@ -1154,5 +1163,10 @@ namespace 百度经验个人助手
             HideLoading();
         }
 
+        private async void buttonDIY_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new ContentDIYDialog();
+            var result = await dlg.ShowAsync();
+        }
     }
 }

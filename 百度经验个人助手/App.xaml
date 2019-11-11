@@ -26,7 +26,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="RootGrid" CornerRadius="20" Background="{TemplateBinding Background}" >
+                        <Border x:Name="RootGrid" CornerRadius="18" Background="{TemplateBinding Background}" >
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal">
