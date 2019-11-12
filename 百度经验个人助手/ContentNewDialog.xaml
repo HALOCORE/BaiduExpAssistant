@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:gif="using:XamlAnimatedGif"
     mc:Ignorable="d"
-    Title="1.5.0 新功能"
+    Title="1.5.3 新功能"
     PrimaryButtonText="关闭"
     SecondaryButtonText="不再显示"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
@@ -18,12 +18,45 @@
             <LinearGradientBrush.Transform>
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
-            <GradientStop Color="Orange"  Offset="0.7"/>
-            <GradientStop Color="LightPink"/>
+            <GradientStop Color="LightBlue"  Offset="0.7"/>
+            <GradientStop Color="AliceBlue"/>
         </LinearGradientBrush>
     </ContentDialog.Background>
     <Grid Width="600" Height="350" Margin="20">
         <ListView HorizontalContentAlignment="Stretch">
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="8" >
+                            <TextBlock FontSize="26" Margin="5">辅助编辑增加自定义功能测试版</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">除了自带的自动填写，雷区检测等功能，还可以自己用脚本定义功能。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="8" >
+                            <TextBlock FontSize="26" Margin="5">数据分析算法改进</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">计算时间应该有所减少</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem>
+                <TextBlock FontSize="20">版本日志：1.5.0 版本增加功能</TextBlock>
+            </ListViewItem>
             <ListViewItem HorizontalContentAlignment="Stretch">
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
@@ -40,7 +73,7 @@
                 </Grid>
             </ListViewItem>
             <ListViewItem>
-                <TextBlock FontSize="20">版本日志：1.4.6版本增加功能</TextBlock>
+                <TextBlock FontSize="20">版本日志：1.4.9版本增加功能</TextBlock>
             </ListViewItem>
             <ListViewItem HorizontalContentAlignment="Stretch">
                 <Grid HorizontalAlignment="Stretch">

@@ -227,6 +227,7 @@ namespace 百度经验个人助手
             TrigType = trigType;
             Note = note;
             Code = code;
+            IsActivate = false;
         }
 
         public DIYTool()
@@ -235,6 +236,7 @@ namespace 百度经验个人助手
             TrigType = "click";
             Note = "";
             Code = "";
+            IsActivate = false;
         }
 
         [XmlElement("Name")] public string Name { get; set; }
@@ -242,6 +244,9 @@ namespace 百度经验个人助手
         [XmlElement("TrigType")] public string TrigType { get; set; }
         [XmlElement("Note")] public string Note { get; set; }
         [XmlElement("Code")] public string Code { get; set; }
+
+        [XmlIgnore]
+        public bool IsActivate { get; set; }
 
         [XmlIgnore]
         public bool IsClickTrig
@@ -257,8 +262,9 @@ namespace 百度经验个人助手
         {
             get
             {
-                if (TrigType == "click") return "🖱 点击触发";
-                else return "📋 页面触发";
+                if (TrigType == "click") return "🖱";
+                else if (IsActivate) return "🔗 激活中";
+                else return "🔗";
             }
         }
 
@@ -270,6 +276,36 @@ namespace 百度经验个人助手
                 if (Note.Trim() == "") return "(请编辑该功能的描述)";
                 if (Note.Length < 40) return Note;
                 else return Note.Substring(0, 35) + "...";
+            }
+        }
+
+        [XmlIgnore]
+        public string StateColor1
+        {
+            get
+            {
+                if (IsActivate) return "White";
+                else return "Black";
+            }
+        }
+
+        [XmlIgnore]
+        public string ToolSymbol
+        {
+            get
+            {
+                if (IsClickTrig)
+                {
+                    return "TouchPointer";
+                }
+                else if (IsActivate)
+                {
+                    return "Pause";
+                }
+                else
+                {
+                    return "Play";
+                }
             }
         }
     }
@@ -285,26 +321,75 @@ namespace 百度经验个人助手
             DIYTools = new ObservableCollection<DIYTool>();
         }
 
-        public void Init()
+        public void Init(bool allClear = false)
         {
-            DIYTools.Clear();
+            //准备自带的功能
+            var tempTools = new ObservableCollection<DIYTool>();
 
             DIYTool dt1 = new DIYTool(
                 "开宝箱",
                 "https://jingyan.baidu.com/usersign",
                 "navigate",
-                "打开签到日历页面，激活此工具，会一直开宝箱知道所有宝箱都开启.",
+                "打开签到日历页面，激活此工具，会一直开宝箱，直到所有宝箱都开启.",
                 "var openb = document.getElementById('openBoxBtn'); if(openb) openb.click();");
 
             DIYTool dt2 = new DIYTool(
                 "开老虎机",
                 "https://jingyan.baidu.com/user/nuc",
                 "click",
-                "打开老虎机，点击此工具，会一直开老虎机直到开完.",
-                "var zp = document.getElementsByClassName(\"zhuanpan\")[0];\nvar try10 = zp.getElementsByClassName(\"try10\")[0];\nif(!try10.classList.contains(\"disable\") try10.click();");
+                "（还没写）打开老虎机，点击此工具，会一直开老虎机直到开完.",
+                "window.external.notify('NOTIFY: 开发者还没写这个功能 | 如果你已经写了，可以告知开发者 | WARN');\r\n//var zp = document.getElementsByClassName(\"zhuanpan\")[0];\r\n//var try10 = zp.getElementsByClassName(\"try10\")[0];\r\n//if(!try10.classList.contains(\"disable\") try10.click();");
 
-            DIYTools.Add(dt1);
-            DIYTools.Add(dt2);
+            DIYTool dt3 = new DIYTool(
+               "查看未读消息-触发器",
+               "https://jingyan.baidu.com/user/nuc",
+               "click",
+               "先激活 “查看未读消息” 功能，然后点击这个进入工作页面。",
+               "window.external.notify('GOTO: https://jingyan.baidu.com/user/nucpage/message FROM: https://jingyan.baidu.com/user/nuc/');");
+
+            DIYTool dt4 = new DIYTool(
+                 "查看未读消息",
+                 "https://jingyan.baidu.com/user/nucpage/message",
+                 "navigate",
+                 "先激活此功能，然后点击 查看未读消息-触发器",
+                 "var cks = document.getElementsByClassName('msg-more-btn'); var tcount = 200; for(let ck of cks) {setTimeout(function(){ck.click()}, tcount); tcount += 200;}");
+
+            tempTools.Add(dt1);
+            tempTools.Add(dt2);
+            tempTools.Add(dt3);
+            tempTools.Add(dt4);
+
+            if (allClear)
+            {
+                DIYTools.Clear();
+                foreach(var tool in tempTools)
+                {
+                    DIYTools.Add(tool);
+                }
+            }
+            else
+            {
+                var midTools = new ObservableCollection<DIYTool>();
+                foreach (var utool in DIYTools)
+                {
+                    bool isDefault = false;
+                    foreach (var tool in tempTools)
+                    {
+                        if (tool.Name == utool.Name) isDefault = true;
+                    }
+                    if (!isDefault) midTools.Add(utool);
+                }
+
+                DIYTools.Clear();
+                foreach (var tool in tempTools)
+                {
+                    DIYTools.Add(tool);
+                }
+                foreach (var tool in midTools)
+                {
+                    DIYTools.Add(tool);
+                }
+            }
         }
     }
 
@@ -316,7 +401,9 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-
+        private static string _editSettingsFileName = "EditSettings.xml";
+        private static string _settingsFileName = "Settings.xml";
+        private static string _dIYToolsSettingsFileName = "DIYToolsSettingsV1.xml";
 
         public static StorageFolder StorageFolder
         {
@@ -335,19 +422,6 @@ namespace 百度经验个人助手
         public static Settings appSettings;
         public static EditSettings editSettings;
         public static DIYToolsSettings dIYToolsSettings;
-
-        /// <summary>
-        /// 显示消息框
-        /// </summary>
-        /// <param name="title">标题</param>
-        /// <param name="message">信息</param>
-        private static async Task ShowMessageDialog(string title, string message)
-        {
-            var msgDialog = new Windows.UI.Popups.MessageDialog(message) { Title = title };
-            //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定", uiCommand => { this.textUserName.Text = $"您点击了：{uiCommand.Label}"; }));
-            //msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("取消", uiCommand => { this.textUserName.Text = $"您点击了：{uiCommand.Label}"; }));
-            await msgDialog.ShowAsync();
-        }
 
 
         private static Regex _invalidXmlChars = new Regex(
@@ -384,7 +458,7 @@ namespace 百度经验个人助手
 
             if (id == null)
             {
-                ShowMessageDialog("奇异情况", "百度id不存在。请询问开发者（1223989563@qq.com）此问题。"
+                Utility.ShowMessageDialog("奇异情况", "百度id不存在。请询问开发者（1223989563@qq.com）此问题。"
                     + "\n此时用户名：" + ExpManager.newMainUserName
                     + "\n此时经验数：" + ExpManager.newMainExpCount);
                 return "临时用户";
@@ -396,13 +470,13 @@ namespace 百度经验个人助手
 
         private static async Task _handleSerializeExceptions(Exception e)
         {
-            await ShowMessageDialog("设置未保存。序列化Xml发生问题",
+            await Utility.ShowMessageDialog("设置未保存。序列化Xml发生问题",
 
                     "错误类型：" + e.GetType() + "\n错误编码：" + string.Format("{0:X}", e.HResult) +
                     "\nXmlSerializer.Serialize函数出错，数据无法保存，看到此错误可截图发送给开发者。其他功能继续。" + e.Message);
             if (e.InnerException != null)
             {
-                await ShowMessageDialog(
+                await Utility.ShowMessageDialog(
                     "e.InnerException", "信息：" + e.Message
                                         + "类型：" + e.GetType() + "\n调用栈："
                                         + e.InnerException.StackTrace);
@@ -420,7 +494,7 @@ namespace 百度经验个人助手
 
             try
             {
-                f = await _storageFolder.GetFileAsync("Settings.xml");
+                f = await _storageFolder.GetFileAsync(_settingsFileName);
             }
             catch (Exception e)
             {
@@ -435,7 +509,7 @@ namespace 百度经验个人助手
             }
             catch (InvalidOperationException e)
             {
-                await ShowMessageDialog("遇到格式错误的设置文件", "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n设置文件：" + f.Name + "\n" + e.Message);
+                await Utility.ShowMessageDialog("遇到格式错误的设置文件", "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n设置文件：" + f.Name + "\n" + e.Message);
                 reader.Dispose();
                 fs.Dispose();
                 return false;
@@ -449,7 +523,7 @@ namespace 百度经验个人助手
 
         public static async Task<bool> SaveSettings()
         {
-            string filename = "Settings.xml";
+            string filename = _settingsFileName;
 
             XmlSerializer serializer =
                 new XmlSerializer(typeof(Settings));
@@ -486,7 +560,7 @@ namespace 百度经验个人助手
 
             try
             {
-                f = await _storageFolder.GetFileAsync("EditSettings.xml");
+                f = await _storageFolder.GetFileAsync(_editSettingsFileName);
             }
             catch (Exception e)
             {
@@ -501,7 +575,7 @@ namespace 百度经验个人助手
             }
             catch (InvalidOperationException e)
             {
-                await ShowMessageDialog("遇到格式错误的设置文件", "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n设置文件：" + f.Name + "\n" + e.Message);
+                await Utility.ShowMessageDialog("遇到格式错误的设置文件", "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n设置文件：" + f.Name + "\n" + e.Message);
                 reader.Dispose();
                 fs.Dispose();
                 return false;
@@ -515,7 +589,7 @@ namespace 百度经验个人助手
 
         public static async Task<bool> SaveEditSettings()
         {
-            string filename = "EditSettings.xml";
+            string filename = _editSettingsFileName;
 
             XmlSerializer serializer =
                 new XmlSerializer(typeof(EditSettings));
@@ -552,7 +626,7 @@ namespace 百度经验个人助手
 
             try
             {
-                f = await _storageFolder.GetFileAsync("DIYToolsSettings.xml");
+                f = await _storageFolder.GetFileAsync(_dIYToolsSettingsFileName);
             }
             catch (Exception e)
             {
@@ -568,7 +642,7 @@ namespace 百度经验个人助手
             }
             catch (InvalidOperationException e)
             {
-                await ShowMessageDialog("遇到格式错误的设置文件", "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n设置文件：" + f.Name + "\n" + e.Message);
+                await Utility.ShowMessageDialog("遇到格式错误的设置文件", "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n设置文件：" + f.Name + "\n" + e.Message);
                 reader.Dispose();
                 fs.Dispose();
                 return false;
@@ -582,7 +656,7 @@ namespace 百度经验个人助手
 
         public static async Task<bool> SaveDIYToolsSettings()
         {
-            string filename = "DIYToolsSettings.xml";
+            string filename = _dIYToolsSettingsFileName;
 
             XmlSerializer serializer =
                 new XmlSerializer(typeof(DIYToolsSettings));
@@ -632,7 +706,7 @@ namespace 百度经验个人助手
                 }
                 catch (Exception e)
                 {
-                    await ShowMessageDialog("创建文件夹出错。可以截图发送给开发者", e.InnerException.ToString() + "\n" + e.StackTrace);
+                    await Utility.ShowMessageDialog("创建文件夹出错。可以截图发送给开发者", e.InnerException.ToString() + "\n" + e.StackTrace);
                     return 0;
                 }
             }
@@ -656,7 +730,7 @@ namespace 百度经验个人助手
                 }
                 catch (Exception e)
                 {
-                    await ShowMessageDialog("创建最新文件夹出错。可以截图发送给开发者", e.InnerException.ToString() + "\n" + e.StackTrace);
+                    await Utility.ShowMessageDialog("创建最新文件夹出错。可以截图发送给开发者", e.InnerException.ToString() + "\n" + e.StackTrace);
                     return 0;
                 }
             }
@@ -716,7 +790,7 @@ namespace 百度经验个人助手
 
             if (_currentUserFolder == null)
             {
-                await ShowMessageDialog("目录不存在，无法保存数据", "要解决此问题请将相关信息提供给开发者。");
+                await Utility.ShowMessageDialog("目录不存在，无法保存数据", "要解决此问题请将相关信息提供给开发者。");
                 return;
             }
             StorageFile file =
@@ -744,13 +818,13 @@ namespace 百度经验个人助手
             }
             catch (Exception e)
             {
-                await ShowMessageDialog("序列化Xml发生问题（System.Xml.Serialization）",
+                await Utility.ShowMessageDialog("序列化Xml发生问题（System.Xml.Serialization）",
 
                     "错误类型：" + e.GetType() + "\n错误编码：" + string.Format("{0:X}", e.HResult) +
                     "\nXmlSerializer.Serialize函数出错，数据无法保存，看到此错误可截图发送给开发者。其他功能继续。" + e.Message);
                 if (e.InnerException != null)
                 {
-                    await ShowMessageDialog(
+                    await Utility.ShowMessageDialog(
                         "e.InnerException", "信息：" + e.Message
                         + "类型：" + e.GetType() + "\n调用栈："
                         + e.InnerException.StackTrace);
@@ -785,7 +859,7 @@ namespace 百度经验个人助手
             }
             catch (InvalidOperationException e)
             {
-                await ShowMessageDialog("遇到格式错误的数据文件", "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n文件名是：" + f.Name + "\n" + e.Message);
+                await Utility.ShowMessageDialog("遇到格式错误的数据文件", "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n文件名是：" + f.Name + "\n" + e.Message);
                 reader.Dispose();
                 fs.Dispose();
                 return null;
@@ -834,7 +908,7 @@ namespace 百度经验个人助手
                 }
                 catch (InvalidOperationException e)
                 {
-                    await ShowMessageDialog("遇到格式错误的数据文件",
+                    await Utility.ShowMessageDialog("遇到格式错误的数据文件",
                         "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n文件名是：" + sf.Name + "\n" + e.Message);
                 }
 
@@ -844,7 +918,7 @@ namespace 百度经验个人助手
 
             if (tempDataPacks.Count == 0)
             {
-                await ShowMessageDialog("无成功读取",
+                await Utility.ShowMessageDialog("无成功读取",
                     "没有成功读取的历史数据包");
             }
             return tempDataPacks;

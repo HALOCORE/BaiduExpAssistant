@@ -25,11 +25,7 @@ namespace 百度经验个人助手
             listViewDIYTools.ItemsSource = StorageManager.dIYToolsSettings.DIYTools;
         }
 
-        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-        }
-
-        private async void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private async void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             bool confirm = await Utility.ShowConfirmDialog("初始化确认", "初始化会清除添加的数据，确定要进行初始化?");
             if (!confirm)
@@ -37,7 +33,7 @@ namespace 百度经验个人助手
                 App.currentMainPage.ShowNotify("操作取消", "未对自定义功能初始化", Symbol.Comment);
                 return;
             }
-            StorageManager.dIYToolsSettings.Init();
+            StorageManager.dIYToolsSettings.Init(true);
             bool isSucceed = await StorageManager.SaveDIYToolsSettings();
             if (isSucceed)
             {
@@ -47,7 +43,26 @@ namespace 百度经验个人助手
             {
                 await Utility.ShowMessageDialog("初始化失败", "自定义功能未初始化.");
             }
-            
+        }
+
+        private async void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            bool confirm = await Utility.ShowConfirmDialog("重新载入确认", "重新载入会保留您已有的功能，但是重置和自带同名的功能，是否继续?");
+            if (!confirm)
+            {
+                App.currentMainPage.ShowNotify("操作取消", "未重新载入自带自定义功能", Symbol.Comment);
+                return;
+            }
+            StorageManager.dIYToolsSettings.Init(false);
+            bool isSucceed = await StorageManager.SaveDIYToolsSettings();
+            if (isSucceed)
+            {
+                App.currentMainPage.ShowNotify("成功重新载入", "自带的自定义功能已重置", Symbol.Accept);
+            }
+            else
+            {
+                await Utility.ShowMessageDialog("初始化失败", "自定义功能未初始化.");
+            }
         }
 
         private void ContentDialog_CloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -152,6 +167,30 @@ namespace 百度经验个人助手
                 {
                     await Utility.ShowMessageDialog("删除出错", "自定义工具删除操作没有保存到文件. 可联系开发者. 1223989563@qq.com");
                 }
+            }
+        }
+
+
+        private async void listViewDIYTools_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (e.OriginalSource.GetType() == typeof(Button)) return;
+
+            DIYTool tool = (DIYTool)listViewDIYTools.SelectedItem;
+
+            if (tool == null) return;
+
+
+            if (tool.IsClickTrig)
+            {
+                await App.currentMainPage.RunDIYClickTool(tool);
+                Tag = ContentDialogResult.None;
+                Hide();
+            }
+            else
+            {
+                await App.currentMainPage.ToggleDIYNavigateTool(tool);
+                listViewDIYTools.ItemsSource = null;
+                listViewDIYTools.ItemsSource = StorageManager.dIYToolsSettings.DIYTools;
             }
         }
     }

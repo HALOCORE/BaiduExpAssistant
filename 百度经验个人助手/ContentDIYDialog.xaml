@@ -6,10 +6,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="自定义功能 (测试版，更新可能删除数据)"
+    Title="自定义功能 (测试版，更新会删除数据，请自行备份)"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
-    SecondaryButtonText="初始化"
+    PrimaryButtonText="初始化"
+    SecondaryButtonText="重新载入自带功能"
     CloseButtonText="关闭"
     CloseButtonClick="ContentDialog_CloseButtonClick"
     HorizontalContentAlignment="Stretch" BorderBrush="#FFCC2973">
@@ -38,7 +39,7 @@
             <ColumnDefinition Width="1*"></ColumnDefinition>
             <ColumnDefinition Width="1.2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="listViewDIYTools" Background="#11000000" Grid.Column="0" Margin="0,0,5,0">
+        <ListView x:Name="listViewDIYTools" Background="#11000000" Grid.Column="0" Margin="0,0,5,0" Tapped="listViewDIYTools_Tapped">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Margin" Value="6,3,6,3"/>
@@ -56,7 +57,7 @@
                             <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
-                            <SymbolIcon Symbol="Flag"/>
+                            <SymbolIcon Foreground="{Binding StateColor1}" Symbol="{Binding ToolSymbol}"/>
                         </Grid>
                         <Grid Grid.Column="1" Margin="10,8,8,5">
                             <Grid.RowDefinitions>
@@ -65,8 +66,8 @@
                             </Grid.RowDefinitions>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Grid.Row="0" HorizontalAlignment="Stretch" 
-                                    VerticalAlignment="Center" FontSize="16" Padding="5,0,5,0" Text="{Binding Name}" />
-                                <TextBlock Padding="5,0,5,0" Foreground="White" FontSize="12" VerticalAlignment="Center" Opacity="1" Text= "{Binding ShowTrigType}" />
+                                    VerticalAlignment="Center" FontSize="16" Padding="5,0,3,0" Text="{Binding Name}" />
+                                <TextBlock Padding="2,0,5,0" Foreground="White" FontSize="13" VerticalAlignment="Center" Opacity="1" Text= "{Binding ShowTrigType}" />
                             </StackPanel>
                             <Grid Grid.Row="1" Margin="0,2,0,5" HorizontalAlignment="Left"
                                 VerticalAlignment="Center">

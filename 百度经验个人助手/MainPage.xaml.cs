@@ -118,14 +118,14 @@ namespace 百度经验个人助手
 
             ShowLoading("读取设置...");
             bool isSettingsRead = await StorageManager.ReadSettings();
-            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != "1.5.0")
+            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != "1.5.3")
             {
                 ContentNewDialog cnd = new ContentNewDialog();
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
                 if (cdr2 == ContentDialogResult.Secondary)
                 {
                     StorageManager.appSettings.isFirstIn = false;
-                    StorageManager.appSettings.version = "1.5.0";
+                    StorageManager.appSettings.version = "1.5.3";
                 }
                 ShowLoading("更新设置...");
                 
@@ -973,13 +973,13 @@ namespace 百度经验个人助手
 
         private async void buttonTestMine_Click(object sender, RoutedEventArgs e)
         {
-            ShowLoading("运行JS...");
+            ShowLoading("载入雷区检测...");
             Utility.LogEvent("OK_TestMineCalled");
             try
             {
                 await JSCodeString.RunJss(webViewMain, new string[] {JSCodeString.JsPrependErrorReport});
                 await Task.Delay(200);
-                await JSCodeString.RunJss(webViewMain, new string[] {JSCodeString.Errable(JSCodeString.JsMineDetect, "雷区检测载入...", "雷区检测开始运行. Thanks to 孢子真好玩") });
+                await JSCodeString.RunJss(webViewMain, new string[] {JSCodeString.ErrableUsingErrBoard(JSCodeString.JsMineDetect, "雷区检测载入...", "雷区检测已调用，请稍等. Thanks to 孢子真好玩") });
             }
             catch (Exception e2)
             {
@@ -1170,6 +1170,17 @@ namespace 百度经验个人助手
         {
             var dlg = new ContentDIYDialog();
             var result = await dlg.ShowAsync();
+        }
+
+        public async Task RunDIYClickTool(DIYTool tool)
+        {
+            await JSCodeString.RunDIYToolCode(webViewMain, tool);
+        }
+
+        public async Task ToggleDIYNavigateTool(DIYTool tool)
+        {
+            tool.IsActivate = !tool.IsActivate;
+            ShowNotify("Navigate Tool Toggle", tool.Name);
         }
     }
 }

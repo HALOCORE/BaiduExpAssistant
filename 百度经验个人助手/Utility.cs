@@ -56,10 +56,22 @@ namespace 百度经验个人助手
 
         public static async Task ShowDetailedError(string title, Exception e)
         {
-            await ShowMessageDialog(title,
-                        "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误类型：" + e.GetType() + "\n错误信息：" +
-                        e.Message + "\n"
-                        + "");
+            
+            string moreInfo = "";
+            if ((uint)e.HResult == 0x80020101) moreInfo = "80020101 通常是Javascript语法错误，或者其它软件未捕获的异常. 如果确定不是语法错误请联系开发者.";
+
+            string showMsg = "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误类型：" + e.GetType() + "\n错误信息：" + e.Message
+                        + "\n错误提示：" + moreInfo;
+
+
+            if (e.InnerException != null)
+            {
+                string innerType = e.InnerException.GetType().ToString();
+                string innerMessage = e.InnerException.Message;
+                showMsg += "\n\n内部错误类型：" + innerType + "\n内部错误信息：" + innerMessage;
+            }
+
+            await ShowMessageDialog(title, showMsg);
         }
     }
 

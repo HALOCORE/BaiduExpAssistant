@@ -740,7 +740,7 @@
                             <GradientStop Color="#CCFF69B4" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
-                    自定义 [Beta]
+                    自定义 [Alpha]
                 </Button>
                 <Grid Opacity="0.2" Visibility="Collapsed">
                     <Grid.ColumnDefinitions>
