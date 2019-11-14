@@ -20,6 +20,10 @@ namespace 百度经验个人助手
 
         #region WebView Set
         //每当一个Navigation完成看是否是主页（插入Cookie).
+
+        //统计连续insert cookie的次数，
+        private static int _insertCookieCount = 0;
+
         private static async Task InsertCookieAndRefresh(
             WebView sender,
             WebViewNavigationCompletedEventArgs e)
@@ -49,12 +53,19 @@ namespace 百度经验个人助手
                 
                 if (curCookie.Contains(ExpManager.newMainUserName))
                 {
+                    _insertCookieCount = 0;
                     isCookieInsertSucceed = true;
                     App.currentMainPage.WebSetUpdate(true, true, true, true);
                     return;
                 }
 
+                if(_insertCookieCount >= 3)
+                {
+                    await Utility.ShowMessageDialog("无法成功载入Cookie", "如果刚刚更新完Cookie，这是正常现象。应用程序即将关闭，请重新打开再试。\n如果多次重试仍然无法载入Cookie，请告知开发者 1223989563@qq.com");
+                    App.Current.Exit();
+                }
 
+                _insertCookieCount += 1;
                 App.currentMainPage.ShowLoading("添加Cookie...");
 
                 string bduss = "";

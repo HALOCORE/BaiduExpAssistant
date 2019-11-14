@@ -84,27 +84,28 @@ namespace 百度经验个人助手
 
 
         public static ObservableCollection<RewardExpEntry> rewardExps;
+        public static HashSet<string> rewardExpIDs;
         public static ObservableCollection<RewardExpEntry> rewardExpsSearched;
 
 
 
         #region 常量字符串
-        public static string regexMainUserName = "title=\"进入我的名片页\" rel=\"nofollow\">\n(.*?)\n</a>";
+        public static string regexMainUserName = "//www.baidu.com/p/(.*?)\\?from=jingyan";
         public static string regexMainIndexHuiXiang = "<span class=\"huixiang-value\" style=\".*?\">(.*?)</span>";
         public static string regexMainIndexYiuZhi = "<span class=\"quality-value value\" style=\".*?\">(.*?)</span>";
         public static string regexMainIndexYuanChuang = "<span class=\"origin-value value\" style=\".*?\">(.*?)</span>";
         public static string regexMainIndexHuoYue = "<span class=\"active-value value\" style=\".*?\">(.*?)</span>";
         public static string regexMainIndexHuDong = "<span class=\"interact-value value\" style=\".*?\">(.*?)</span>";
         public static string regexMainExpCount = "<span class=\"exp-num\">(.*?)</span>";
-        public static string regexMainPortraitUrl = "<div class=\"portrait-cover\">\n</div>\n<img src=\"(.*?)\" alt=\"";
+        public static string regexMainPortraitUrl = "src=\"(http[s]{0,1}://himg.bdimg.com/sys/portrait/item/.*?)\"";
         public static string regexMainBdStoken = "\"BdStoken\"[ \\s]*:[\\s]*\"([\\d\\w]+)\"";
         public static string regexMainBdstt = "\"bdstt\"[ \\s]*:[\\s]*\"([\\d\\w]+)\"";
         public static string regexContentExpTitleAndUrl = "<a class=\"f14\" target=\"_blank\" title=\"(.*?)\" href=\"(.*?)\">";
         public static string regexContentExpView = "<span class=\"view-count\">(\\d*?)</span>";
         public static string regexContentExpVote = "<span class=\"vote-count\">(\\d*?)</span>";
         public static string regexContentExpCollect = "<span class=\"favc-count\">(\\d*?)</span>";
-        public static string regexContentExpDate = "<span class=\"f-date\">(.*?)</span>";
-        public static string regexRewardExpAll = "<span class=\"cash\" style=\".*?\">¥(.*?)" +
+        public static string regexContentExpDate = "<span class=\"f-date\">(.*?)<\\/span>";
+        public static string regexRewardExpAll = "<span class=\"cash\" style=\".*?\">[\\S]{1,4}?([\\d\\.]+)" +
                                                  "</span><a class=\"title query-item-id\"[^<]*? data-queryId=\"(.*?)\">(.*?)</a>";
 
         public static string urlPrefix = "https://jingyan.baidu.com";
@@ -139,6 +140,7 @@ namespace 百度经验个人助手
 
             contentExpsSearched = new ObservableCollection<ContentExpEntry>();
             rewardExps = new ObservableCollection<RewardExpEntry>();
+            rewardExpIDs = new HashSet<string>();
             rewardExpsSearched = new ObservableCollection<RewardExpEntry>();
 
 
@@ -185,7 +187,7 @@ namespace 百度经验个人助手
         private static async Task GetMainSubStep_CookiedGetMain()
         {
             htmlMain = await ExpManager.SimpleRequestUrl(
-                "https://jingyan.baidu.com/user/nuc",
+                "https://jingyan.baidu.com/user/nuc/",
                 "https://jingyan.baidu.com/"
             );
 
@@ -463,6 +465,7 @@ namespace 百度经验个人助手
         #endregion
 
         #region 悬赏
+
         public static async Task<bool> CookielessGetReward(string tp, int cid, int pg)
         {
             string rewardUrl = "https://jingyan.baidu.com/patch?tab=" + tp + "&cid=" + cid + "&pn=" + pg * 15;
@@ -477,15 +480,22 @@ namespace 百度经验个人助手
         private static bool ParseReward(string html, string pageUrl)
         {
             MatchCollection mc = Regex.Matches(html, regexRewardExpAll);
-            foreach (Match m in mc)
+            bool anyNew = false;
+            lock (rewardExpIDs)
             {
-                rewardExps.Add(new RewardExpEntry(
-                    m.Groups[3].Value,
-                    decimal.Parse(m.Groups[1].Value),
-                    pageUrl,
-                    m.Groups[2].Value
-                    ));
+                foreach (Match m in mc)
+                {
+                    string qid = m.Groups[2].Value;
+                    if (rewardExpIDs.Contains(qid)) continue;
+                    rewardExps.Add(new RewardExpEntry(
+                        m.Groups[3].Value,
+                        decimal.Parse(m.Groups[1].Value),
+                        pageUrl, qid));
+                    rewardExpIDs.Add(qid);
+                    anyNew = true;
+                }
             }
+            if (!anyNew) return false;
             if (mc.Count > 0) return true;
             return false;
         }

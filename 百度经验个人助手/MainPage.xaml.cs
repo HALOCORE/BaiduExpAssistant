@@ -118,14 +118,14 @@ namespace 百度经验个人助手
 
             ShowLoading("读取设置...");
             bool isSettingsRead = await StorageManager.ReadSettings();
-            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != "1.5.3")
+            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != "1.5.4")
             {
                 ContentNewDialog cnd = new ContentNewDialog();
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
                 if (cdr2 == ContentDialogResult.Secondary)
                 {
                     StorageManager.appSettings.isFirstIn = false;
-                    StorageManager.appSettings.version = "1.5.3";
+                    StorageManager.appSettings.version = "1.5.4";
                 }
                 ShowLoading("更新设置...");
                 
@@ -386,6 +386,12 @@ namespace 百度经验个人助手
         /// <param name="e"></param>
         private async void buttonSetCookie_Click(object sender, RoutedEventArgs e)
         {
+            if(App.currentMainPage.StackPanelWebViewCover.Visibility == Visibility.Collapsed)
+            {
+                await Utility.ShowMessageDialog("请重启应用再修改Cookie", "本次启动使用了辅助编辑功能，造成Cookie锁定，无法修改。\n请重新启动应用程序再修改。");
+                return;
+            }
+
             buttonSetCookie.IsEnabled = false;
             buttonSetCookieProgress.IsActive = true;
             buttonSetCookieProgress.Visibility = Visibility.Visible;
@@ -534,6 +540,7 @@ namespace 百度经验个人助手
         public async Task UpdateReward(int pglow, int pghigh, string tp, int cid)
         {
             ExpManager.rewardExps.Clear();
+            ExpManager.rewardExpIDs.Clear();
             for (int i = pglow; i <= pghigh; )
             {
                 Task<bool> Task0 = ExpManager.CookielessGetReward(tp, cid, i);
@@ -555,18 +562,20 @@ namespace 百度经验个人助手
                 }
                 textRewardCacheState.Text = cacheStateText;
 
+                bool shouldBreak = false;
                 if (!(await Task0))
                 {
-                    break;
+                    shouldBreak = true;
                 }
                 if (Task1 != null && !(await Task1))
                 {
-                    break;
+                    shouldBreak = true;
                 }
                 if (Task2 != null && !(await Task2))
                 {
-                    break;
+                    shouldBreak = true;
                 }
+                if (shouldBreak) break;
             }
             isCacheReward = true;
             ShowNotify("悬赏获取完成", "共获取 " + ExpManager.rewardExps.Count + " 条.");
