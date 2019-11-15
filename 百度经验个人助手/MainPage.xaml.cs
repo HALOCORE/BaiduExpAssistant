@@ -118,14 +118,20 @@ namespace 百度经验个人助手
 
             ShowLoading("读取设置...");
             bool isSettingsRead = await StorageManager.ReadSettings();
-            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != "1.5.4")
+            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != StorageManager.VER)
             {
                 ContentNewDialog cnd = new ContentNewDialog();
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
                 if (cdr2 == ContentDialogResult.Secondary)
                 {
+                    bool confirm = await Utility.ShowConfirmDialog("确认：已知晓该版本更改了数据位置", "数据分析不能分析之前的数据。", "已知晓", "再看一下说明");
+                    if (!confirm)
+                    {
+                        ContentNewDialog cnd3 = new ContentNewDialog();
+                        ContentDialogResult cdr3 = await cnd.ShowAsync();
+                    }
                     StorageManager.appSettings.isFirstIn = false;
-                    StorageManager.appSettings.version = "1.5.4";
+                    StorageManager.appSettings.version = StorageManager.VER;
                 }
                 ShowLoading("更新设置...");
                 
@@ -310,7 +316,7 @@ namespace 百度经验个人助手
         /// </summary>
         private void ShowNewMainInf()
         {
-            textUserName.Text = ExpManager.newMainUserName;
+            textUserName.Text = ExpManager.NewMainUserNameDecoded;
             textHX.Text = "回享度：" + ExpManager.newMainIndexHuiXiang;
             textYZ.Text = "优质度：" + ExpManager.newMainIndexYiuZhi;
             textHD.Text = "互动度：" + ExpManager.newMainIndexHuDong;
@@ -438,7 +444,7 @@ namespace 百度经验个人助手
 
             if (!isCookieOK)
             {
-                Utility.ShowMessageDialog("Cookie添加", ExpManager.setcookieFailedInfo);
+                await Utility.ShowMessageDialog("Cookie添加", ExpManager.setcookieFailedInfo);
                 buttonSetCookie.IsEnabled = true;
                 buttonSetCookieProgress.IsActive = false;
                 buttonSetCookieProgress.Visibility = Visibility.Collapsed;
@@ -455,7 +461,7 @@ namespace 百度经验个人助手
             {
                 await StorageManager.SaveCookie(ExpManager.cookie);
                 buttonSetCookieText.Text = "√ Cookie";
-                await Utility.ShowMessageDialog("设置完成", "Cookie有效，可以更新信息了。\n点击头像链接到个人中心。");
+                await Utility.ShowMessageDialog("设置完成", "Cookie有效，可以更新信息了。\n点击头像进入辅助编辑器。");
                 Utility.LogEvent("YES_SetCookieSucceed");
 
                 ContentTipsDialog scd3 = new ContentTipsDialog();
@@ -463,7 +469,7 @@ namespace 百度经验个人助手
             }
             else
             {
-                Utility.ShowMessageDialog("验证Cookie", "Cookie无效，请重新设置");
+                await Utility.ShowMessageDialog("验证Cookie", "Cookie无效，请重新设置");
                 Utility.LogEvent("NO_SetCookieFailed");
             }
 
@@ -477,22 +483,19 @@ namespace 百度经验个人助手
         /// 在Main已经成功更新后，更新Content
         /// </summary>
         /// <returns>更新Content是否成功</returns>
-        public async Task<bool> UpdateContents()
+        public async Task UpdateContents()
         {
             
-            bool ret =  await ExpManager.GetContents(
+            await ExpManager.GetContents(
                 textVisitAll, 
                 listViewContentExps);
 
-            if (ret)
-            {
-                ShowContentInf();
-                isDataAvailable = true;
-                isThisTimeUpdated = true;
-                ShowControls();
-            }
-            
-            return ret;
+
+            ShowContentInf();
+            isDataAvailable = true;
+            isThisTimeUpdated = true;
+            ShowControls();
+
         }
 
         /// <summary>
@@ -506,31 +509,22 @@ namespace 百度经验个人助手
             buttonUpdateExpProgress.IsActive = true;
             buttonUpdateExpProgress.Visibility = Visibility.Visible;
 
-            bool result = await UpdateContents();
-            if (result)
-            {
-                await StorageManager.SaveDataPack(ExpManager.currentDataPack);
+            await UpdateContents();
+            await StorageManager.SaveDataPack(ExpManager.currentDataPack);
 
-                UpdateTile();
+            UpdateTile();
 
-                //Utility.ShowMessageDialog("更新完成", "点击 \"✅ 本次已更新\" 打开数据所在文件夹：\n" + StorageManager.StorageFolder.Path);
-                ShowNotify("更新完成", "点击数据分析以计算增量");
-                Utility.LogEvent("YES_UpdateExpSucceed");
+            //Utility.ShowMessageDialog("更新完成", "点击 \"✅ 本次已更新\" 打开数据所在文件夹：\n" + StorageManager.StorageFolder.Path);
+            ShowNotify("更新完成", "点击数据分析以计算增量");
+            Utility.LogEvent("YES_UpdateExpSucceed");
 
-                textDate.Text = "✅ 本次已更新";
-                textDate.Foreground = new SolidColorBrush(Color.FromArgb(255,120,230,120));
+            textDate.Text = "✅ 本次已更新";
+            textDate.Foreground = new SolidColorBrush(Color.FromArgb(255,120,230,120));
 
 
-                buttonUpdateExp.IsEnabled = true;
-                buttonUpdateExpProgress.IsActive = false;
-                buttonUpdateExpProgress.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                await Utility.ShowMessageDialog("更新出现问题, 应用需要重新启动", "如果频繁出现，那就是情况1，请联系开发者改换算法。\n可能的原因：\n1. 并发网络请求不稳定（重启应用）\n2. 要输入验证码（输入验证码再重启应用）\n3. 用户中途退出登录（重新设置Cookie）\n");
-                Utility.LogEvent("ASSERT_UpdateExpNull");
-                App.Current.Exit();
-            }
+            buttonUpdateExp.IsEnabled = true;
+            buttonUpdateExpProgress.IsActive = false;
+            buttonUpdateExpProgress.Visibility = Visibility.Collapsed;
         }
 
         #endregion ------------------------------------------------------------
@@ -579,6 +573,17 @@ namespace 百度经验个人助手
             }
             isCacheReward = true;
             ShowNotify("悬赏获取完成", "共获取 " + ExpManager.rewardExps.Count + " 条.");
+            if(ExpManager.rewardExps.Count == 0)
+            {
+                bool isNotBug = await Utility.ShowConfirmDialog("获取了0条悬赏，是确实没有还是程序出错？", "", "忽略此问题", "我认为程序有错");
+
+                if (!isNotBug)
+                {
+                    //REPORT
+                    string relvar = "html=" + Utility.varTrace["rewardHtml"];
+                    await Utility.FireErrorReport("悬赏获取0条", relvar);
+                }
+            }
             ShowControls();
         }
 
@@ -804,8 +809,6 @@ namespace 百度经验个人助手
 
         private async void buttonStatistic_Click_Substep2()
         {
-            ObservableCollection<ContentExpEntry> data = null;
-
             ContentSelectDataFileDialog sdf = new ContentSelectDataFileDialog(await StorageManager.GetDataPackFiles());
             ContentDialogResult r = await sdf.ShowAsync();
 
@@ -819,9 +822,19 @@ namespace 百度经验个人助手
             }
 
             ShowLoading("读取文件...");
-            StatManager.DataPackSingleSelected = await StorageManager.ReadHistoryDataPackSingle(sdf.selectedFile);
+            try
+            {
+                StatManager.DataPackSingleSelected = await StorageManager.ReadHistoryDataPackSingle(sdf.selectedFile);
+            }catch(Exception ee)
+            {
+                //REPORT
+                string rel = "filename=" + sdf.selectedFile.Name;
+                await Utility.FireErrorReport("数据分析读取历史文件失败", rel, ee);
+                StatManager.DataPackSingleSelected = null;
+            }
             HideLoading();
 
+            ObservableCollection<ContentExpEntry> data = null;
             if (StatManager.DataPackSingleSelected != null)
             {
                 if (StatManager.DataPackSingleSelected.date.Date == DateTime.Today.Date)

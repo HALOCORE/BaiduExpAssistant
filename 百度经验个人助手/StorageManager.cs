@@ -128,6 +128,15 @@ namespace 百度经验个人助手
         [XmlArray("contentExps")]
         public ObservableCollection<ContentExpEntry> contentExps;
 
+        [XmlIgnore]
+        public string MainUserNameDecoded
+        {
+            get
+            {
+                return Uri.UnescapeDataString(mainUserName);
+            }
+        }
+
         public void SafeSetUserName(string uname)
         {
             mainUserName = StorageManager.RemoveInvalidXmlChars(uname);
@@ -395,11 +404,11 @@ namespace 百度经验个人助手
 
     public static class StorageManager
     {
-        private static StorageFolder _storageFolder =
-            ApplicationData.Current.LocalFolder;
-        private static string _currentUserName;
+        private static StorageFolder _storageFolder = ApplicationData.Current.LocalFolder;
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
+
+        public const string VER = "1.5.5";
 
         private static string _editSettingsFileName = "EditSettings.xml";
         private static string _settingsFileName = "Settings.xml";
@@ -464,7 +473,7 @@ namespace 百度经验个人助手
                 return "临时用户";
             }
 
-            return GetValidFileName(id);
+            return GetValidFileName("USER-" + id);
 
         }
 
@@ -687,7 +696,6 @@ namespace 百度经验个人助手
         {
             //Do nothing
             bool needCreateFolder = false;
-            _currentUserName = id;
             string folderName = GetFolderName(id);
             try
             {
@@ -712,7 +720,7 @@ namespace 百度经验个人助手
             }
 
             bool needCreateRecentFolder = false;
-            string recentfolderName = "最新数据";
+            string recentfolderName = "NewestData";
             try
             {
                 _currentUserRecentFolder = await _currentUserFolder.GetFolderAsync(recentfolderName);
@@ -786,7 +794,7 @@ namespace 百度经验个人助手
         public static async Task SaveDataPack(DataPack dp)
         {
             //TODO
-            string filename = string.Format("每日数据Ver2_{0:d}.xml", dp.date).Replace("/", "-");
+            string filename = string.Format("DailyDataVer2_{0:d}.xml", dp.date).Replace("/", "-");
 
             if (_currentUserFolder == null)
             {
@@ -800,7 +808,7 @@ namespace 百度经验个人助手
                 );
             StorageFile file2 =
                 await _currentUserRecentFolder.CreateFileAsync(
-                    "最新.xml",
+                    "newest.xml",
                     CreationCollisionOption.ReplaceExisting
                 );
 
@@ -844,7 +852,7 @@ namespace 百度经验个人助手
 
             try
             {
-                f = await _currentUserRecentFolder.GetFileAsync("最新.xml");
+                f = await _currentUserRecentFolder.GetFileAsync("newest.xml");
             }
             catch (Exception e)
             {
@@ -886,7 +894,7 @@ namespace 百度经验个人助手
             return tempDataPacks[0];
         }
 
-        //读出历史数据包返回
+        //读出历史数据包返回 (数据分析调用)
         public static async Task<ObservableCollection<DataPack>> ReadHistoryDataPacks(ObservableCollection<StorageFile> files)
         {
             ObservableCollection<DataPack> tempDataPacks = new ObservableCollection<DataPack>();
@@ -909,7 +917,8 @@ namespace 百度经验个人助手
                 catch (InvalidOperationException e)
                 {
                     await Utility.ShowMessageDialog("遇到格式错误的数据文件",
-                        "非关键问题，一切继续。看到此消息可截图给开发者以解决问题。\n文件名是：" + sf.Name + "\n" + e.Message);
+                        "看到此消息可截图给开发者。\n文件名是：" + sf.Name + "\n" + e.Message);
+                    throw e;
                 }
 
                 reader.Dispose();
@@ -920,6 +929,7 @@ namespace 百度经验个人助手
             {
                 await Utility.ShowMessageDialog("无成功读取",
                     "没有成功读取的历史数据包");
+                throw new InvalidDataException("没有成功读取的历史数据包");
             }
             return tempDataPacks;
         }

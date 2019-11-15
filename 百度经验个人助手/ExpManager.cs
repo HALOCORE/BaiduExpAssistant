@@ -66,6 +66,14 @@ namespace 百度经验个人助手
         public static string htmlMain;
 
         //always show the newest Main Inf
+        public static string NewMainUserNameDecoded
+        {
+            get
+            {
+                if (newMainUserName != null) return Uri.UnescapeDataString(newMainUserName);
+                else return ""; //to check
+            }
+        }
         public static string newMainUserName;
         public static string newMainIndexHuiXiang;
         public static string newMainIndexYiuZhi;
@@ -248,6 +256,16 @@ namespace 百度经验个人助手
                 await Utility.ShowMessageDialog("获得异常的用户名信息",
                     matchUname.Groups[0].Value.ToString() + "\n" + matchUname.Groups[1].Value.ToString()
                     + "\n很可能是所填写的Cookie中不含有效的BDUSS（方法1），或者填写的BDUSS无效（方法2）。\n如果都不是，那这是意外的问题，可以截图并联系开发者：1223989563@qq.com。");
+
+                bool isSelfProblem = await Utility.ShowConfirmDialog("确认操作无误，Cookie含有 'BDUSS=xxxx'，也没有退出登录", "如果确认问题不是cookie无效，或者操作失误，那么可以提交错误报告给开发者。", "可能是没设置好", "我确认操作没问题");
+                if (!isSelfProblem)
+                {
+                    //REPORT
+                    string relvars = "regex=" + regexMainUserName + "\n" + "htmlMain=" + htmlMain;
+                    await Utility.FireErrorReport("用户名获取失败", relvars);
+
+                    Application.Current.Exit();
+                }
                 return false;
             }
             newMainUserName = matchUname.Groups[1].Value;
@@ -407,7 +425,7 @@ namespace 百度经验个人助手
         /// </summary>
         /// <param name="textShow">要更新的文字</param>
         /// <returns></returns>
-        public static async Task<bool> GetContents(TextBlock textShow, ListView itemShow)
+        public static async Task GetContents(TextBlock textShow, ListView itemShow)
         {
             GetContentsSubStep_NewDataPack();
 
@@ -441,26 +459,32 @@ namespace 百度经验个人助手
                 if (Task4 != null) await Task4;
                 //await Utility.ShowMessageDialog("线程等待完成","i="+i);
 
-                for (int j = i; j < i + currentTasksCount; ++j)
-                {
-                    if (htmlContentPages[j] == "FAILED") return false;  //如果获取出错，返回失败
-                }
+                //for (int j = i; j < i + currentTasksCount; ++j)
+                //{
+                //    if (htmlContentPages[j] == "FAILED") return false;  //如果获取出错，返回失败
+                //}
                 //如果解析出错，直接返回失败。
                 for (int j = i; j < i + currentTasksCount; ++j)
                 {
                     if (!GetContentsSubStep_ParseContentPage(j))
                     {
                         Utility.LogEvent("ERROR_ParseContentFailed");
-                        await Utility.ShowMessageDialog("意外问题", "数据获取成功但是解析失败。获取页 " + i + " 无要寻找的经验条目，或者Baidu经验页面有调整。"
+                        await Utility.ShowMessageDialog("意外问题，程序收集错误后结束", "数据获取成功但是解析失败。获取页 " + i + " 无要寻找的经验条目，可能是用户中途退出登录，也可能是Baidu经验页面有调整（可能性最低）。"
                                                         + "\n一般情况下，这是一个容易解决的问题，看到此对话框可以截图给开发者并询问解决方法。");
-                        return false;
+
+                        Utility.LogEvent("ASSERT_UpdateExpNull");
+
+                        //REPORT
+                        string relvars = "page-id=" + i + "\nhtml content=" + htmlContentPages[j];
+                        await Utility.FireErrorReport("更新EXP Content页面匹配失败", relvars);
+
+                        App.Current.Exit();
                     }
                 }
             }
 
             //如果成功，计算calcsum4。
             GetContentsSubStep_CalcSum4();
-            return true;
         }
         #endregion
 
@@ -494,6 +518,7 @@ namespace 百度经验个人助手
                     rewardExpIDs.Add(qid);
                     anyNew = true;
                 }
+                if (!anyNew) Utility.varTrace["rewardHtml"] = html;
             }
             if (!anyNew) return false;
             if (mc.Count > 0) return true;
@@ -523,6 +548,7 @@ namespace 百度经验个人助手
                 response = await client.SendRequestAsync(req);
                 string respstr = response.Content.ToString().Replace(" ", "");
                 bool isGetSucceed = false;
+                bool isCritical = false;
                 if (respstr.IndexOf("\"errno\":0") >= 0)
                 {
                     Utility.LogEvent("YES_TakeRewardSucceed");
@@ -539,11 +565,13 @@ namespace 百度经验个人助手
                 {
                     Utility.LogEvent("ERROR_TakeRewardInvalid");
                     respstr = "身份验证失败，如果确定Cookie设定有效，可告知开发者 wang1223989563。错误码:2";
+                    isCritical = true;
                 }
                 else
                 {
                     Utility.LogEvent("ERROR_TakeRewardUnknown" + respstr);
                     respstr = "未知错误类型 (非302或2错误。可告知开发者 wang1223989563) \n错误信息: " + respstr;
+                    isCritical = true;
                 }
 
                 bool enterEditor = false;
@@ -553,6 +581,12 @@ namespace 百度经验个人助手
                 }
                 else{
                     await Utility.ShowMessageDialog("领取不成功", respstr);
+                    if (isCritical)
+                    {
+                        //REPORT
+                        string vars = "queryId=" + queryId + "\nrespstr=" + respstr + "\nheaders=" + req.Headers.ToString();
+                        await Utility.FireErrorReport("领取失败", vars);
+                    }
                 }
                 
                 req.Dispose();
@@ -562,6 +596,10 @@ namespace 百度经验个人助手
             {
                 Utility.LogEvent("ERROR_TakeRewardException");
                 await Utility.ShowDetailedError("领取未成功", e);
+                
+                //REPORT
+                await Utility.FireErrorReport("领取程序崩溃", "queryId=" + queryId, e);
+
                 return false;
             }
         }
@@ -717,6 +755,10 @@ namespace 百度经验个人助手
                 {
                     Utility.LogEvent("ERROR_ResponseNot200-" + response.StatusCode);
                     await Utility.ShowMessageDialog("意外情况，返回状态不是200 OK", "返回状态: " + response.StatusCode.ToString() + "\n请向开发者（1223989563@qq.com）反映.");
+
+                    // REPORT
+                    string arelvars = "url=" + url + "\nreferrer=" + referrer + "\nisverifying=" + isVerifying;
+                    await Utility.FireErrorReport("SimpleRequestUrl 返回非200 OK", arelvars);
                 }
 
                 IHttpContent icont = response.Content;
@@ -783,6 +825,11 @@ namespace 百度经验个人助手
                         "错误代码：" + String.Format("{0:x8}", e.HResult) + "\n错误信息：\n\n" +
                         e.Message + "\n"
                         + "如果是验证码问题，请先打开浏览器，输入验证码，稍后再打开本程序。\n验证码问题在中文版系统中已修复，因此这条消息不该看到。开发者需要知道您的错误信息（1223989563@qq.com）");
+
+                    // REPORT
+                    string arelvars = "url=" + url + "\nreferrer=" + referrer + "\nisverifying=" + isVerifying;
+                    await Utility.FireErrorReport("SimpleRequestUrl 0x80072f76非验证码", arelvars, e);
+
                     Application.Current.Exit();
                 }
                 else if ((uint)e.HResult == 0x80072efd)
@@ -801,12 +848,18 @@ namespace 百度经验个人助手
                 }
 
                 Utility.LogEvent("ERROR-UNEXPECTED:" + e.HResult.ToString());
-                await Utility.ShowMessageDialog("网络故障，错误信息请留意", "关闭此提示框，程序收集错误信息后自动结束。\n错误信息：\n\n" + e.Message);
-                throw e;
+                await Utility.ShowMessageDialog("网络故障，错误信息请留意", "关闭此提示框，程序收集错误信息。\n错误信息：\n\n" + e.Message);
+
+                // REPORT
+                string relvars = "url=" + url + "\nreferrer=" + referrer + "\nisverifying=" + isVerifying;
+                await Utility.FireErrorReport("SimpleRequestUrl 网络故障", relvars, e);
+
+                Application.Current.Exit();
+                return ""; //should never reached.
             }
         }
 
-        public static async Task<string> CookiedPostForm(string url, string referrer, KeyValuePair<string, string>[] keyValues)
+        public static async Task<string> PostData(string url, string referrer, KeyValuePair<string, string>[] keyValues)
         {
             //HttpResponseMessage response = null;
             try
@@ -817,22 +870,17 @@ namespace 百度经验个人助手
 
                 req.Content = cont;
 
-                req.Headers.Referer = new Uri(referrer);
+                if(referrer != "") req.Headers.Referer = new Uri(referrer);
 
                 HttpResponseMessage hc = await client.SendRequestAsync(req);
-
-                //await Utility.ShowMessageDialog("响应", hc.Content.ToString());
 
                 req.Dispose();
 
                 return hc.Content.ToString();
-
-
             }
-            catch (Exception e)
+            catch (Exception ee)
             {
-
-                return "Cannot get response";
+                return "ERROR: " + ee.HResult + " " + ee.Message;
             }
         }
 

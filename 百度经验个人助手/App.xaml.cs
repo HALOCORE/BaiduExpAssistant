@@ -32,6 +32,19 @@ namespace 百度经验个人助手
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.UnhandledException += async (sender, e) =>
+            {
+                if (e.Exception.Message.StartsWith("ERROR-REPORT-FAILED"))
+                {
+                    throw e.Exception;
+                }
+
+                //REPORT
+                string relvar = "senderType=" + sender.GetType() + "\nsender=" + sender.ToString();
+                await Utility.FireErrorReport("未知错误", relvar, e.Exception);
+
+                throw e.Exception;
+            };
             
             ApplicationView.PreferredLaunchViewSize = new Size(1200, 750);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Auto;

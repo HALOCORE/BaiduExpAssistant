@@ -113,6 +113,9 @@
     <Compile Include="ContentEditSettingsDialog.xaml.cs">
       <DependentUpon>ContentEditSettingsDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ContentErrorReportDialog.xaml.cs">
+      <DependentUpon>ContentErrorReportDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ContentHelpDialog.xaml.cs">
       <DependentUpon>ContentHelpDialog.xaml</DependentUpon>
     </Compile>
@@ -201,6 +204,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ContentEditSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentErrorReportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

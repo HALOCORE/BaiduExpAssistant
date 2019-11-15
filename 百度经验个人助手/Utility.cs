@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,11 +10,55 @@ namespace 百度经验个人助手
 {
     public static class Utility
     {
+        public static List<string> customEventsLog = new List<string>();
+        public static Hashtable varTrace = new Hashtable();
 
         public static void LogEvent(string evt)
         {
             StoreServicesCustomEventLogger logger = StoreServicesCustomEventLogger.GetDefault();
             logger.Log(evt);
+            customEventsLog.Add(evt);
+        }
+
+        //if fire report succeed, this app should exit or continue. No throw exceptions.
+        // ------------------
+        //The final exceptions are report failures, and unknown ones.
+        public static async Task FireErrorReport(string name, string relatedVars, Exception err=null)
+        {
+            string eventStr = string.Join(", ", customEventsLog);
+            string errStr = "";
+            if (err != null) errStr = err.HResult.ToString() + "\n" + err.Message + "\n" + err.Source + "\n" + err.StackTrace;
+            string bar = "==================";
+            string report = bar + "NAME" + bar + "\n\n"
+                + name + "\n"
+                + bar + "VER" + bar + "\n"
+                + StorageManager.VER + "\n\n"
+                + bar + "EXCEPTION" + bar + "\n"
+                + errStr + "\n\n"
+                + bar + "RELATED-VARS" + bar + "\n"
+                + relatedVars + "\n\n";
+
+            var dlg = new ContentErrorReportDialog(name, report);
+            var result = await dlg.ShowAsync();
+            if(result == Windows.UI.Xaml.Controls.ContentDialogResult.Secondary)
+            {
+                App.currentMainPage.ShowLoading("正在发送错误报告...");
+                string data = report;
+                if (dlg.errorNote != "") data += bar + "NOTE" + bar + "\n" + dlg.errorNote + "\n\n";
+                var formData = new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("data", data) };
+                string postResult = await ExpManager.PostData("http://193.112.68.240:8122/errorreport", "", formData);
+                App.currentMainPage.HideLoading();
+
+                if (postResult.StartsWith("ERROR")) {
+                    await ShowMessageDialog("发送失败", postResult + "下次出错可再尝试发送，或者直接邮件开发者。");
+                    throw new Exception("ERROR-REPORT-FAILED");
+                }
+                else
+                {
+                    await ShowMessageDialog("发送成功", "谢谢，错误报告已经提交成功。");
+                    return;
+                }
+            }
         }
 
         public static string Transferred(string input)
