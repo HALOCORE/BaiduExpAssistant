@@ -36,14 +36,18 @@ namespace 百度经验个人助手
             {
                 if (e.Exception.Message.StartsWith("ERROR-REPORT-FAILED"))
                 {
-                    throw e.Exception;
+                    return;
                 }
 
+                if (e.Exception.Message.StartsWith("ERROR-LET-IT-DOWN"))
+                {
+                    return;
+                }
+
+                e.Handled = true;
                 //REPORT
                 string relvar = "senderType=" + sender.GetType() + "\nsender=" + sender.ToString();
                 await Utility.FireErrorReport("未知错误", relvar, e.Exception);
-
-                throw e.Exception;
             };
             
             ApplicationView.PreferredLaunchViewSize = new Size(1200, 750);

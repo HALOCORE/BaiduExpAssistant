@@ -36,7 +36,9 @@ namespace 百度经验个人助手
                 + bar + "EXCEPTION" + bar + "\n"
                 + errStr + "\n\n"
                 + bar + "RELATED-VARS" + bar + "\n"
-                + relatedVars + "\n\n";
+                + relatedVars + "\n\n"
+                + bar + "EVENTS" + bar + "\n"
+                + eventStr + "\n\n";
 
             var dlg = new ContentErrorReportDialog(name, report);
             var result = await dlg.ShowAsync();
@@ -50,12 +52,12 @@ namespace 百度经验个人助手
                 App.currentMainPage.HideLoading();
 
                 if (postResult.StartsWith("ERROR")) {
-                    await ShowMessageDialog("发送失败", postResult + "下次出错可再尝试发送，或者直接邮件开发者。");
+                    await ShowMessageDialog("发送失败", postResult + "如果始终无法发送，下次出错直接复制错误报告的内容，发送邮件给开发者 1223989563@qq.com");
                     throw new Exception("ERROR-REPORT-FAILED");
                 }
                 else
                 {
-                    await ShowMessageDialog("发送成功", "谢谢，错误报告已经提交成功。");
+                    await ShowMessageDialog("匿名发送成功", "谢谢，错误报告已经匿名提交成功。\n注意，开发者可以看到报告但是无法与你取得联系。\n如果需要与开发者取得联系，可邮件 1223989563@qq.com");
                     return;
                 }
             }

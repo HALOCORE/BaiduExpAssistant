@@ -215,7 +215,6 @@ namespace 百度经验个人助手
                 bool getSucceed = await UpdateMain();
                 if (!getSucceed)
                 {
-                    await Utility.ShowMessageDialog("主页获取不成功", "如果不是网络问题，那可能是BDUSS已经失效。（是否有退出登录操作？）");
                     Utility.LogEvent("InitFailed_InvalidBDUSS");
                 }
                 HideLoading();
@@ -962,16 +961,19 @@ namespace 百度经验个人助手
             Opacity = _oldOpacity;
         }
 
-        private void buttonMainPage_Click(object sender, RoutedEventArgs e)
+        private async void buttonMainPage_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(ExpManager.cookie))
             {
                 Utility.ShowMessageDialog("请先设置Cookie", "设置Cookie完成后，可以保持登录进入编辑器。\n禁止在此暴露账号密码进行登陆。");
                 return;
             }
+
+            ShowLoading("设置数据读取...");
+            await StorageManager.InitReadAllCommonData();
+
             ShowLoading("访问jingyan.baidu.com...");
             webViewMain.Navigate(new Uri("https://jingyan.baidu.com/"));
-
             App.currentMainPage.StackPanelWebViewCover.Visibility = Visibility.Collapsed;
 
             //List<Uri> allowedUris = new List<Uri>();
@@ -1037,15 +1039,17 @@ namespace 百度经验个人助手
 
         private async void buttonBigPicture_Click(object sender, RoutedEventArgs e)
         {
-            ShowLoading("运行JS...");
+            ShowLoading("初始化大图片框...");
             Utility.LogEvent("OK_BigPictureCalled");
             try
             {
-                await JSCodeString.RunJs(webViewMain, JSCodeString.JsAddPictureBox);
+                await JSCodeString.InjectCommonData(webViewMain);
+                await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/BigPic.js");
+                Utility.LogEvent("YES_BigPictureSucceed");
             }
             catch (Exception)
             {
-                await Utility.ShowMessageDialog("添加失败", "当前页面可能不是编辑器页面");
+                await Utility.ShowMessageDialog("添加 Script 失败", "异常问题，请联系开发者 1223989563@qq.com");
             }
             HideLoading();
         }
@@ -1203,6 +1207,12 @@ namespace 百度经验个人助手
         {
             tool.IsActivate = !tool.IsActivate;
             ShowNotify("Navigate Tool Toggle", tool.Name);
+        }
+
+        private void TextBlock_Tapped_1(object sender, TappedRoutedEventArgs e)
+        {
+            //error test
+            throw new Exception("异常捕获测试 Catch Exception Test");
         }
     }
 }

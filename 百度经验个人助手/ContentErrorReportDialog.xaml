@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="将出错信息发送给开发者（除了在此提交，也可以邮件联系）"
-    PrimaryButtonText="忽略此错误"
+    PrimaryButtonText="忽略此错误（程序错误可能扩大）"
     SecondaryButtonText="提交给开发者以修复bug"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick">

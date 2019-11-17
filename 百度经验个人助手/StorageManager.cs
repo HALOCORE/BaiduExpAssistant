@@ -22,6 +22,8 @@ using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage;
 using Windows.UI;
+using Windows.Data.Json;
+using Windows.System;
 
 namespace 百度经验个人助手
 {
@@ -408,11 +410,13 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.5.5";
+        public const string VER = "1.5.7";
 
         private static string _editSettingsFileName = "EditSettings.xml";
         private static string _settingsFileName = "Settings.xml";
         private static string _dIYToolsSettingsFileName = "DIYToolsSettingsV1.xml";
+
+        private static string _commonSetDataFolderName = "CommonSetDataV1";
 
         public static StorageFolder StorageFolder
         {
@@ -432,6 +436,86 @@ namespace 百度经验个人助手
         public static EditSettings editSettings;
         public static DIYToolsSettings dIYToolsSettings;
 
+        #region COMMON DATA
+        public static JsonObject _commonSetData;
+
+        public static string CommonSetDataString
+        {
+            get { return _commonSetData.ToString(); }
+        }
+
+        public static async Task InitReadAllCommonData()
+        {
+            _commonSetData = new JsonObject();
+            StorageFolder sf = await GetSubFolderAsync(StorageFolder, _commonSetDataFolderName);
+            IReadOnlyList<StorageFile> files = await sf.GetFilesAsync();
+            int fileCount = 0;
+            foreach (var file in files)
+            {
+                string data = "";
+                JsonObject jo = null;
+                string groupId = "";
+                bool isSucceed = false;
+                try
+                {
+                    data = await ReadStringFromFileAsync(file);
+                    jo = JsonValue.Parse(data).GetObject();
+                    groupId = DecodeValidFileName(file.Name).Replace(".json", "");
+                    isSucceed = true;
+                    fileCount++;
+                }
+                catch(Exception e)
+                {
+                    await Utility.ShowMessageDialog("发现无法解析的数据文件, 请修复或清除", "文件位置: " + sf.Name + " > " + file.Name);
+                    await Launcher.LaunchFolderAsync(sf);
+                    await Utility.ShowDetailedError("解析失败的详细信息", e);
+                }
+
+                if (isSucceed)
+                {
+                    SetCommonData(groupId, jo);
+                }
+            }
+            App.currentMainPage.ShowNotify("设置数据读取完成", "共成功读取 " + fileCount + " 个文件");
+        }
+
+        public static void SetCommonData(string groupId, JsonObject dataObj)
+        {
+            if (!_commonSetData.ContainsKey(groupId)) _commonSetData[groupId] = new JsonObject();
+            foreach (var key in dataObj.Keys)
+            {
+                _commonSetData[groupId].GetObject()[key] = dataObj[key];
+            }
+        }
+
+        public static async Task SaveCommonData(string groupId)
+        {
+            string fname = GetValidFileName(groupId + ".json");
+            await SaveStringToFileAsync(_commonSetDataFolderName, fname, _commonSetData[groupId].GetObject().ToString());
+        }
+
+        private static async Task SaveStringToFileAsync(string foldername, string filename, string data)
+        {
+            StorageFolder sf = await GetSubFolderAsync(StorageFolder, foldername);
+            StorageFile f = await sf.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
+            Stream fs = await f.OpenStreamForWriteAsync();
+            StreamWriter sw = new StreamWriter(fs);
+            sw.Write(data);
+            sw.Dispose();
+            fs?.Dispose();
+        }
+
+        private static async Task<string> ReadStringFromFileAsync(StorageFile f)
+        {
+            if (f == null) return "";
+            Stream fs = await f.OpenStreamForReadAsync();
+            StreamReader sw = new StreamReader(fs);
+            string data = await sw.ReadToEndAsync();
+            sw.Dispose();
+            fs?.Dispose();
+            return data;
+        }
+        #endregion
 
         private static Regex _invalidXmlChars = new Regex(
             @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
@@ -445,7 +529,8 @@ namespace 百度经验个人助手
             if (string.IsNullOrEmpty(text)) return "";
             return _invalidXmlChars.Replace(text, "");
         }
-        private static string GetValidFileName(string input)
+
+        public static string GetValidFileName(string input)
         {
             input = input.Replace("_", "_b");
 
@@ -460,6 +545,23 @@ namespace 百度经验个人助手
             input = input.Replace("|", "_v");
             return input;
         }
+
+        public static string DecodeValidFileName(string input)
+        {
+            input = input.Replace("_v", "|");
+            input = input.Replace("_r", ">");
+            input = input.Replace("_l", "<");
+            input = input.Replace("_y", "\"");
+            input = input.Replace("_q", "?");
+            input = input.Replace("_x", "*");
+            input = input.Replace("_c", ":");
+            input = input.Replace("_d", "/");
+            input = input.Replace("_s", "\\");
+
+            input = input.Replace("_b", "_");
+            return input;
+        }
+
         private static string GetFolderName(string id)
         {
             char[] forbiddens = { '\\', '/', ':', '*', '?', '"', '<', '>', '|' };

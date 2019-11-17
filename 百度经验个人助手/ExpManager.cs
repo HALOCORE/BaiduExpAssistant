@@ -253,11 +253,21 @@ namespace 百度经验个人助手
             Match matchUname = Regex.Match(htmlMain, regexMainUserName);
             if (matchUname.Groups[1].Value == "" || matchUname.Groups[1].Value == null)
             {
-                await Utility.ShowMessageDialog("获得异常的用户名信息",
-                    matchUname.Groups[0].Value.ToString() + "\n" + matchUname.Groups[1].Value.ToString()
-                    + "\n很可能是所填写的Cookie中不含有效的BDUSS（方法1），或者填写的BDUSS无效（方法2）。\n如果都不是，那这是意外的问题，可以截图并联系开发者：1223989563@qq.com。");
+                bool isLengthSatisfied = false;
+                foreach(var pair in client.DefaultRequestHeaders.Cookie)
+                {
+                    if (pair.Name.ToUpper() == "BDUSS" && pair.Value.Trim().Length == 192) isLengthSatisfied = true;
+                }
 
-                bool isSelfProblem = await Utility.ShowConfirmDialog("确认操作无误，Cookie含有 'BDUSS=xxxx'，也没有退出登录", "如果确认问题不是cookie无效，或者操作失误，那么可以提交错误报告给开发者。", "可能是没设置好", "我确认操作没问题");
+                string guessReason = "";
+                if (isLengthSatisfied) guessReason = "最可能的原因是从浏览器退出登录，或者切换账号了。";
+                else guessReason = "最可能的原因是没有复制完整BDUSS，完整的BDUSS有 192 个字符。";
+
+                await Utility.ShowMessageDialog("Cookie设置不起作用",
+                    matchUname.Groups[0].Value.ToString() + " " + matchUname.Groups[1].Value.ToString() + "\n"
+                    + guessReason + "\n如果确认不是，那这是意外的问题。");
+
+                bool isSelfProblem = await Utility.ShowConfirmDialog("确认操作无误，Cookie含有192个字符长的BDUSS，也没有退出登录/切换账号", "如果确认问题不是cookie无效，或者操作失误，那么可以提交错误报告给开发者。", "可能是没设置好", "我确认操作没问题");
                 if (!isSelfProblem)
                 {
                     //REPORT
