@@ -434,7 +434,7 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
             //将图像绘制到画布的，图片的左上角
             try {
                 if (!isBksrc1Checked) {
-                    ctx.drawImage(apple, 0, 0, apple.width, apple.height, 0, 0, 600, 240);
+                    ctx.drawImage(apple, 0, 0, apple.width - 30, apple.height - 30, 0, 0, 600, 240);
                 } else {
                     ctx.drawImage(apple, 0, 0, apple.width - 260, apple.height - 120, 0, 0, 600, 240);
                 }

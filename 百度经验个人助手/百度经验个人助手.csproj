@@ -168,6 +168,7 @@
     <Content Include="Assets\code\AutoComplete.js" />
     <Content Include="Assets\code\BigPic.js" />
     <Content Include="Assets\code\jquery.autocompleter.css" />
+    <Content Include="Assets\code\PicInsert.js" />
     <Content Include="Assets\code\test01.css" />
     <Content Include="Assets\code\test02.html" />
     <Content Include="Assets\CookieClickContent.gif" />

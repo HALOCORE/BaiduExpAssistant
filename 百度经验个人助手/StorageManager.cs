@@ -342,15 +342,22 @@ namespace 百度经验个人助手
                 "开宝箱",
                 "https://jingyan.baidu.com/usersign",
                 "navigate",
-                "打开签到日历页面，激活此工具，会一直开宝箱，直到所有宝箱都开启.",
+                "先激活此工具，再打开签到日历页面，会一直开宝箱，直到所有宝箱都开启.",
                 "var openb = document.getElementById('openBoxBtn'); if(openb) openb.click();");
 
-            DIYTool dt2 = new DIYTool(
+            DIYTool dt21 = new DIYTool(
+                "去往老虎机页面",
+                "https://jingyan.baidu.com/user/nuc",
+                "click",
+                "先点击此工具，然后用 “开老虎机” 工具.",
+                "window.external.notify(\"GOTO: https://jingyan.baidu.com/activity/lottery\");");
+
+            DIYTool dt22 = new DIYTool(
                 "开老虎机",
                 "https://jingyan.baidu.com/user/nuc",
                 "click",
-                "（还没写）打开老虎机，点击此工具，会一直开老虎机直到开完.",
-                "window.external.notify('NOTIFY: 开发者还没写这个功能 | 如果你已经写了，可以告知开发者 | WARN');\r\n//var zp = document.getElementsByClassName(\"zhuanpan\")[0];\r\n//var try10 = zp.getElementsByClassName(\"try10\")[0];\r\n//if(!try10.classList.contains(\"disable\") try10.click();");
+                "先通过 “去往老虎机页面” 工具进入老虎机，再点击此工具.",
+                "var zp = document.getElementsByClassName(\"zhuanpan\")[0];\nvar try10 = zp.getElementsByClassName(\"try10\")[0];\nfunction lwj(){\n  if(!try10.classList.contains(\"disable\")){\n     try10.click();\n     setTimeout(lwj, 1000);\n }\n}\nlwj();");
 
             DIYTool dt3 = new DIYTool(
                "查看未读消息-触发器",
@@ -367,7 +374,8 @@ namespace 百度经验个人助手
                  "var cks = document.getElementsByClassName('msg-more-btn'); var tcount = 200; for(let ck of cks) {setTimeout(function(){ck.click()}, tcount); tcount += 200;}");
 
             tempTools.Add(dt1);
-            tempTools.Add(dt2);
+            tempTools.Add(dt21);
+            tempTools.Add(dt22);
             tempTools.Add(dt3);
             tempTools.Add(dt4);
 
@@ -411,7 +419,7 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.5.8";
+        public const string VER = "1.5.9";
 
         private static string _editSettingsFileName = "EditSettings.xml";
         private static string _settingsFileName = "Settings.xml";

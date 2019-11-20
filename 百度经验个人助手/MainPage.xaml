@@ -796,16 +796,19 @@
                     简介图与大图 (Alhpa) ：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
-                    1. 输入标题自动生成简介图
+                    1. 输入标题自动生成简介图，一键保存到文件
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.8">
                     2. 大图片框悬浮置顶，可拖拽移动
+                </TextBlock>
+                <TextBlock FontSize="20" Foreground="Gray" Opacity="0.7">
+                    3. 一键插入所有图片到步骤中
                 </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
                     自动补全 (Beta) ：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
-                    1. 随时Tab键呼出自动补全框
+                    1. Tab键呼出自动补全框
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.8">
                     2. Tab键插入补全框第一条/插入新条目
@@ -820,7 +823,7 @@
                     自定义 (Alpha) ：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
-                    1. 可以用代码写自定义功能
+                    1. 可以用代码写自定义功能（已读所有消息等）
                 </TextBlock>
             </StackPanel>
             <WebView x:Name="webViewMain" Grid.Column="1"></WebView>

@@ -135,12 +135,12 @@ namespace 百度经验个人助手
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
                 if (cdr2 == ContentDialogResult.Secondary)
                 {
-                    bool confirm = await Utility.ShowConfirmDialog("确认：已知晓该版本更改了数据位置", "数据分析不能分析之前的数据。", "已知晓", "再看一下说明");
-                    if (!confirm)
-                    {
-                        ContentNewDialog cnd3 = new ContentNewDialog();
-                        ContentDialogResult cdr3 = await cnd.ShowAsync();
-                    }
+                    //bool confirm = await Utility.ShowConfirmDialog("确认：已知晓该版本更改了数据位置", "数据分析不能分析之前的数据。", "已知晓", "再看一下说明");
+                    //if (!confirm)
+                    //{
+                    //    ContentNewDialog cnd3 = new ContentNewDialog();
+                    //    ContentDialogResult cdr3 = await cnd.ShowAsync();
+                    //}
                     StorageManager.appSettings.isFirstIn = false;
                     StorageManager.appSettings.version = StorageManager.VER;
                 }
@@ -159,11 +159,6 @@ namespace 百度经验个人助手
             ShowLoading("读取DIY功能设置...");
             await StorageManager.ReadDIYToolsSettings();
 
-            if (Window.Current.Bounds.Width < 1100)
-            {
-                textUserName.Text = "您的窗口过窄";
-                Utility.LogEvent("InitWarn_WindowTooNarrow");
-            }
             Uri[] uris =
             {
                 new Uri("ms-appx:///Assets/8-5-4.jpg") ,
@@ -229,9 +224,16 @@ namespace 百度经验个人助手
                     Utility.LogEvent("InitFailed_InvalidBDUSS");
                 }
                 HideLoading();
+                if (Window.Current.Bounds.Width< 1270)
+                {
+                    ShowNotify("提醒: 您的窗口过窄", "当前宽度为 " + Window.Current.Bounds.Width + ", 建议的最低宽度为 1366", Symbol.Comment);
+                    Utility.LogEvent("Notify_WindowTooNarrow");
+                }
             }
             else
             {
+                HideLoading();
+                await Utility.ShowMessageDialog("请重新设置Cookie", "Cookie文件不可读取或者内容已损坏");
                 buttonSetCookie_Click(null, null);
             }
 
@@ -495,7 +497,12 @@ namespace 百度经验个人助手
         /// <returns>更新Content是否成功</returns>
         public async Task UpdateContents()
         {
-            
+            if (Window.Current.Bounds.Width< 1270)
+            {
+                ShowNotify("提醒: 您的窗口过窄", "当前宽度为 " + Window.Current.Bounds.Width + ", 建议的最低宽度为 1366", Symbol.Comment);
+                Utility.LogEvent("Notify_WindowTooNarrow");
+            }
+
             await ExpManager.GetContents(
                 textVisitAll, 
                 listViewContentExps);
@@ -543,6 +550,13 @@ namespace 百度经验个人助手
 
         public async Task UpdateReward(int pglow, int pghigh, string tp, int cid)
         {
+            if (Window.Current.Bounds.Width< 1270)
+            {
+                ShowNotify("提醒: 您的窗口过窄", "当前宽度为 " + Window.Current.Bounds.Width + ", 建议的最低宽度为 1366", Symbol.Comment);
+                Utility.LogEvent("Notify_WindowTooNarrow");
+            }
+
+
             ExpManager.rewardExps.Clear();
             ExpManager.rewardExpIDs.Clear();
             for (int i = pglow; i <= pghigh; )
@@ -857,6 +871,11 @@ namespace 百度经验个人助手
                     ExpManager.currentDataPack.contentExps);
                 data = StatManager.DeltaExps;
                 HideLoading();
+                if (Window.Current.Bounds.Width< 1270)
+                {
+                    ShowNotify("提醒: 您的窗口过窄", "当前宽度为 " + Window.Current.Bounds.Width + ", 建议的最低宽度为 1366", Symbol.Comment);
+                    Utility.LogEvent("Notify_WindowTooNarrow");
+                }
             }
             if (data != null) //to check if calc is done.
             {
@@ -1057,6 +1076,9 @@ namespace 百度经验个人助手
                 await JSCodeString.InjectCommonData(webViewMain);
                 await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/BigPic.js");
                 Utility.LogEvent("YES_BigPictureSucceed");
+                ShowLoading("初始化图片插入...");
+                await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/PicInsert.js");
+                Utility.LogEvent("YES_BigPicInstSucceed");
             }
             catch (Exception)
             {

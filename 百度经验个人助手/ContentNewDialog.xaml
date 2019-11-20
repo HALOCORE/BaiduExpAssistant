@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:gif="using:XamlAnimatedGif"
     mc:Ignorable="d"
-    Title="1.5.8 更新说明"
+    Title="1.5.9 更新说明"
     PrimaryButtonText="关闭"
     SecondaryButtonText="不再显示"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
@@ -18,12 +18,27 @@
             <LinearGradientBrush.Transform>
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
-            <GradientStop Color="#FFFDB9B9"  Offset="0.7"/>
+            <GradientStop Color="LightGoldenrodYellow"  Offset="0.7"/>
             <GradientStop Color="GhostWhite"/>
         </LinearGradientBrush>
     </ContentDialog.Background>
     <Grid Width="600" Height="350" Margin="20">
         <ListView HorizontalContentAlignment="Stretch">
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="4" Padding="8">
+                            <TextBlock FontSize="26" Margin="5">一键插入图片到各个步骤</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">上传所有图片包括简介图以后，点击插入图片即可。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
             <ListViewItem HorizontalContentAlignment="Stretch" Visibility="Visible">
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
