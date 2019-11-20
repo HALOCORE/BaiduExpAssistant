@@ -131,10 +131,10 @@
 function saveConfig() {
     var saveObj = {};
     var isChecked = document.getElementById("brief-img-source-check1").checked;
-    var secondBgUrl = document.getElementById("brief-background").value;
+    var backgroundText = document.getElementById("background-urls-textarea").value;
     var iconText = document.getElementById("icon-urls-textarea").value;
     saveObj['brief-background-first-checked'] = isChecked;
-    saveObj['brief-background-second-url'] = secondBgUrl;
+    saveObj['brief-background-text'] = backgroundText;
     saveObj['brief-icon-text'] = iconText;
     saveObj['group-id'] = "bigpics";
     var dataStr = JSON.stringify(saveObj);
@@ -153,22 +153,67 @@ function launchUrl(url) {
     }
     catch (e) {}
 }
+function saveCanvas(){
+    var canvas = document.getElementById("brief-canvas");
+    var oldPosition = canvas.style.position;
+    canvas.style.position = "fixed";
+    canvas.style.left = 0;
+    canvas.style.top = 0;
+    var oldZIndex = canvas.style.zIndex;
+    canvas.style.zIndex = 200000;
+    var oldTransform = canvas.style.transform;
+    canvas.style.transform = "scale(" + document.body.clientWidth / 600 / 1.5 + ")";
+    var oldTransformOrigin = canvas.style.transformOrigin;
+    canvas.style.transformOrigin = "0% 0%";
+
+    setTimeout(saveCanvasPhrase2, 200);
+    
+}
+function saveCanvasPhrase2() {
+    try { window.external.notify("SAVE-PIC: " + 600 / 240 + " | 600 | 240"); } catch (e) { };
+    setTimeout(saveCanvasPhrase3, 200);
+}
+function saveCanvasPhrase3() {
+    var canvas = document.getElementById("brief-canvas");
+    canvas.style.position = "static";
+    canvas.style.zIndex = "auto";
+    canvas.style.transform = "initial";
+    canvas.style.transformOrigin = "initial";
+    try { window.external.notify("NOTIFY: 操作完成 | 界面恢复原来状态 | OK"); } catch (e) { };
+}
+function toggleSettings() {
+    var toggleButton = document.getElementById("toggle-settings");
+    var setingZone = document.getElementById("setting-zone");
+    if (setingZone.style.display == "none") {
+        setingZone.style.display = "block";
+        toggleButton.innerText = "↑ 收起设置 ↑";
+    }
+    else {
+        setingZone.style.display = "none";
+        toggleButton.innerText = "↓ 展开设置 ↓";
+    }
+}
 function TryLoadSettings() {
-    if (CommonSetData) {
-        var settings = CommonSetData["bigpics"];
-        if (settings) {
-            try {
-                document.getElementById("brief-img-source-check1").checked = settings['brief-background-first-checked'];
-                document.getElementById("brief-img-source-check2").checked = !settings['brief-background-first-checked'];
-                document.getElementById("brief-background").value = settings['brief-background-second-url'];
-                document.getElementById("icon-urls-textarea").value = settings['brief-icon-text'];
-            }
-            catch (e) {
-                window.external.notify("ERROR: 简介图设置恢复不成功.");
+    try {
+        if (CommonSetData) {
+            var settings = CommonSetData["bigpics"];
+            if (settings) {
+                if(settings['brief-background-first-checked'])
+                    document.getElementById("brief-img-source-check1").checked = settings['brief-background-first-checked'];
+                if(settings['brief-background-first-checked'])
+                    document.getElementById("brief-img-source-check2").checked = !settings['brief-background-first-checked'];
+                if(settings['brief-background-text'])
+                    document.getElementById("background-urls-textarea").value = settings['brief-background-text'];
+                if(settings['brief-icon-text'])
+                    document.getElementById("icon-urls-textarea").value = settings['brief-icon-text'];
             }
         }
     }
+    catch (e) {
+        try { window.external.notify("ERROR: 简介图设置恢复不成功."); } catch (e) {}
+    }
 }
+
 function AddBriefImgEditor() {
     var existEditor = document.getElementById("brief-img-editor");
     if (existEditor) {
@@ -193,21 +238,40 @@ function AddBriefImgEditor() {
     editorBox.innerHTML = `
     <canvas width="600" height="240" style="width: 600px;height: 240px;border: wheat solid 1px"
     id="brief-canvas"></canvas>
-    <div style="padding: 15px;border-radius: 10px;background: white;margin-right: 85px;">
+    <div>
+        <button id="save-canvas" onclick="saveCanvas()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
+            保存简介图到本地
+        </button>
+        <button id="toggle-settings" onclick="toggleSettings()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
+            ↓ 展开设置 ↓
+        </button>
+        <button id="brief-conf-close" onclick="closeBriefPic()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
+            隐藏
+        </button>
+    </div>
+    <div id="setting-zone" style="padding: 15px;border-radius: 10px;background: white;margin-right: 85px;display: none;">
         <div>
             背景：
             <br>
             <label style="display: block;">
-                <input id="brief-img-source-check1" name="briefImageSource" type="radio" value="" checked />
+                <input id="brief-img-source-check1" name="briefImageSource" type="radio" value="" />
                 方案1: 使用悬浮大图片框中的图片（上传图片之一）
-                <input style="display: none;" id="brief-background-bigbox" value="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1573974876906&di=93a30f92eabc6b48e2d44fb36f703340&imgtype=0&src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F62a970ae9c765386b6066b45288a55b4c8e686817d63f-yODBrZ_fw658" />
+                <input style="display: none;" id="brief-background-bigbox" value="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4061924083,1937802988&fm=26&gp=0.jpg" />
             </label>
             <label style="display: block;">
-                <input id="brief-img-source-check2" name="briefImageSource" type="radio" value="" />
-                方案2: 使用网络图片
-                <input id="brief-background"
-                    value="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1573974876906&di=93a30f92eabc6b48e2d44fb36f703340&imgtype=0&src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F62a970ae9c765386b6066b45288a55b4c8e686817d63f-yODBrZ_fw658">
-                <button id="gen1" onclick="launchUrl('https://image.baidu.com/')">百度图片</button>
+                <input id="brief-img-source-check2" name="briefImageSource" type="radio" value="" checked/>
+                方案2: 关键词匹配（和图标类似）<button id="gen1" onclick="launchUrl('https://image.baidu.com/')">百度图片</button><span>(注意timgsa.baidu.com开头的无效)</span>
+                <input id="brief-background" style="display: none;" value=""/>
+                <div style="width: 424px; margin-top: 5px; display: block; font-size: 12px; padding: 3px;">
+                    <span id="background-urls-note" style="color: darkcyan">最终背景图为从上往下找到的第一个关键词匹配。</span>
+                </div>
+                <textarea id="background-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 3px;">
+unity = http://pic.nipic.com/2007-11-02/20071128716391_2.jpg
+win = https://www.windowsmode.com/wp-content/uploads/2018/08/microsoft-releases-windows-10-redstone-5-fall-2018-build-17728-522183-2.jpg
+word = https://cn.bing.com/th?id=OIP.2l4mI6F0_MiyyGcPB-aoYAHaEK&pid=Api&rs=1
+
+= http://b.hiphotos.baidu.com/image/pic/item/908fa0ec08fa513db777cf78376d55fbb3fbd9b3.jpg
+                </textarea>
             </label>
         </div>
         <div style="margin-top: 15px; margin-bottom: 5px;">
@@ -242,13 +306,20 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
         <button id="brief-conf-save" onclick="saveConfig()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
             保存配置
         </button>
-        <button id="brief-conf-close" onclick="closeBriefPic()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
-            隐藏
-        </button>
-        <image class="brief-img" style="display:none;" id="brief-backgroundImage"></image>
-        <image class="brief-img" style="display:none;" id="brief-iconImage"></image>
+        <img class="brief-img" style="display:none;" id="brief-backgroundImage"></img>
+        <img class="brief-img" style="display:none;" id="brief-iconImage"></img>
     </div> 
     `;
+
+    function backgroundShowNote(note, color) {
+        if (!note) {
+            note = "最终背景图为从上往下找到的第一个关键词匹配。";
+            color = "darkcyan";
+        }
+        var elem = document.getElementById("background-urls-note");
+        elem.innerText = note;
+        elem.style.color = color;
+    }
 
     function iconShowNote(note, color) {
         if (!note) {
@@ -265,6 +336,8 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
 
     var oldsrc1 = "";
     var oldsrc2 = "";
+    var forceBg = false;
+    var forceIc = false;
     function updateBriefImage() {
         if (document.getElementById("brief-img-editor").style.display == "none") return;
         //update brief icon
@@ -288,12 +361,34 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
                 break;
             }
         }
+        //update brief background
+        pairs = [];
+        try {
+            var urltxt = document.getElementById("background-urls-textarea");
+            var lines = urltxt.value.split("\n").map(x => x.trim()).filter(x => x != "");
+            pairs = lines.map(x => x.split("=")).map(y => [y[0], y.slice(1).join("=")].map(z => z.trim()));
+            for (var elem of pairs) {
+                if (elem.length != 2) throw "error";
+                if (!elem[1].startsWith("http")) throw "error";
+            }
+            backgroundShowNote();
+        }
+        catch (e) {
+            backgroundShowNote("输入格式不正确!", "red");
+        }
+        for (var p of pairs) {
+            if (titleInput.value.toLowerCase().indexOf(p[0].toLowerCase()) >= 0) {
+                document.getElementById("brief-background").value = p[1];
+                break;
+            }
+        }
+        //check canvas update.
         var isBksrc1Checked = document.getElementById("brief-img-source-check1").checked;
         var newCompInputVal = titleInput.value + " | "
             + $("#brief-background-bigbox").val() + " | " + $("#brief-background").val()
             + " | " + $("#brief-icon").val() + " | "
             + document.getElementById("brief-fontColor").innerText
-            + " | " + isBksrc1Checked;
+            + " | " + isBksrc1Checked + " | " + forceBg + " | " + forceIc;
         console.log(newCompInputVal);
         if (oldCompInputVal == newCompInputVal) return;
         oldCompInputVal = newCompInputVal;
@@ -305,13 +400,17 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
             var newsrc1 = $("#brief-background").val();
         }
         var newsrc2 = $("#brief-icon").val();
-        if (newsrc1 != oldsrc1) {
-            $("#brief-backgroundImage").attr("src", newsrc1);
+        if (newsrc1 != oldsrc1 || forceBg) { //there's no ?t in new/old src var.
+            $("#brief-backgroundImage").attr("src", newsrc1 + "?t=" + Date.now());
             oldsrc1 = newsrc1;
+            forceBg = false;
+            console.log("# forceBg");
         }
-        if (newsrc2 != oldsrc2) {
-            $("#brief-iconImage").attr("src", newsrc2);
+        if (newsrc2 != oldsrc2 || forceIc) {
+            $("#brief-iconImage").attr("src", newsrc2 + "?t=" + Date.now());
             oldsrc2 = newsrc2;
+            forceIc = false;
+            console.log("# forceIc");
         }
 
         $.when.apply(null, $(".brief-img").map(function (i, e) {
@@ -333,16 +432,26 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
             //图片
             var apple = document.getElementById("brief-backgroundImage");
             //将图像绘制到画布的，图片的左上角
-            if (!isBksrc1Checked) {
-                ctx.drawImage(apple, 0, 0, apple.width, apple.height, 0, 0, 600, 240);
-            } else {
-                ctx.drawImage(apple, 0, 0, apple.width - 260, apple.height - 120, 0, 0, 600, 240);
+            try {
+                if (!isBksrc1Checked) {
+                    ctx.drawImage(apple, 0, 0, apple.width, apple.height, 0, 0, 600, 240);
+                } else {
+                    ctx.drawImage(apple, 0, 0, apple.width - 260, apple.height - 120, 0, 0, 600, 240);
+                }
+            } catch (e) {
+                forceBg = true; //force update next time.
             }
+            
             //画一个实心矩形
             fillRoundRect(ctx, 66, 66, 468, 108, 12, document.getElementById("brief-fontColor").innerText);
+            
             apple = document.getElementById("brief-iconImage");
-            //将图像绘制到画布的，图片的左上角
-            ctx.drawImage(apple, 96, 79.2, 81.6, 81.6);
+            try {
+                //将图像绘制到画布的，图片的左上角
+                ctx.drawImage(apple, 96, 79.2, 81.6, 81.6);
+            } catch (e) {
+                forceIc = true; //force update next time.
+            }
             // 设置颜色
             ctx.fillStyle = "black";
             // 设置水平对齐方式
@@ -397,11 +506,12 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
     try {
         AddMyImg();
         AddBriefImgEditor();
+        window.external.notify("2ND-GOTO: https://www.easyicon.net/");
         setTimeout(TryLoadSettings, 100); //no reason yet.
         window.external.notify("NOTIFY: 添加成功 | 大图片框和简介图已载入 | OK");
     } catch (e) {
         var emm = document.createElement("div");
         emm.innerText = e.message;
-        window.external.notify("SHOW-DIALOG: 添加大图片框失败 | 可能的原因:\n1. 当前页面可能不是编辑器页面\n2. 代码运行出错" + emm.innerText.replace("|", " I "));
+        try{window.external.notify("SHOW-DIALOG: 添加大图片框失败 | 可能的原因:\n1. 当前页面可能不是编辑器页面\n2. 代码运行出错" + emm.innerText.replace("|", " I "));} catch(e2){};
     }
 })();

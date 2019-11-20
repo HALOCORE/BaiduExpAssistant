@@ -20,6 +20,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
+using Windows.Graphics.Imaging;
 
 //“空白页”项模板在 http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409 上有介绍
 
@@ -39,7 +40,7 @@ namespace 百度经验个人助手
             App.currentMainPage = this;
             ExpManager.Init();
             StatManager.Init();
-            
+
 
             listViewSearchExps.ItemsSource = ExpManager.rewardExps;
 
@@ -48,6 +49,15 @@ namespace 百度经验个人助手
 
             SelfCheckAndInit();
 
+        }
+
+        public bool SecondWebViewVisibility{
+            get { return borderWebViewSecondary.Visibility == Visibility.Visible; }
+            set
+            {
+                if (value) borderWebViewSecondary.Visibility = Visibility.Visible;
+                else borderWebViewSecondary.Visibility = Visibility.Collapsed;
+            }
         }
 
         public void ShowLoading(string loadmsg)
@@ -112,8 +122,9 @@ namespace 百度经验个人助手
         {
             gridMain.Visibility = Visibility.Visible;
             gridSecond.Visibility = Visibility.Collapsed;
+            SecondWebViewVisibility = false;
 
-            JSCodeString.SetWebView(webViewMain);
+            JSCodeString.SetWebView(webViewMain, webViewSecondary);
             WebSetUpdate(true, false, false, false);
 
             ShowLoading("读取设置...");
@@ -1192,6 +1203,26 @@ namespace 百度经验个人助手
             HideLoading();
         }
 
+        public async Task<WriteableBitmap> GetWebViewImageAsync(double ratio, int reWidth, int reHeight)
+        {
+            InMemoryRandomAccessStream ms = new InMemoryRandomAccessStream();
+            await webViewMain.CapturePreviewToStreamAsync(ms);
+
+            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(ms);
+            int width = (int)decoder.PixelWidth;
+            int height = (int)decoder.PixelHeight;
+            int cropWidth = (int)(width / 1.5);
+            int cropHeight = (int)(width / ratio / 1.5);
+            
+            WriteableBitmap bitmap = new WriteableBitmap(width, height);
+            bitmap.SetSource(ms);
+            bitmap = bitmap.Crop(2, 2, cropWidth, cropHeight);
+            bitmap = bitmap.Resize(reWidth, reHeight, WriteableBitmapExtensions.Interpolation.Bilinear);
+           
+            ms.Dispose();
+            return bitmap;
+        }
+
         private async void buttonDIY_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new ContentDIYDialog();
@@ -1209,10 +1240,19 @@ namespace 百度经验个人助手
             ShowNotify("Navigate Tool Toggle", tool.Name);
         }
 
-        private void TextBlock_Tapped_1(object sender, TappedRoutedEventArgs e)
+        private async void TextBlock_Tapped_1(object sender, TappedRoutedEventArgs e)
         {
             //error test
+            //var bmap = await GetWebViewImageAsync(600.0/240, 600, 240);
+            //await StorageManager.SaveWritableBitmapAsync(bmap);
+
+            //imageProfile.Source = bmap;
             throw new Exception("异常捕获测试 Catch Exception Test");
+        }
+
+        private void buttonWebViewSecondaryClose_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            SecondWebViewVisibility = false;
         }
     }
 }

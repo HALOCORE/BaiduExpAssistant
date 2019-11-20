@@ -10,6 +10,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using Windows.Data.Json;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.Graphics.Imaging;
 
 namespace 百度经验个人助手
 {
@@ -98,7 +100,7 @@ namespace 百度经验个人助手
 
         }
 
-        public static void SetWebView(WebView webView)
+        public static void SetWebView(WebView webView, WebView secondWebView)
         {
 
             webView.NavigationCompleted += async (view, args) =>
@@ -157,9 +159,10 @@ namespace 百度经验个人助手
                 {
                     await Utility.ShowMessageDialog("javascript 运行异常", args.Value);
                 }
-                else if (args.Value.StartsWith("GOTO: "))
+                else if (args.Value.StartsWith("GOTO: ") || args.Value.StartsWith("2ND-GOTO: "))
                 {
-                    string newUri = args.Value.Replace("GOTO: ", "").Trim();
+                    string gotoType = args.Value.Split(':')[0];
+                    string newUri = args.Value.Replace("2ND-GOTO: ", "").Replace("GOTO: ", "").Trim();
                     string referrer = "";
                     if (newUri.Contains(" FROM: "))
                     {
@@ -171,7 +174,9 @@ namespace 百度经验个人助手
                     {
                         HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, new Uri(newUri));
                         if(referrer != "") req.Headers.Referer = new Uri(referrer);
-                        webView.NavigateWithHttpRequestMessage(req);
+
+                        if(gotoType == "GOTO") webView.NavigateWithHttpRequestMessage(req);
+                        else secondWebView.NavigateWithHttpRequestMessage(req);
 
                         App.currentMainPage.ShowNotify("跳转成功", newUri);
                     }
@@ -179,6 +184,20 @@ namespace 百度经验个人助手
                     {
                         await Utility.ShowMessageDialog("跳转不成功", "尝试跳转目标: " + newUri);
                         await Utility.ShowDetailedError("出错详细信息", ee);
+                    }
+                }
+                else if (args.Value.StartsWith("2ND-VISIBILITY: "))
+                {
+                    string val = args.Value.Replace("2ND-VISIBILITY: ", "").Trim();
+                    if(val == "VISIBLE")
+                    {
+                        App.currentMainPage.ShowNotify("第二页面可见", "可以手动关闭");
+                        App.currentMainPage.SecondWebViewVisibility = true;
+                    }
+                    else
+                    {
+                        App.currentMainPage.ShowNotify("第二页面隐藏", "回到主页面");
+                        App.currentMainPage.SecondWebViewVisibility = false;
                     }
                 }
                 else if (args.Value.StartsWith("NOTIFY: "))
@@ -232,7 +251,35 @@ namespace 百度经验个人助手
                     Utility.LogEvent("YES_CommonDataSucceed");
                     App.currentMainPage.ShowNotify("数据保存成功", "保存组别为" + groupId);
                 }
-                else
+                else if (args.Value.StartsWith("SAVE-PIC: ")){
+                    string[] data = args.Value.Replace("SAVE-PIC: ", "").Trim().Split('|');
+                    if(data.Length != 3)
+                    {
+                        await Utility.ShowMessageDialog("保存图片调用格式不正确", "正确格式为 SAVE-PIC: 宽高比 | 宽度 | 高度");
+                        return;
+                    }
+                    else
+                    {
+                        App.currentMainPage.ShowLoading("保存简介图...");
+                        try
+                        {
+                            double ratio = Convert.ToDouble(data[0].Trim());
+                            int width = Convert.ToInt32(data[1].Trim());
+                            int height = Convert.ToInt32(data[2].Trim());
+                            WriteableBitmap img = await App.currentMainPage.GetWebViewImageAsync(ratio, width, height);
+                            await StorageManager.SaveWritableBitmapAsync(img);
+                            App.currentMainPage.HideLoading();
+                        }
+                        catch(Exception e)
+                        {
+                            await Utility.ShowMessageDialog("保存图片失败", "未能保存到文件");
+                            await Utility.ShowDetailedError("错误详细信息", e);
+                            App.currentMainPage.HideLoading();
+                            return;
+                        }
+                    }
+                }
+                else 
                 {
                     await Utility.ShowMessageDialog("未知的 window.external.notify 调用", "window.external.notify 调用必须以指定单词开头");
                 }

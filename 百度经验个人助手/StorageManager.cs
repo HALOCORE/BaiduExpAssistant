@@ -24,6 +24,7 @@ using Windows.Storage;
 using Windows.UI;
 using Windows.Data.Json;
 using Windows.System;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace 百度经验个人助手
 {
@@ -410,7 +411,7 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.5.7";
+        public const string VER = "1.5.8";
 
         private static string _editSettingsFileName = "EditSettings.xml";
         private static string _settingsFileName = "Settings.xml";
@@ -1101,6 +1102,31 @@ namespace 百度经验个人助手
 
         #endregion
 
+        public static async Task SaveWritableBitmapAsync(WriteableBitmap bmp)
+        {
+            string fileName = DateTime.UtcNow.Ticks + ".png";
+            Guid BitmapEncoderGuid = BitmapEncoder.PngEncoderId;
+            StorageFolder folder = await GetSubFolderAsync(ApplicationData.Current.LocalFolder, "EDITOR-BriefPicture");
+            StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+
+            using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
+            {
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoderGuid, stream);
+                Stream pixelStream = bmp.PixelBuffer.AsStream();
+                byte[] pixels = new byte[pixelStream.Length];
+                await pixelStream.ReadAsync(pixels, 0, pixels.Length);
+
+                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
+                                    (uint)bmp.PixelWidth,
+                                    (uint)bmp.PixelHeight,
+                                    96.0,
+                                    96.0,
+                                    pixels);
+                await encoder.FlushAsync();
+            }
+            await Launcher.LaunchFolderAsync(folder);
+        }
+    
 
         /// <summary>
         /// 获取一个数据包的描述（时间）

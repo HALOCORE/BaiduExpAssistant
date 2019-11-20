@@ -823,8 +823,16 @@
                     1. 可以用代码写自定义功能
                 </TextBlock>
             </StackPanel>
-            
             <WebView x:Name="webViewMain" Grid.Column="1"></WebView>
+            <Border x:Name="borderWebViewSecondary" Grid.Column="1" Margin="50" BorderThickness="3" BorderBrush="DarkGray"  Visibility="Visible">
+                <Grid>
+                    <WebView x:Name="webViewSecondary"></WebView>
+                    <Button x:Name="buttonWebViewSecondaryClose" Padding="8" Opacity="0.7" Background="LightGray" HorizontalAlignment="Right" VerticalAlignment="Top" Tapped="buttonWebViewSecondaryClose_Tapped">
+                        <SymbolIcon Foreground="Black" Symbol="Cancel"/>
+                    </Button>
+                </Grid>
+            </Border>
+            
         </Grid>
 
         <Grid x:Name="GridNotify" Width="Auto" Grid.Column="0" Grid.ColumnSpan="3"

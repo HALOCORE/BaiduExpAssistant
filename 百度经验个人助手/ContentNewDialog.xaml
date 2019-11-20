@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:gif="using:XamlAnimatedGif"
     mc:Ignorable="d"
-    Title="1.5.7 更新说明"
+    Title="1.5.8 更新说明"
     PrimaryButtonText="关闭"
     SecondaryButtonText="不再显示"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
@@ -36,19 +36,23 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
                         <StackPanel Margin="8">
-                            <TextBlock FontSize="26" Margin="5">简介图：编辑器辅助（支持简介图测试版）</TextBlock>
-                            <TextBlock  Margin="5" TextWrapping="Wrap">根据标题选择图标，可自行更换背景图。Bug修复和错误报告改进。</TextBlock>
+                            <TextBlock FontSize="26" Margin="5">简介图 Bug 修复 / 更新，支持保存到文件</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">百度图片和百度云访问策略突然调整造成程序简介图无法加载... 非常坑。</TextBlock>
 
                         </StackPanel>
                     </StackPanel>
                     <Border Grid.Row="1" Margin="6"  BorderThickness="3" BorderBrush="MediumPurple" Width="400">
-                        <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="400" Height="185" gif:AnimationBehavior.SourceUri="Assets/features/1.3.9ACAlpha.gif"
+                        <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="400" Height="185" gif:AnimationBehavior.SourceUri="Assets/features/1.5.7.gif"
                                 Source="Assets/features/1.5.7.gif" Stretch="Fill"
                                 Opacity="0.7"
                         >
                         </Image>
                     </Border>
                 </Grid>
+            </ListViewItem>
+            
+            <ListViewItem>
+                <TextBlock FontSize="20">版本日志：1.5.7 版本增加功能</TextBlock>
             </ListViewItem>
             <ListViewItem HorizontalContentAlignment="Stretch">
                 <Grid HorizontalAlignment="Stretch">
@@ -61,6 +65,21 @@
                         <StackPanel Margin="4" Padding="8">
                             <TextBlock FontSize="26" Margin="5">每日数据存放目录变更 (兼容英文win10)</TextBlock>
                             <TextBlock  Margin="5" TextWrapping="Wrap">之前的历史数据不再被数据分析识别。但是可以手动移动数据文件。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="8">
+                            <TextBlock FontSize="26" Margin="5">简介图：编辑器辅助（支持简介图测试版）</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">根据标题选择图标，可自行更换背景图。Bug修复和错误报告改进。</TextBlock>
                         </StackPanel>
                     </StackPanel>
                 </Grid>

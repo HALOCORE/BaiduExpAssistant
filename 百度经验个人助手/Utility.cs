@@ -5,6 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Services.Store.Engagement;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.Storage.Streams;
+using Windows.Foundation;
+using Windows.Graphics.Imaging;
+using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace 百度经验个人助手
 {
@@ -23,7 +29,7 @@ namespace 百度经验个人助手
         //if fire report succeed, this app should exit or continue. No throw exceptions.
         // ------------------
         //The final exceptions are report failures, and unknown ones.
-        public static async Task FireErrorReport(string name, string relatedVars, Exception err=null)
+        public static async Task FireErrorReport(string name, string relatedVars, Exception err = null)
         {
             string eventStr = string.Join(", ", customEventsLog);
             string errStr = "";
@@ -42,7 +48,7 @@ namespace 百度经验个人助手
 
             var dlg = new ContentErrorReportDialog(name, report);
             var result = await dlg.ShowAsync();
-            if(result == Windows.UI.Xaml.Controls.ContentDialogResult.Secondary)
+            if (result == Windows.UI.Xaml.Controls.ContentDialogResult.Secondary)
             {
                 App.currentMainPage.ShowLoading("正在发送错误报告...");
                 string data = report;
@@ -51,7 +57,8 @@ namespace 百度经验个人助手
                 string postResult = await ExpManager.PostData("http://193.112.68.240:8122/errorreport", "", formData);
                 App.currentMainPage.HideLoading();
 
-                if (postResult.StartsWith("ERROR")) {
+                if (postResult.StartsWith("ERROR"))
+                {
                     await ShowMessageDialog("发送失败", postResult + "如果始终无法发送，下次出错直接复制错误报告的内容，发送邮件给开发者 1223989563@qq.com");
                     throw new Exception("ERROR-REPORT-FAILED");
                 }
@@ -103,7 +110,7 @@ namespace 百度经验个人助手
 
         public static async Task ShowDetailedError(string title, Exception e)
         {
-            
+
             string moreInfo = "";
             if ((uint)e.HResult == 0x80020101) moreInfo = "80020101 通常是Javascript语法错误，或者其它软件未捕获的异常. 如果确定不是语法错误请联系开发者.";
 
@@ -121,5 +128,5 @@ namespace 百度经验个人助手
             await ShowMessageDialog(title, showMsg);
         }
     }
-
 }
+
