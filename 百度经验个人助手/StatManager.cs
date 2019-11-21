@@ -109,6 +109,11 @@ namespace 百度经验个人助手
             _expsOld = expsOld;
             CalcDeltaExpsDelegate d = CalcDeltaExps;
             await Task.Run(new Action(d));
+            if (_isErrorInCalcDeltaExps)
+            {
+                await Utility.ShowMessageDialog("本次分析有少许条目错误。重复名称不是Bug但是重复ID是Bug，请告知开发者", "遇到重复的经验ID");
+                await Utility.FireErrorReport("数据分析时发现重复的经验ID", "[exp]");
+            }
         }
 
         private static DateTime Datestr2Date(string datestr)
@@ -270,6 +275,7 @@ namespace 百度经验个人助手
         private static ObservableCollection<ContentExpEntry> _expsNew;
         private delegate void CalcDeltaExpsDelegate();
 
+        private static bool _isErrorInCalcDeltaExps = false;
         private static void CalcDeltaExps()
         {
             _deltaExps.Clear();
@@ -279,11 +285,16 @@ namespace 百度经验个人助手
 
             string[] urlSeperator = { ".com/" };
 
+            
             Hashtable h = new Hashtable();
             foreach(ContentExpEntry ets in _expsNew)
             {
                 string key = ets.Url.Split(urlSeperator, StringSplitOptions.None)[1];
-                h.Add(key, ets);
+                if (h.ContainsKey(key))
+                {
+                    _isErrorInCalcDeltaExps = true;
+                }
+                else h.Add(key, ets);
             }
 
             foreach (ContentExpEntry ets in _expsOld)   //对于历史数据中的每个经验条目

@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:gif="using:XamlAnimatedGif"
     mc:Ignorable="d"
-    Title="1.5.9 更新说明"
+    Title=""
     PrimaryButtonText="关闭"
     SecondaryButtonText="不再显示"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"

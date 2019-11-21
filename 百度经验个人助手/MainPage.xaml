@@ -173,7 +173,7 @@
             Stretch="UniformToFill"/>
     </Page.Background>
     <Grid>
-        <Grid x:Name="gridMain" Visibility="Collapsed" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid x:Name="gridMain" Visibility="Visible" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="230"/>
@@ -331,7 +331,7 @@
                         <DoubleAnimation Duration="0:0:1.3" From="0.3" To="1" RepeatBehavior="Forever" AutoReverse="True" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="buttonTips" ></DoubleAnimation>
                     </Storyboard>
                 </StackPanel.Resources>
-
+                <TextBlock x:Name="textVersion" HorizontalAlignment="Center">v x.x.x</TextBlock>
                 <Button x:Name="buttonTips" Width="100" Height="32" FontSize="14"
                     Foreground="AntiqueWhite" Click="buttonTips_Click">
                     <Button.Background>
@@ -638,7 +638,7 @@
 
         </Grid>
 
-        <Grid x:Name="gridSecond" Visibility="Visible" Background="White" Opacity="1">
+        <Grid x:Name="gridSecond" Visibility="Collapsed" Background="White" Opacity="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="1*"/>

@@ -120,6 +120,7 @@ namespace 百度经验个人助手
         /// </summary>
         public async void SelfCheckAndInit()
         {
+            textVersion.Text = "v " + StorageManager.VER;
             gridMain.Visibility = Visibility.Visible;
             gridSecond.Visibility = Visibility.Collapsed;
             SecondWebViewVisibility = false;
@@ -129,7 +130,7 @@ namespace 百度经验个人助手
 
             ShowLoading("读取设置...");
             bool isSettingsRead = await StorageManager.ReadSettings();
-            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != StorageManager.VER)
+            if (StorageManager.appSettings.isFirstIn || StorageManager.appSettings.version != StorageManager.FUNC_VER)
             {
                 ContentNewDialog cnd = new ContentNewDialog();
                 ContentDialogResult cdr2 = await cnd.ShowAsync();
@@ -142,7 +143,7 @@ namespace 百度经验个人助手
                     //    ContentDialogResult cdr3 = await cnd.ShowAsync();
                     //}
                     StorageManager.appSettings.isFirstIn = false;
-                    StorageManager.appSettings.version = StorageManager.VER;
+                    StorageManager.appSettings.version = StorageManager.FUNC_VER;
                 }
                 ShowLoading("更新设置...");
                 
@@ -216,12 +217,17 @@ namespace 百度经验个人助手
             string cookieGet = await StorageManager.GetCookieTry();
             if (cookieGet != null)
             {
-                if (!ExpManager.SetCookie(cookieGet)) return;
+                if (!ExpManager.SetCookie(cookieGet))
+                {
+                    await Utility.ShowMessageDialog("请重新设置Cookie", "Cookie文件内容不正确");
+                    HideLoading();
+                    return;
+                }
                 ShowLoading("尝试更新个人信息...");
                 bool getSucceed = await UpdateMain();
                 if (!getSucceed)
                 {
-                    Utility.LogEvent("InitFailed_InvalidBDUSS");
+                    Utility.LogEvent("InitFailed_InvalidBDUSS");                    
                 }
                 HideLoading();
                 if (Window.Current.Bounds.Width< 1270)
@@ -233,7 +239,6 @@ namespace 百度经验个人助手
             else
             {
                 HideLoading();
-                await Utility.ShowMessageDialog("请重新设置Cookie", "Cookie文件不可读取或者内容已损坏");
                 buttonSetCookie_Click(null, null);
             }
 
@@ -604,8 +609,7 @@ namespace 百度经验个人助手
                 if (!isNotBug)
                 {
                     //REPORT
-                    string relvar = "html=" + Utility.varTrace["rewardHtml"];
-                    await Utility.FireErrorReport("悬赏获取0条", relvar);
+                    await Utility.FireErrorReport("悬赏获取0条", "[reward]");
                 }
             }
             ShowControls();

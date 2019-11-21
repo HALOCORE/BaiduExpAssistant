@@ -17,6 +17,7 @@ namespace 百度经验个人助手
     public static class Utility
     {
         public static List<string> customEventsLog = new List<string>();
+        public static List<string> localEventLog = new List<string>();
         public static Hashtable varTrace = new Hashtable();
 
         public static void LogEvent(string evt)
@@ -26,14 +27,34 @@ namespace 百度经验个人助手
             customEventsLog.Add(evt);
         }
 
+        public static void LogLocalEvent(string evt)
+        {
+            localEventLog.Add(evt);
+        }
+
         //if fire report succeed, this app should exit or continue. No throw exceptions.
         // ------------------
         //The final exceptions are report failures, and unknown ones.
-        public static async Task FireErrorReport(string name, string relatedVars, Exception err = null)
+        public static async Task FireErrorReport(string name, string relatedVars, Exception err = null, string eventMessage = "")
         {
             string eventStr = string.Join(", ", customEventsLog);
+            string localEventStr = string.Join("\n", localEventLog);
             string errStr = "";
-            if (err != null) errStr = err.HResult.ToString() + "\n" + err.Message + "\n" + err.Source + "\n" + err.StackTrace;
+            if (err != null) errStr = eventMessage + "\n" + err.HResult.ToString() + "\n" + err.Message + "\n" + err.Source + "\n" + err.StackTrace;
+
+            string varTraceStr = "";
+            string relatedVarsFirstLine = relatedVars.Split('\n')[0].Trim();
+            if (relatedVarsFirstLine.StartsWith("[") && relatedVarsFirstLine.EndsWith("]"))
+            {
+                foreach(string key in Utility.varTrace.Keys)
+                {
+                    if (key.Contains(relatedVarsFirstLine))
+                    {
+                        varTraceStr = varTraceStr + key + " = " + Utility.varTrace[key] + "\n";
+                    }
+                }
+            }
+
             string bar = "==================";
             string report = bar + "NAME" + bar + "\n\n"
                 + name + "\n"
@@ -42,12 +63,23 @@ namespace 百度经验个人助手
                 + bar + "EXCEPTION" + bar + "\n"
                 + errStr + "\n\n"
                 + bar + "RELATED-VARS" + bar + "\n"
-                + relatedVars + "\n\n"
+                + relatedVars + "\n" + varTraceStr + "\n\n"
                 + bar + "EVENTS" + bar + "\n"
-                + eventStr + "\n\n";
+                + eventStr + "\n\n"
+                + bar + "LOCAL-EVENTS" + bar + "\n"
+                + localEventStr + "\n\n";
 
             var dlg = new ContentErrorReportDialog(name, report);
-            var result = await dlg.ShowAsync();
+            var result = Windows.UI.Xaml.Controls.ContentDialogResult.None;
+            try
+            {
+                result = await dlg.ShowAsync();
+            }
+            catch (Exception) //允许在ContentDialog打开的情况下出错
+            {
+                bool shouldSend = await ShowConfirmDialog("是否将错误报告发送给开发者? ", "窗口被占用, 错误报告无法显示. 是否将错误报告发送给开发者?", "发送给开发者", "忽略此错误");
+                if (shouldSend) result = Windows.UI.Xaml.Controls.ContentDialogResult.Secondary;
+            }
             if (result == Windows.UI.Xaml.Controls.ContentDialogResult.Secondary)
             {
                 App.currentMainPage.ShowLoading("正在发送错误报告...");

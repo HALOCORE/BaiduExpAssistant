@@ -47,7 +47,7 @@ namespace 百度经验个人助手
                 e.Handled = true;
                 //REPORT
                 string relvar = "senderType=" + sender.GetType() + "\nsender=" + sender.ToString();
-                await Utility.FireErrorReport("未知错误", relvar, e.Exception);
+                await Utility.FireErrorReport("未知错误", relvar, e.Exception, e.Message);
             };
             
             ApplicationView.PreferredLaunchViewSize = new Size(1200, 750);

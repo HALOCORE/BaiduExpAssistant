@@ -22,6 +22,7 @@ namespace 百度经验个人助手
         public ContentNewDialog()
         {
             this.InitializeComponent();
+            this.Title = StorageManager.FUNC_VER + " 更新说明";
         }
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

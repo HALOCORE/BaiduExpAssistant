@@ -144,6 +144,43 @@ namespace 百度经验个人助手
         {
             mainUserName = StorageManager.RemoveInvalidXmlChars(uname);
         }
+
+        public async Task CheckRemoveDuplicate()
+        {
+            HashSet<string> expids = new HashSet<string>();
+            string[] urlSeperator = { ".com/" };
+            int duplicateCount = 0;
+            List<ContentExpEntry> toRemove = new List<ContentExpEntry>();
+            foreach (var elem in contentExps)
+            {
+                string eid = elem.Url.Split(urlSeperator, StringSplitOptions.None)[1].Trim();
+                if (expids.Contains(eid))
+                {
+                    toRemove.Add(elem);
+                    duplicateCount++;
+                }
+                else
+                {
+                    expids.Add(eid);
+                }
+            }
+
+            foreach (var rme in toRemove)
+            {
+                contentExps.Remove(rme);
+            }
+
+            if (duplicateCount > 0)
+            {
+                await Utility.ShowMessageDialog("发现重复的经验ID", "这是一个Bug，请告知开发者");
+                await Utility.FireErrorReport("CheckRemoveDuplicate 发现重复的经验ID", "[exp]\ntotal=" + contentExpsCount + "\nactual=" + contentExps.Count);
+            }
+            else if(contentExps.Count != contentExpsCount)
+            {
+                await Utility.ShowMessageDialog("获取的经验个数和预期 " + contentExpsCount +  " 不符", "这是一个Bug，请告知开发者");
+                await Utility.FireErrorReport("CheckRemoveDuplicate 获取的经验个数和预期不符", "[exp]\ntotal=" + contentExpsCount + "\nactual=" + contentExps.Count);
+            }
+        }
     }
 
 
@@ -419,7 +456,8 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.5.9";
+        public const string VER = "1.6.0";
+        public const string FUNC_VER = "1.5.9";
 
         private static string _editSettingsFileName = "EditSettings.xml";
         private static string _settingsFileName = "Settings.xml";
@@ -986,6 +1024,9 @@ namespace 百度经验个人助手
 
             reader.Dispose();
             fs.Dispose();
+
+            //检查和去除重复
+            await tempDp.CheckRemoveDuplicate();
             return tempDp;
 
 
@@ -1002,6 +1043,7 @@ namespace 百度经验个人助手
             ObservableCollection<StorageFile> files = new ObservableCollection<StorageFile>();
             files.Add(file);
             ObservableCollection<DataPack> tempDataPacks = await ReadHistoryDataPacks(files);
+            await tempDataPacks[0].CheckRemoveDuplicate();
             return tempDataPacks[0];
         }
 

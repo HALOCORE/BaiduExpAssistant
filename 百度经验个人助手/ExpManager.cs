@@ -260,10 +260,20 @@ namespace 百度经验个人助手
                 }
 
                 string guessReason = "";
-                if (isLengthSatisfied) guessReason = "最可能的原因是从浏览器退出登录，或者切换账号了。";
-                else guessReason = "最可能的原因是没有复制完整BDUSS，完整的BDUSS有 192 个字符。";
+                string shortReason = "";
+                if (isLengthSatisfied)
+                {
+                    guessReason = "最可能的原因是从浏览器退出登录，或者切换账号了。";
+                    shortReason = "可能是因为从获取Cookie的地方退出登录或切换账号";
+                }
+                else
+                {
+                    guessReason = "最可能的原因是没有复制完整BDUSS，完整的BDUSS有 192 个字符。";
+                    shortReason = "完整的BDUSS有 192 个字符";
+                }
 
-                await Utility.ShowMessageDialog("Cookie设置不起作用",
+
+                await Utility.ShowMessageDialog("Cookie不起作用" + shortReason,
                     matchUname.Groups[0].Value.ToString() + " " + matchUname.Groups[1].Value.ToString() + "\n"
                     + guessReason + "\n如果确认不是，那这是意外的问题。");
 
@@ -356,7 +366,7 @@ namespace 百度经验个人助手
         //private static string thread2Ret;
         //private static string thread3Ret;
         //private static string thread4Ret;
-        private static async Task GetContentsSubStep_CookiedGetContentPage(int pg, int threadID)
+        private static async Task GetContentsSubStep_CookiedGetContentPage(int pg)
         {
             string result = await ExpManager.SimpleRequestUrl(
                 "https://jingyan.baidu.com/user/nucpage/content?tab=exp&expType=published&pn=" + pg * 20,
@@ -377,7 +387,9 @@ namespace 百度经验个人助手
 
         private static bool GetContentsSubStep_ParseContentPage(int pg) //TODO: why error showed page 0 Error, first page still get?
         {
+            Utility.LogLocalEvent("ParseContentPage " + pg);
             string html = htmlContentPages[pg];
+            Utility.varTrace["[exp]GetContentsSubStep_ParseContentPage_html"] = html;
             MatchCollection mcTitleAndUrl = Regex.Matches(html, regexContentExpTitleAndUrl);
             MatchCollection mcView = Regex.Matches(html, regexContentExpView);
             MatchCollection mcVote = Regex.Matches(html, regexContentExpVote);
@@ -445,7 +457,7 @@ namespace 百度经验个人助手
 
             //并行任务数是5
             int onceTasksGoal = 5;
-            for (int i = 0; i < pagesCount; i += onceTasksGoal)//每次增加3个任务
+            for (int i = 0; i < pagesCount; i += onceTasksGoal)
             {
                 textShow.Text = String.Format("更新中 ({0}/{1})", i, ExpManager.currentDataPack.contentPagesCount);
 
@@ -453,15 +465,15 @@ namespace 百度经验个人助手
 
 
                 //await Utility.ShowMessageDialog("开始新建线程", "页号码 i=" + i + ",  建立" + currentTasksCount + "个");
-                Task Task0 = GetContentsSubStep_CookiedGetContentPage(i, 0);
+                Task Task0 = GetContentsSubStep_CookiedGetContentPage(i);
                 Task Task1 = null;
                 Task Task2 = null;
                 Task Task3 = null;
                 Task Task4 = null;
-                if (currentTasksCount > 1) Task1 = GetContentsSubStep_CookiedGetContentPage(i + 1, 0);
-                if (currentTasksCount > 2) Task2 = GetContentsSubStep_CookiedGetContentPage(i + 2, 0);
-                if (currentTasksCount > 3) Task3 = GetContentsSubStep_CookiedGetContentPage(i + 3, 0);
-                if (currentTasksCount > 4) Task4 = GetContentsSubStep_CookiedGetContentPage(i + 4, 0);
+                if (currentTasksCount > 1) Task1 = GetContentsSubStep_CookiedGetContentPage(i + 1);
+                if (currentTasksCount > 2) Task2 = GetContentsSubStep_CookiedGetContentPage(i + 2);
+                if (currentTasksCount > 3) Task3 = GetContentsSubStep_CookiedGetContentPage(i + 3);
+                if (currentTasksCount > 4) Task4 = GetContentsSubStep_CookiedGetContentPage(i + 4);
                 await Task0;
                 if (Task1 != null) await Task1;
                 if (Task2 != null) await Task2;
@@ -492,6 +504,9 @@ namespace 百度经验个人助手
                     }
                 }
             }
+
+            //检查和去除重复
+            await currentDataPack.CheckRemoveDuplicate();
 
             //如果成功，计算calcsum4。
             GetContentsSubStep_CalcSum4();
@@ -528,7 +543,7 @@ namespace 百度经验个人助手
                     rewardExpIDs.Add(qid);
                     anyNew = true;
                 }
-                if (!anyNew) Utility.varTrace["rewardHtml"] = html;
+                if (!anyNew) Utility.varTrace["[reward]rewardHtml"] = html;
             }
             if (!anyNew) return false;
             if (mc.Count > 0) return true;
@@ -744,6 +759,7 @@ namespace 百度经验个人助手
         //prepared private
         public static async Task<string> SimpleRequestUrl(string url, string referrer, string method = "GET", bool thisVerifying = false)
         {
+            Utility.LogLocalEvent("SimpleRequestUrl " + url);
             HttpResponseMessage response = null;
             try
             {
@@ -781,6 +797,7 @@ namespace 百度经验个人助手
                 icont.Dispose();
                 response.Dispose();
 
+                Utility.varTrace["[request][exp]SimpleRequestUrl_return"] = content;
                 return content;
             }
             catch (Exception e)
