@@ -28,6 +28,7 @@ using HttpMethod = Windows.Web.Http.HttpMethod;
 using HttpRequestMessage = Windows.Web.Http.HttpRequestMessage;
 using HttpResponseMessage = Windows.Web.Http.HttpResponseMessage;
 using System.Threading;
+using Windows.Web.Http.Filters;
 
 namespace 百度经验个人助手
 {
@@ -63,6 +64,7 @@ namespace 百度经验个人助手
 
         public static string cookie;
         public static HttpClient client;
+        public static HttpBaseProtocolFilter protocolFilter;
         public static string htmlMain;
 
         //always show the newest Main Inf
@@ -109,6 +111,7 @@ namespace 百度经验个人助手
         public static string regexMainBdStoken = "\"BdStoken\"[ \\s]*:[\\s]*\"([\\d\\w]+)\"";
         public static string regexMainBdstt = "\"bdstt\"[ \\s]*:[\\s]*\"([\\d\\w]+)\"";
         public static string regexContentExpTitleAndUrl = "<a class=\"f14\" target=\"_blank\" title=\"(.*?)\" href=\"(.*?)\">";
+        public static string regexContentExpCounter = "class=\"f14\"";
         public static string regexContentExpView = "<span class=\"view-count\">(\\d*?)</span>";
         public static string regexContentExpVote = "<span class=\"vote-count\">(\\d*?)</span>";
         public static string regexContentExpCollect = "<span class=\"favc-count\">(\\d*?)</span>";
@@ -146,12 +149,12 @@ namespace 百度经验个人助手
             client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
             client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0");
 
+            protocolFilter = new HttpBaseProtocolFilter();
+
             contentExpsSearched = new ObservableCollection<ContentExpEntry>();
             rewardExps = new ObservableCollection<RewardExpEntry>();
             rewardExpIDs = new HashSet<string>();
             rewardExpsSearched = new ObservableCollection<RewardExpEntry>();
-
-
         }
 
         /// <summary>
@@ -161,6 +164,7 @@ namespace 百度经验个人助手
         /// <returns></returns>
         public static bool SetCookie(string newCookie)
         {
+            clearJingyanCookie(); //清除Cookie
             newCookie = newCookie.Trim();
             if (newCookie.Substring(newCookie.Length - 1) != ";") newCookie += ';';
             ExpManager.cookie = newCookie;
@@ -321,12 +325,12 @@ namespace 百度经验个人助手
             return true;
         }
 
-        public static async Task<bool> GetMain()
+        public static async Task<bool> GetMain(bool noPortrait = false)
         {
             await GetMainSubStep_CookiedGetMain();
             if (!await GetMainSubStep_ParseMain()) return false; //parse error
 
-            newMainPortrait = await GetMainSubStep_CookielessGetPic(newMainPortraitUrl); //possible to be NULL, but MainPage will handle this.
+            if(!noPortrait) newMainPortrait = await GetMainSubStep_CookielessGetPic(newMainPortraitUrl); //possible to be NULL, but MainPage will handle this.
             return true;
         }
 
@@ -385,7 +389,7 @@ namespace 百度经验个人助手
             //return true;
         }
 
-        private static bool GetContentsSubStep_ParseContentPage(int pg) //TODO: why error showed page 0 Error, first page still get?
+        private static async Task<bool> GetContentsSubStep_ParseContentPage(int pg, int expectedCount) //TODO: why error showed page 0 Error, first page still get?
         {
             Utility.LogLocalEvent("ParseContentPage " + pg);
             string html = htmlContentPages[pg];
@@ -406,6 +410,12 @@ namespace 百度经验个人助手
             if (mcTitleAndUrl.Count == 0)
             {
                 return false;
+            }
+            if(mcTitleAndUrl.Count != expectedCount)
+            {
+                await Utility.ShowMessageDialog("抱歉，第 " + (pg + 1) + " 页期望获取 " + expectedCount + " 条经验，实际获取了 " + mcTitleAndUrl.Count + "条。", "为了确定错误原因，请稍后将错误信息提交给开发者以解决问题。");
+                Utility.varTrace["[exp]error_expect__page_" + pg] = expectedCount;
+                Utility.varTrace["[exp]error_page_" + pg] = html;
             }
             for (int i = 0; i < mcTitleAndUrl.Count; ++i)
             {
@@ -488,7 +498,9 @@ namespace 百度经验个人助手
                 //如果解析出错，直接返回失败。
                 for (int j = i; j < i + currentTasksCount; ++j)
                 {
-                    if (!GetContentsSubStep_ParseContentPage(j))
+                    int expectedExpCount = 20;
+                    if (j == pagesCount - 1) expectedExpCount = currentDataPack.contentExpsCount % 20;
+                    if (!(await GetContentsSubStep_ParseContentPage(j, expectedExpCount)))
                     {
                         Utility.LogEvent("ERROR_ParseContentFailed");
                         await Utility.ShowMessageDialog("意外问题，程序收集错误后结束", "数据获取成功但是解析失败。获取页 " + i + " 无要寻找的经验条目，可能是用户中途退出登录，也可能是Baidu经验页面有调整（可能性最低）。"
@@ -755,6 +767,36 @@ namespace 百度经验个人助手
 #endif
             }
         }
+
+        #region ABOUT COOKIE
+        private static void clearJingyanCookie()
+        {
+            string url = "https://jingyan.baidu.com";
+            var cookieManager = protocolFilter.CookieManager;
+            var cookies = cookieManager.GetCookies(new Uri(url));
+            foreach (var cookie in cookies)
+            {
+                cookieManager.DeleteCookie(cookie);
+            }
+        }
+
+        private static void debugPrintCookie(string url)
+        {
+            //get CookieManager instance
+            var cookieManager = protocolFilter.CookieManager;
+            //get cookies
+            var cookies = cookieManager.GetCookies(new Uri(url));
+            Debug.WriteLine("----------------------" + url);
+            foreach (var cookie in cookies)
+            {
+                Debug.WriteLine(cookie.Name + ": " + cookie.Value);
+            }
+            //you can also SetCookie
+            //cookieManager.SetCookie(MyCookie);
+        }
+
+        #endregion
+
 
         //prepared private
         public static async Task<string> SimpleRequestUrl(string url, string referrer, string method = "GET", bool thisVerifying = false)

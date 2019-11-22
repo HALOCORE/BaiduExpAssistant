@@ -454,11 +454,7 @@ namespace 百度经验个人助手
                 return;
             }
 
-
             bool isCookieOK = ExpManager.SetCookie(scd.userInputCookie);
-
-
-
             if (!isCookieOK)
             {
                 await Utility.ShowMessageDialog("Cookie添加", ExpManager.setcookieFailedInfo);
@@ -531,6 +527,9 @@ namespace 百度经验个人助手
             buttonUpdateExpProgress.IsActive = true;
             buttonUpdateExpProgress.Visibility = Visibility.Visible;
 
+            textVisitAll.Text = "更新主页...";
+            await ExpManager.GetMain();
+            ShowNewMainInf();
             await UpdateContents();
             await StorageManager.SaveDataPack(ExpManager.currentDataPack);
 

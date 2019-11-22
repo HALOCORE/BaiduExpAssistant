@@ -145,7 +145,7 @@ namespace 百度经验个人助手
             mainUserName = StorageManager.RemoveInvalidXmlChars(uname);
         }
 
-        public async Task CheckRemoveDuplicate()
+        public async Task CheckRemoveDuplicate(bool silence = false)
         {
             HashSet<string> expids = new HashSet<string>();
             string[] urlSeperator = { ".com/" };
@@ -170,13 +170,28 @@ namespace 百度经验个人助手
                 contentExps.Remove(rme);
             }
 
+            if (silence)
+            {
+                if (duplicateCount > 0)
+                {
+                    Utility.LogEvent("ERROR_DataPackDuplicate");
+                }
+                else if (contentExps.Count != contentExpsCount)
+                {
+                    Utility.LogEvent("ERROR_DataPackCount");
+                }
+                return;
+            }
+
             if (duplicateCount > 0)
             {
+                Utility.LogEvent("ERROR_DataPackDuplicate_REPORT");
                 await Utility.ShowMessageDialog("发现重复的经验ID", "这是一个Bug，请告知开发者");
                 await Utility.FireErrorReport("CheckRemoveDuplicate 发现重复的经验ID", "[exp]\ntotal=" + contentExpsCount + "\nactual=" + contentExps.Count);
             }
             else if(contentExps.Count != contentExpsCount)
             {
+                Utility.LogEvent("ERROR_DataPackCount_REPORT");
                 await Utility.ShowMessageDialog("获取的经验个数和预期 " + contentExpsCount +  " 不符", "这是一个Bug，请告知开发者");
                 await Utility.FireErrorReport("CheckRemoveDuplicate 获取的经验个数和预期不符", "[exp]\ntotal=" + contentExpsCount + "\nactual=" + contentExps.Count);
             }
@@ -1026,7 +1041,7 @@ namespace 百度经验个人助手
             fs.Dispose();
 
             //检查和去除重复
-            await tempDp.CheckRemoveDuplicate();
+            await tempDp.CheckRemoveDuplicate(silence: true);
             return tempDp;
 
 
@@ -1043,7 +1058,7 @@ namespace 百度经验个人助手
             ObservableCollection<StorageFile> files = new ObservableCollection<StorageFile>();
             files.Add(file);
             ObservableCollection<DataPack> tempDataPacks = await ReadHistoryDataPacks(files);
-            await tempDataPacks[0].CheckRemoveDuplicate();
+            await tempDataPacks[0].CheckRemoveDuplicate(silence: true);
             return tempDataPacks[0];
         }
 
