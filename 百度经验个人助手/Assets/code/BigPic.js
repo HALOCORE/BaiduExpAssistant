@@ -248,6 +248,7 @@ function AddBriefImgEditor() {
         <button id="brief-conf-close" onclick="closeBriefPic()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
             隐藏
         </button>
+        <input checked="checked" id="wrap-line-enabled" type="checkbox" style="margin-left: 15px;"/> 自动换行
     </div>
     <div id="setting-zone" style="padding: 15px;border-radius: 10px;background: white;margin-right: 85px;display: none;">
         <div>
@@ -348,7 +349,7 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
             pairs = lines.map(x => x.split("=")).map(y => [y[0], y.slice(1).join("=")].map(z => z.trim()));
             for (var elem of pairs) {
                 if (elem.length != 2) throw "error";
-                if (!elem[1].startsWith("http")) throw "error";
+                if (!elem[1].startsWith("http") && !elem[1].startsWith("ms-appdata")) throw "error";
             }
             iconShowNote();
         }
@@ -369,7 +370,7 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
             pairs = lines.map(x => x.split("=")).map(y => [y[0], y.slice(1).join("=")].map(z => z.trim()));
             for (var elem of pairs) {
                 if (elem.length != 2) throw "error";
-                if (!elem[1].startsWith("http")) throw "error";
+                if (!elem[1].startsWith("http") && !elem[1].startsWith("ms-appdata")) throw "error";
             }
             backgroundShowNote();
         }
@@ -386,7 +387,7 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
         var isBksrc1Checked = document.getElementById("brief-img-source-check1").checked;
         var newCompInputVal = titleInput.value + " | "
             + $("#brief-background-bigbox").val() + " | " + $("#brief-background").val()
-            + " | " + $("#brief-icon").val() + " | "
+            + " | " + $("#brief-icon").val() + " | " + document.getElementById("wrap-line-enabled").checked + " | "
             + document.getElementById("brief-fontColor").innerText
             + " | " + isBksrc1Checked + " | " + forceBg + " | " + forceIc;
         console.log(newCompInputVal);
@@ -460,8 +461,37 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
             ctx.textBaseline = "middle";
             // 设置字体
             ctx.font = "32px bold 黑体";
-            // 绘制文字（参数：要写的字，x坐标，y坐标）
-            ctx.fillText(titleInput.value, 201.6, 122.4, 297.6);
+            // 测量单行能否放下
+            var words = [].concat.apply([],
+                (titleInput.value.split(/([a-zA-Z0-9]+)/g)
+                    .map(x => 
+                         (x.trim() != "" && (!x.match(/[a-zA-Z0-9]+/g))) ? x.split("") : [x]
+                        )
+                ));
+            var firstLine = "";
+            var secondLine = "";
+            var oneLineOK = true;
+            for (var word of words) {
+                if (!oneLineOK) {
+                    secondLine += word;
+                } else {
+                    firstLine += word;
+                    var metrics = ctx.measureText(firstLine);
+                    if (metrics.width > 297.6 + 30) {
+                        oneLineOK = false;
+                    }
+                }
+            }
+            if (secondLine.trim() == "") oneLineOK = true;
+            if (oneLineOK || (!document.getElementById("wrap-line-enabled").checked)) {
+                // 绘制文字（参数：要写的字，x坐标，y坐标）
+                ctx.fillText(firstLine + secondLine, 201.6, 122.4, 297.6);
+            } else {
+                ctx.font = "28px bold 黑体";
+                // 绘制文字（参数：要写的字，x坐标，y坐标）
+                ctx.fillText(firstLine, 201.6, 104.4, 297.6);
+                ctx.fillText(secondLine, 201.6, 141.6, 297.6);
+            }
         });
 
 
