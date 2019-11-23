@@ -33,8 +33,8 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
                         <StackPanel Margin="4" Padding="8">
-                            <TextBlock FontSize="26" Margin="5">一键插入图片到各个步骤</TextBlock>
-                            <TextBlock  Margin="5" TextWrapping="Wrap">上传所有图片包括简介图以后，点击插入图片即可。</TextBlock>
+                            <TextBlock FontSize="26" Margin="5">感谢反馈，数据分析Bug范围进一步缩小</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">一旦问题被精确定位，会被尽快修复。</TextBlock>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -51,18 +51,51 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
                         <StackPanel Margin="8">
-                            <TextBlock FontSize="26" Margin="5">简介图 Bug 修复 / 更新，支持保存到文件</TextBlock>
-                            <TextBlock  Margin="5" TextWrapping="Wrap">百度图片和百度云访问策略突然调整造成程序简介图无法加载... 非常坑。</TextBlock>
+                            <TextBlock FontSize="26" Margin="5">简介图支持自动两行文字，支持另存为</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">提醒：添加图片时要考虑网络图片加载速度。</TextBlock>
 
                         </StackPanel>
                     </StackPanel>
                     <Border Grid.Row="1" Margin="6"  BorderThickness="3" BorderBrush="MediumPurple" Width="400">
-                        <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="400" Height="185" gif:AnimationBehavior.SourceUri="Assets/features/1.5.7.gif"
-                                Source="Assets/features/1.5.7.gif" Stretch="Fill"
+                        <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="400" Height="185"
+                                gif:AnimationBehavior.SourceUri="Assets/features/1.6.2.gif"
+                                Source="Assets/features/1.6.2.gif" Stretch="Fill"
                                 Opacity="0.7"
                         >
                         </Image>
                     </Border>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem>
+                <TextBlock FontSize="20">版本日志：1.5.9 版本增加功能</TextBlock>
+            </ListViewItem>
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="4" Padding="8">
+                            <TextBlock FontSize="26" Margin="5">一键插入图片到各个步骤</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">上传所有图片包括简介图以后，点击插入图片即可。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem HorizontalContentAlignment="Stretch" Visibility="Visible">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="8">
+                            <TextBlock FontSize="26" Margin="5">简介图 Bug 修复 / 更新，支持保存到文件</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">百度图片和百度云访问策略突然调整造成程序简介图无法加载... 非常坑。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
             </ListViewItem>
             

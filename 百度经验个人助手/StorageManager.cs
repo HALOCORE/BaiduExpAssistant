@@ -192,8 +192,13 @@ namespace 百度经验个人助手
             else if(contentExps.Count != contentExpsCount)
             {
                 Utility.LogEvent("ERROR_DataPackCount_REPORT");
-                await Utility.ShowMessageDialog("获取的经验个数和预期 " + contentExpsCount +  " 不符", "这是一个Bug，请告知开发者");
-                await Utility.FireErrorReport("CheckRemoveDuplicate 获取的经验个数和预期不符", "[exp]\ntotal=" + contentExpsCount + "\nactual=" + contentExps.Count);
+                string err = "获取的经验个数和预期 " + contentExpsCount + " 不符";
+                if (Utility.varTrace.Contains("last-error") && Utility.varTrace["last-error"].ToString().StartsWith("pubCountError"))
+                {
+                    err = "经验个数不符，原因是发现某页的已发布经验数不等于预期的总经验数";
+                }
+                await Utility.ShowMessageDialog(err, "为了进一步定位Bug，可提交错误报告给开发者");
+                await Utility.FireErrorReport("CheckRemoveDuplicate " + err, "[exp]\ntotal=" + contentExpsCount + "\nactual=" + contentExps.Count);
             }
         }
     }
@@ -471,8 +476,8 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.6.0";
-        public const string FUNC_VER = "1.5.9";
+        public const string VER = "1.6.4";
+        public const string FUNC_VER = "1.6.3";
 
         private static string _editSettingsFileName = "EditSettings.xml";
         private static string _settingsFileName = "Settings.xml";
@@ -1167,12 +1172,28 @@ namespace 百度经验个人助手
 
         #endregion
 
-        public static async Task SaveWritableBitmapAsync(WriteableBitmap bmp)
+        public static async Task<bool> SaveWritableBitmapAsync(WriteableBitmap bmp, bool isSaveAs)
         {
             string fileName = DateTime.UtcNow.Ticks + ".png";
             Guid BitmapEncoderGuid = BitmapEncoder.PngEncoderId;
-            StorageFolder folder = await GetSubFolderAsync(ApplicationData.Current.LocalFolder, "EDITOR-BriefPicture");
-            StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+
+            StorageFile file = null;
+            StorageFolder folder = null;
+            if (isSaveAs)
+            {
+                var savePicker = new Windows.Storage.Pickers.FileSavePicker();
+                // Dropdown of file types the user can save the file as
+                savePicker.FileTypeChoices.Add("PNG图片", new List<string>() { ".png" });
+                // Default file name if the user does not type one in or select a file to replace
+                savePicker.SuggestedFileName = fileName;
+                file = await savePicker.PickSaveFileAsync();
+                if (file == null) return false;
+            }
+            else
+            {
+                folder = await GetSubFolderAsync(ApplicationData.Current.LocalFolder, "EDITOR-BriefPicture");
+                file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+            }
 
             using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
             {
@@ -1189,7 +1210,8 @@ namespace 百度经验个人助手
                                     pixels);
                 await encoder.FlushAsync();
             }
-            await Launcher.LaunchFolderAsync(folder);
+            if (folder != null) await Launcher.LaunchFolderAsync(folder);
+            return true;
         }
     
 

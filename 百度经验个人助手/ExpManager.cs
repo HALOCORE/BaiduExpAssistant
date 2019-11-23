@@ -110,6 +110,7 @@ namespace 百度经验个人助手
         public static string regexMainPortraitUrl = "src=\"(http[s]{0,1}://himg.bdimg.com/sys/portrait/item/.*?)\"";
         public static string regexMainBdStoken = "\"BdStoken\"[ \\s]*:[\\s]*\"([\\d\\w]+)\"";
         public static string regexMainBdstt = "\"bdstt\"[ \\s]*:[\\s]*\"([\\d\\w]+)\"";
+        public static string regexContentPublishedCount = "href=\"/user/nucpage/content\">\\w*? \\((\\d+)\\)</a></li>";
         public static string regexContentExpTitleAndUrl = "<a class=\"f14\" target=\"_blank\" title=\"(.*?)\" href=\"(.*?)\">";
         public static string regexContentExpCounter = "class=\"f14\"";
         public static string regexContentExpView = "<span class=\"view-count\">(\\d*?)</span>";
@@ -389,11 +390,24 @@ namespace 百度经验个人助手
             //return true;
         }
 
-        private static async Task<bool> GetContentsSubStep_ParseContentPage(int pg, int expectedCount) //TODO: why error showed page 0 Error, first page still get?
+        private static async Task<bool> GetContentsSubStep_ParseContentPage(int pg, int expectedCount, int totalExpectedCount) //TODO: why error showed page 0 Error, first page still get?
         {
             Utility.LogLocalEvent("ParseContentPage " + pg);
             string html = htmlContentPages[pg];
             Utility.varTrace["[exp]GetContentsSubStep_ParseContentPage_html"] = html;
+            try
+            {
+                Match mcPublishedCount = Regex.Match(html, regexContentPublishedCount);
+                string pubCountStr = mcPublishedCount.Groups[1].Value.Trim();
+                bool isPubCountCorrect = pubCountStr == totalExpectedCount.ToString();
+                Utility.varTrace["[exp]pg-pubcount-" + pg] = pg + " : " + pubCountStr;
+                if (!isPubCountCorrect) Utility.varTrace["last-error"] = "pubCountError 解析经验页面，已发布 不等于 经验数";
+            }
+            catch (Exception)
+            {
+                Utility.varTrace["[exp]error-" + pg] = "ParseContentPage regexContentPublishedCount 正则匹配失败";
+            }
+
             MatchCollection mcTitleAndUrl = Regex.Matches(html, regexContentExpTitleAndUrl);
             MatchCollection mcView = Regex.Matches(html, regexContentExpView);
             MatchCollection mcVote = Regex.Matches(html, regexContentExpVote);
@@ -499,8 +513,9 @@ namespace 百度经验个人助手
                 for (int j = i; j < i + currentTasksCount; ++j)
                 {
                     int expectedExpCount = 20;
-                    if (j == pagesCount - 1) expectedExpCount = currentDataPack.contentExpsCount % 20;
-                    if (!(await GetContentsSubStep_ParseContentPage(j, expectedExpCount)))
+                    if (j == pagesCount - 1) expectedExpCount = (currentDataPack.contentExpsCount + 19) % 20 + 1;
+                    int totalExpectedCount = currentDataPack.contentExpsCount;
+                    if (!(await GetContentsSubStep_ParseContentPage(j, expectedExpCount, totalExpectedCount)))
                     {
                         Utility.LogEvent("ERROR_ParseContentFailed");
                         await Utility.ShowMessageDialog("意外问题，程序收集错误后结束", "数据获取成功但是解析失败。获取页 " + i + " 无要寻找的经验条目，可能是用户中途退出登录，也可能是Baidu经验页面有调整（可能性最低）。"

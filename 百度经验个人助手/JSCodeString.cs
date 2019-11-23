@@ -209,9 +209,9 @@ namespace 百度经验个人助手
                         await Utility.ShowMessageDialog("Javascript Notify 消息提示调用不正确", "格式为:\nNOTIFY: 标题 | 说明 | OK/WARN/ERROR ");
                     }
                     Symbol smb = Symbol.Accept;
-                    if (nParams[2] == "WARN") smb = Symbol.Comment;
-                    if (nParams[2] == "ERROR") smb = Symbol.Cancel;
-                    App.currentMainPage.ShowNotify(nParams[0], nParams[1], smb);
+                    if (nParams[2].Trim() == "WARN") smb = Symbol.Comment;
+                    if (nParams[2].Trim() == "ERROR") smb = Symbol.Cancel;
+                    App.currentMainPage.ShowNotify(nParams[0].Trim(), nParams[1].Trim(), smb);
                 }
                 else if (args.Value.StartsWith("SHOW-DIALOG: "))
                 {
@@ -221,7 +221,7 @@ namespace 百度经验个人助手
                     {
                         await Utility.ShowMessageDialog("Javascript Notify 消息提示调用不正确", "格式为:\nSHOW-DIALOG: 标题 | 说明");
                     }
-                    await Utility.ShowMessageDialog(nParams[0], nParams[1]);
+                    await Utility.ShowMessageDialog(nParams[0].Trim(), nParams[1].Trim());
                 }
                 else if (args.Value.StartsWith("LAUNCH: "))
                 {
@@ -251,11 +251,13 @@ namespace 百度经验个人助手
                     Utility.LogEvent("YES_CommonDataSucceed");
                     App.currentMainPage.ShowNotify("数据保存成功", "保存组别为" + groupId);
                 }
-                else if (args.Value.StartsWith("SAVE-PIC: ")){
-                    string[] data = args.Value.Replace("SAVE-PIC: ", "").Trim().Split('|');
+                else if (args.Value.StartsWith("SAVE-PIC: ") || args.Value.StartsWith("SAVEAS-PIC: "))
+                {
+                    bool isSaveAs = args.Value.StartsWith("SAVEAS-PIC: ");
+                    string[] data = args.Value.Replace("SAVEAS-PIC: ", "").Replace("SAVE-PIC: ", "").Trim().Split('|');
                     if(data.Length != 3)
                     {
-                        await Utility.ShowMessageDialog("保存图片调用格式不正确", "正确格式为 SAVE-PIC: 宽高比 | 宽度 | 高度");
+                        await Utility.ShowMessageDialog("保存图片调用格式不正确", "正确格式为 SAVEAS-PIC/SAVE-PIC: 宽高比 | 宽度 | 高度");
                         return;
                     }
                     else
@@ -267,8 +269,12 @@ namespace 百度经验个人助手
                             int width = Convert.ToInt32(data[1].Trim());
                             int height = Convert.ToInt32(data[2].Trim());
                             WriteableBitmap img = await App.currentMainPage.GetWebViewImageAsync(ratio, width, height);
-                            await StorageManager.SaveWritableBitmapAsync(img);
+                            bool isSaved = await StorageManager.SaveWritableBitmapAsync(img, isSaveAs);
                             App.currentMainPage.HideLoading();
+                            if (!isSaved)
+                            {
+                                App.currentMainPage.ShowNotify("取消保存", "简介图未保存", Symbol.Cancel);
+                            }
                         }
                         catch(Exception e)
                         {
@@ -281,7 +287,7 @@ namespace 百度经验个人助手
                 }
                 else 
                 {
-                    await Utility.ShowMessageDialog("未知的 window.external.notify 调用", "window.external.notify 调用必须以指定单词开头");
+                    await Utility.ShowMessageDialog("未知的 window.external.notify 调用", args.Value.ToString());
                 }
             };
         }

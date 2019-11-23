@@ -153,7 +153,8 @@ function launchUrl(url) {
     }
     catch (e) {}
 }
-function saveCanvas(){
+
+function saveCanvas(method) {
     var canvas = document.getElementById("brief-canvas");
     var oldPosition = canvas.style.position;
     canvas.style.position = "fixed";
@@ -166,11 +167,20 @@ function saveCanvas(){
     var oldTransformOrigin = canvas.style.transformOrigin;
     canvas.style.transformOrigin = "0% 0%";
 
-    setTimeout(saveCanvasPhrase2, 200);
+    if (method == 0) {
+        setTimeout(saveCanvasPhrase20, 200);
+    }
+    else {
+        setTimeout(saveCanvasPhrase21, 200);
+    }
     
 }
-function saveCanvasPhrase2() {
+function saveCanvasPhrase20() {
     try { window.external.notify("SAVE-PIC: " + 600 / 240 + " | 600 | 240"); } catch (e) { };
+    setTimeout(saveCanvasPhrase3, 200);
+}
+function saveCanvasPhrase21() {
+    try { window.external.notify("SAVEAS-PIC: " + 600 / 240 + " | 600 | 240"); } catch (e) { };
     setTimeout(saveCanvasPhrase3, 200);
 }
 function saveCanvasPhrase3() {
@@ -239,8 +249,11 @@ function AddBriefImgEditor() {
     <canvas width="600" height="240" style="width: 600px;height: 240px;border: wheat solid 1px"
     id="brief-canvas"></canvas>
     <div>
-        <button id="save-canvas" onclick="saveCanvas()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
-            保存简介图到本地
+        <button id="save-canvas" onclick="saveCanvas(0)" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
+            保存简介图
+        </button>
+        <button id="save-canvas" onclick="saveCanvas(1)" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
+            简介图另存为
         </button>
         <button id="toggle-settings" onclick="toggleSettings()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
             ↓ 展开设置 ↓
@@ -266,10 +279,11 @@ function AddBriefImgEditor() {
                 <div style="width: 424px; margin-top: 5px; display: block; font-size: 12px; padding: 3px;">
                     <span id="background-urls-note" style="color: darkcyan">最终背景图为从上往下找到的第一个关键词匹配。</span>
                 </div>
-                <textarea id="background-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 3px;">
+                <textarea id="background-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 3px;overflow-x: scroll;white-space: nowrap;">
 unity = http://pic.nipic.com/2007-11-02/20071128716391_2.jpg
-win = https://www.windowsmode.com/wp-content/uploads/2018/08/microsoft-releases-windows-10-redstone-5-fall-2018-build-17728-522183-2.jpg
+win = http://image.tianjimedia.com/uploadImages/2016/097/17/U7SP0XU4SSRD_windows-10-expected-to-beat-windows-7-in-first-12-months-performance-502625-2.jpg
 word = https://cn.bing.com/th?id=OIP.2l4mI6F0_MiyyGcPB-aoYAHaEK&pid=Api&rs=1
+chrome = http://img.mp.sohu.com/upload/20170526/ee6776da5af84cec81f68e3fce9274aa_th.png
 
 = http://b.hiphotos.baidu.com/image/pic/item/908fa0ec08fa513db777cf78376d55fbb3fbd9b3.jpg
                 </textarea>
@@ -287,7 +301,7 @@ word = https://cn.bing.com/th?id=OIP.2l4mI6F0_MiyyGcPB-aoYAHaEK&pid=Api&rs=1
         <div style="width: 424px; margin-top: 5px; display: block; font-size: 12px; padding: 3px;">
             <span id="icon-urls-note" style="color: darkcyan">最终图标为从上往下找到的第一个关键词匹配。</span>
         </div>
-        <textarea id="icon-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 3px;">
+        <textarea id="icon-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 3px;overflow-x: scroll;white-space: nowrap;">
 word = https://www.easyicon.net/api/resizeApi.php?id=1212930&size=128
 谷歌浏览器 = https://www.easyicon.net/api/resizeApi.php?id=1212918&size=128
 android = https://www.easyicon.net/api/resizeApi.php?id=1229034&size=128

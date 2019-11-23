@@ -1236,8 +1236,8 @@ namespace 百度经验个人助手
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(ms);
             int width = (int)decoder.PixelWidth;
             int height = (int)decoder.PixelHeight;
-            int cropWidth = (int)(width / 1.5);
-            int cropHeight = (int)(width / ratio / 1.5);
+            int cropWidth = (int)(width / 1.5) - 4;
+            int cropHeight = (int)(width / ratio / 1.5) - 4;
             
             WriteableBitmap bitmap = new WriteableBitmap(width, height);
             bitmap.SetSource(ms);
