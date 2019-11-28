@@ -702,7 +702,7 @@
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center">自动填写</TextBlock>
+                        <TextBlock VerticalAlignment="Center">杂项填写</TextBlock>
                         <Button x:Name="buttonEditSettings" Margin="0" Padding="5" Grid.Column="1" HorizontalAlignment="Right" Background="Transparent" Click="buttonEditSettings_Click">
                             <SymbolIcon Symbol="Setting"></SymbolIcon>
                         </Button>
@@ -769,7 +769,7 @@
                     首先点击主页初始化
                 </TextBlock>
                 <TextBlock FontSize="24" Margin="0,12,0,0" Foreground="Gray">
-                    自动填写支持（设置在按钮右侧⚙）：
+                    杂项填写支持（设置在按钮右侧⚙）：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
                     1. 标题→部分简介

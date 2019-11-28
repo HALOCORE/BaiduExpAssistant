@@ -7,7 +7,7 @@
     box.className = "img-preview";
     box.id = "my-img-preview";
     box.style.left = 200.183 + "px";
-    box.style.top = 100.717 + "px";
+    box.style.bottom = 140.717 + "px";
     box.style.display = "block";
     box.style.position = "fixed";
     box.style.width = 400 + 12 + "px";
@@ -279,7 +279,7 @@ function AddBriefImgEditor() {
                 <div style="width: 424px; margin-top: 5px; display: block; font-size: 12px; padding: 3px;">
                     <span id="background-urls-note" style="color: darkcyan">最终背景图为从上往下找到的第一个关键词匹配。</span>
                 </div>
-                <textarea id="background-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 3px;overflow-x: scroll;white-space: nowrap;">
+                <textarea id="background-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 11px;overflow-x: scroll;white-space: nowrap;">
 unity = http://pic.nipic.com/2007-11-02/20071128716391_2.jpg
 win = http://image.tianjimedia.com/uploadImages/2016/097/17/U7SP0XU4SSRD_windows-10-expected-to-beat-windows-7-in-first-12-months-performance-502625-2.jpg
 word = https://cn.bing.com/th?id=OIP.2l4mI6F0_MiyyGcPB-aoYAHaEK&pid=Api&rs=1
@@ -301,7 +301,7 @@ chrome = http://img.mp.sohu.com/upload/20170526/ee6776da5af84cec81f68e3fce9274aa
         <div style="width: 424px; margin-top: 5px; display: block; font-size: 12px; padding: 3px;">
             <span id="icon-urls-note" style="color: darkcyan">最终图标为从上往下找到的第一个关键词匹配。</span>
         </div>
-        <textarea id="icon-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 3px;overflow-x: scroll;white-space: nowrap;">
+        <textarea id="icon-urls-textarea" style="display: block; width: 560px; height: 130px; margin-top: 5px; font-size: 12px; padding: 11px;overflow-x: scroll;white-space: nowrap;">
 word = https://www.easyicon.net/api/resizeApi.php?id=1212930&size=128
 谷歌浏览器 = https://www.easyicon.net/api/resizeApi.php?id=1212918&size=128
 android = https://www.easyicon.net/api/resizeApi.php?id=1229034&size=128
@@ -317,7 +317,7 @@ win = https://www.easyicon.net/api/resizeApi.php?id=1229085&size=128
             <input type="color" id="html5colorpicker" onchange="" value="#ff0000">
             <span id="brief-fontColor" style="margin-left: 8px;">rgba(255,255,255,0.9)</span><br><br>
         </div>
-        <p>注意事项：图片图标在浏览器查找，浏览器中右键图片，可以复制图片地址。<br>如果希望设置可以保存可以保留到下次使用，点击保存配置。<br>生成简介图后，并不会自动上传，请右键保存图片再上传。</p>
+        <p>注意事项：图片图标在浏览器查找，浏览器中右键图片，可以复制图片地址。<br>如果希望设置可以保存可以保留到下次使用，点击保存配置。<br><b>生成简介图后，并不会自动上传，请点击另存为，或者保存图片，再上传。</b></p>
         <button id="brief-conf-save" onclick="saveConfig()" style="font-size: 16px;padding: 5px 25px;font-family: auto;margin-top: 6px;">
             保存配置
         </button>

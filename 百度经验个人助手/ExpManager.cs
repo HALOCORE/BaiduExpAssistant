@@ -310,9 +310,6 @@ namespace 百度经验个人助手
             Match matchHuoy = Regex.Match(htmlMain, regexMainIndexHuoYue);
             newMainIndexHuoYue = matchHuoy.Groups[1].Value;
 
-            Match matchENum = Regex.Match(htmlMain, regexMainExpCount);
-            newMainExpCount = matchENum.Groups[1].Value;
-
             Match matchPUrl = Regex.Match(htmlMain, regexMainPortraitUrl);
             newMainPortraitUrl = matchPUrl.Groups[1].Value;
 
@@ -321,6 +318,31 @@ namespace 百度经验个人助手
 
             Match matchBdstt = Regex.Match(htmlMain, regexMainBdstt);
             newMainBdstt = matchBdstt.Groups[1].Value;
+
+            //this method is not correct...
+            //Match matchENum = Regex.Match(htmlMain, regexMainExpCount);
+            //newMainExpCount = matchENum.Groups[1].Value;
+            
+
+            try
+            {
+                string result = await ExpManager.SimpleRequestUrl(
+                    "https://jingyan.baidu.com/user/nucpage/content?tab=exp&expType=published&pn=0",
+                    "https://jingyan.baidu.com/user/nuc"
+                );
+                Match mcPublishedCount = Regex.Match(result, regexContentPublishedCount);
+                string pubCountStr = mcPublishedCount.Groups[1].Value.Trim();
+                int pubCount = Convert.ToInt32(pubCountStr);
+                newMainExpCount = pubCount.ToString();
+            }
+            catch (Exception)
+            {
+                Utility.varTrace["[exp]get-main-pubcount-error"] = "GetMainSubStep_ParseMain 获取经验数失败";
+                Utility.LogEvent("ERROR-MainPubCountFailed");
+                App.currentMainPage.ShowNotify("获取已发布经验数失败, 用主页经验数代替", "这是百度经验的Bug，可能得到不准确的结果");
+                Match matchENum = Regex.Match(htmlMain, regexMainExpCount);
+                newMainExpCount = matchENum.Groups[1].Value;
+            }
 
             isCookieValid = true;
             return true;
@@ -586,6 +608,9 @@ namespace 百度经验个人助手
             HttpResponseMessage response = null;
             try
             {
+                App.currentMainPage.ShowLoading("请求参数获取...");
+                await GetMain(noPortrait: true);
+                App.currentMainPage.ShowLoading("发送领取请求...");
                 string url = "https://jingyan.baidu.com/patchapi/claimQuery?queryId="
                     + queryId + "&token=" + newMainBdStoken + "&timestamp=" + newMainBdstt;
                 HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
@@ -598,6 +623,8 @@ namespace 百度经验个人助手
                 //};
                 //req.Content = new FormUrlEncodedContent(urlParams) as IHttpContent;
                 response = await client.SendRequestAsync(req);
+                App.currentMainPage.HideLoading();
+
                 string respstr = response.Content.ToString().Replace(" ", "");
                 bool isGetSucceed = false;
                 bool isCritical = false;
@@ -651,7 +678,7 @@ namespace 百度经验个人助手
                 
                 //REPORT
                 await Utility.FireErrorReport("领取程序崩溃", "queryId=" + queryId, e);
-
+                App.currentMainPage.HideLoading();
                 return false;
             }
         }
