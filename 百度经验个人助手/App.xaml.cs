@@ -3,6 +3,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.UI.Notifications;
+using Windows.Data.Xml.Dom;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -121,15 +122,15 @@ namespace 百度经验个人助手
 
         private void ShowWindowsNotice(string header, string detail)
         {
-            var t = Windows.UI.Notifications.ToastTemplateType.ToastText02;
-            //在模板添加xml要的标题
-            var content = Windows.UI.Notifications.ToastNotificationManager.GetTemplateContent(t);
-            //需要using Windows.Data.Xml.Dom;
-            Windows.Data.Xml.Dom.XmlNodeList xml = content.GetElementsByTagName("text");
+            var t = ToastTemplateType.ToastText02;
+            var content = ToastNotificationManager.GetTemplateContent(t);
+
+            //Windows.Data.Xml.Dom.XmlNodeList
+            XmlNodeList xml = content.GetElementsByTagName("text"); 
             xml[0].AppendChild(content.CreateTextNode(header));
             xml[1].AppendChild(content.CreateTextNode(detail));
-            //需要using Windows.UI.Notifications;
-            Windows.UI.Notifications.ToastNotification toast = new ToastNotification(content);
+
+            ToastNotification toast = new ToastNotification(content);
             ToastNotificationManager.CreateToastNotifier().Show(toast);
         }
 
@@ -138,7 +139,10 @@ namespace 百度经验个人助手
             if (App.currentMainPage.isAssistEditorEditing)
             {
                 Utility.LogEvent("Editing_EnterBackground");
-                ShowWindowsNotice("辅助编辑器进入后台，保存草稿提醒", "Windows会根据电量/内存情况清理后台。建议在最小化之前保存草稿。");
+
+                ShowWindowsNotice(
+                    "辅助编辑器进入后台，保存草稿提醒", 
+                    "Windows会根据电量/内存情况清理后台。建议在最小化之前保存草稿。");
             }
             else if (App.currentMainPage.isAssistEditorActivated)
             {

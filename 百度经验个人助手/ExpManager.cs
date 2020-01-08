@@ -857,7 +857,41 @@ namespace 百度经验个人助手
                     req = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
                 }
                 req.Headers.Referer = new Uri(referrer);
-                response = await client.SendRequestAsync(req);
+
+                var cts = new CancellationTokenSource();
+                var token = cts.Token;
+                Task<HttpResponseMessage> task = null;
+                task = client.SendRequestAsync(req).AsTask(token);
+                int delayMs = 0;
+                while (delayMs < 4000 && !task.IsCompleted) { await Task.Delay(50); delayMs += 50; }
+                if(task.IsCompleted) response = await task;
+                else
+                {
+                    App.currentMainPage.ShowNotify("请求超过4秒", "请确保访问百度是畅通的", Symbol.Important);
+                    while (delayMs < 10000 && !task.IsCompleted) { await Task.Delay(50); delayMs += 50; }
+                    if (task.IsCompleted)
+                    {
+                        response = await task;
+                    }
+                    else
+                    {
+                        bool resend = await Utility.ShowConfirmDialog(
+                       "请求超过10秒, 是否重发?",
+                       "该请求已发出了10秒无响应，建议重新发送。如果继续等待将一直等到请求返回或者报错。\n如果是公司网络，注意防火墙造成的丢包等问题，建议用家用宽带/手机热点。",
+                       "重新发送", "继续等待");
+                        if (resend)
+                        {
+                            cts.Cancel();
+                            req.Dispose();
+                            return await SimpleRequestUrl(url, referrer, method);
+                        }
+                        else
+                        {
+                            response = await task;
+                        }
+                    }
+                }
+
                 req.Dispose();
 
 
