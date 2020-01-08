@@ -476,8 +476,8 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.6.5";
-        public const string FUNC_VER = "1.6.3";
+        public const string VER = "1.6.6";
+        public const string FUNC_VER = "1.6.6";
 
         private static string _editSettingsFileName = "EditSettings.xml";
         private static string _settingsFileName = "Settings.xml";

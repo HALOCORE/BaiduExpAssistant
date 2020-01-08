@@ -105,6 +105,22 @@ namespace 百度经验个人助手
 
             webView.NavigationCompleted += async (view, args) =>
             {
+                if(args.Uri.AbsoluteUri.ToLower().IndexOf("/edit/content") > 0)
+                {
+                    App.currentMainPage.isAssistEditorEditing = true;
+                    try
+                    {
+                        await JSCodeString.AddScriptUri(webView, "ms-appx-web:///Assets/code/Checker.js");
+                    }
+                    catch (Exception e)
+                    {
+                        App.currentMainPage.ShowNotify("检查功能未加载", e.Message, Symbol.Cancel);
+                    }
+                }
+                else
+                {
+                    App.currentMainPage.isAssistEditorEditing = false;
+                }
                 //App.currentMainPage.ShowNotify("到达页面", args.Uri.AbsoluteUri);
                 if (args.Uri.AbsoluteUri.ToLower().StartsWith("http://"))
                 {
@@ -155,7 +171,7 @@ namespace 百度经验个人助手
                     await StorageManager.SaveAutoCompleteData("", jsonData);
                     //Utility.ShowMessageDialog(o.ToString(), args.Value);
                 }
-                else if(args.Value.StartsWith("ERROR: "))
+                else if (args.Value.StartsWith("ERROR: "))
                 {
                     await Utility.ShowMessageDialog("javascript 运行异常", args.Value);
                 }
@@ -173,14 +189,14 @@ namespace 百度经验个人助手
                     try
                     {
                         HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, new Uri(newUri));
-                        if(referrer != "") req.Headers.Referer = new Uri(referrer);
+                        if (referrer != "") req.Headers.Referer = new Uri(referrer);
 
-                        if(gotoType == "GOTO") webView.NavigateWithHttpRequestMessage(req);
+                        if (gotoType == "GOTO") webView.NavigateWithHttpRequestMessage(req);
                         else secondWebView.NavigateWithHttpRequestMessage(req);
 
                         App.currentMainPage.ShowNotify("跳转成功", newUri);
                     }
-                    catch(Exception ee)
+                    catch (Exception ee)
                     {
                         await Utility.ShowMessageDialog("跳转不成功", "尝试跳转目标: " + newUri);
                         await Utility.ShowDetailedError("出错详细信息", ee);
@@ -189,7 +205,7 @@ namespace 百度经验个人助手
                 else if (args.Value.StartsWith("2ND-VISIBILITY: "))
                 {
                     string val = args.Value.Replace("2ND-VISIBILITY: ", "").Trim();
-                    if(val == "VISIBLE")
+                    if (val == "VISIBLE")
                     {
                         App.currentMainPage.ShowNotify("第二页面可见", "可以手动关闭");
                         App.currentMainPage.SecondWebViewVisibility = true;
@@ -204,7 +220,7 @@ namespace 百度经验个人助手
                 {
                     string info = args.Value.Replace("NOTIFY: ", "");
                     string[] nParams = info.Split('|');
-                    if(nParams.Length != 3)
+                    if (nParams.Length != 3)
                     {
                         await Utility.ShowMessageDialog("Javascript Notify 消息提示调用不正确", "格式为:\nNOTIFY: 标题 | 说明 | OK/WARN/ERROR ");
                     }
@@ -212,6 +228,11 @@ namespace 百度经验个人助手
                     if (nParams[2].Trim() == "WARN") smb = Symbol.Comment;
                     if (nParams[2].Trim() == "ERROR") smb = Symbol.Cancel;
                     App.currentMainPage.ShowNotify(nParams[0].Trim(), nParams[1].Trim(), smb);
+                }
+                else if (args.Value.StartsWith("LOG-EVENT: "))
+                {
+                    string info = args.Value.Replace("LOG-EVENT: ", "");
+                    Utility.LogEvent(info);
                 }
                 else if (args.Value.StartsWith("SHOW-DIALOG: "))
                 {
@@ -234,11 +255,12 @@ namespace 百度经验个人助手
                     string data = args.Value.Replace("SET-DATA: ", "").Trim();
                     JsonObject jo = null;
                     string groupId = "";
-                    try { 
+                    try
+                    {
                         jo = JsonValue.Parse(data).GetObject();
                         groupId = jo["group-id"].GetString();
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Utility.LogEvent("NO_CommonDataParseError");
                         await Utility.ShowMessageDialog("保存数据调用格式错误", "请确定是JSON字符串，且含有字符串成员 group-id");
@@ -255,7 +277,7 @@ namespace 百度经验个人助手
                 {
                     bool isSaveAs = args.Value.StartsWith("SAVEAS-PIC: ");
                     string[] data = args.Value.Replace("SAVEAS-PIC: ", "").Replace("SAVE-PIC: ", "").Trim().Split('|');
-                    if(data.Length != 3)
+                    if (data.Length != 3)
                     {
                         await Utility.ShowMessageDialog("保存图片调用格式不正确", "正确格式为 SAVEAS-PIC/SAVE-PIC: 宽高比 | 宽度 | 高度");
                         return;
@@ -276,7 +298,7 @@ namespace 百度经验个人助手
                                 App.currentMainPage.ShowNotify("取消保存", "简介图未保存", Symbol.Cancel);
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             await Utility.ShowMessageDialog("保存图片失败", "未能保存到文件");
                             await Utility.ShowDetailedError("错误详细信息", e);
@@ -285,7 +307,7 @@ namespace 百度经验个人助手
                         }
                     }
                 }
-                else 
+                else
                 {
                     await Utility.ShowMessageDialog("未知的 window.external.notify 调用", args.Value.ToString());
                 }
@@ -328,7 +350,9 @@ namespace 百度经验个人助手
 
         public static string JsMineDetect =
                 "eval(function(p,a,c,k,e,d){e=function(c){return(c<a?\"\":e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!\'\'.replace(/^/,String)){while(c--)d[e(c)]=k[c]||e(c);k=[function(e){return d[e]}];e=function(){return\'\\\\w+\'};c=1;};while(c--)if(k[c])p=p.replace(new RegExp(\'\\\\b\'+e(c)+\'\\\\b\',\'g\'),k[c]);return p;}(\'5 D(v){7 1Z G(5(N,1S){6 h=1s.1T(\"h\");d(h.P){h.1p=5(){d(h.P==\"1Q\"||h.P==\"1R\"){h.1p=O;N()}}}t{h.1N=N};h.1M=v;1s.1P.1O(h)})};(5(f){6 F=[];d(1U 20!==\"5\"){F.l(\"//1C.1B.s/1k/3.2.1/1k.1A\")};G.1t(F.c(5(e){7 D(e)})).1z(5(){G.1t([\"//1C.1B.s/I/3.1.0/I.1A\"].c(5(1D){7 D(1D)})).1z(f)})})(5(){6 C=\"【1l】\";6 n={};M(22,4);5 M(9,r){6 1r=$(\".23 p, 21.1W\").c(5(i,e){7 e.1V}).1Y().1X([$(\"[1H=R]\").1I()]).1J(5(e,i){7 e.A()}).y(\",\");I.1L(`<x 1o=\"L\">1K</x><x 1o=\"Z\"></x>`.A(),{1G:0,1F:[\\\'2n\\\'],2p:5(k,2q){M(22,4)}});6 b=1m(1r,9,r);d(b.j<2){b.l(C)};$.15.16(O,b.c(5(e,i){7 $.14({v:\\\'//J.K.s/10/11\\\',13:{R:e}})})).18(5(){1v=1d.1e.c.1f(1c,5(e,i){7 e[0]});6 1w=b.c(5(e,i){7 e.2r(\\\'【1l】\\\',\\\'\\\')});6 B=[];1v.1b(5(e,i){d(e&&e.1a!=0){B.l(1w[i])}});d(B.j==0){2m(5(){$(\"#L\").U(\"2u\")},2o)}t{B.1b(5(u,i){n[u]=[];6 9=12;6 17=1x(u,9);$.15.16(O,17.c(5(e,i){7 $.14({v:\\\'//J.K.s/10/11\\\',13:{R:e}})})).18(5(){19=1d.1e.c.1f(1c,5(e,i){7 e[0]});H=19.c(5(e,i){7(e&&e.1a!=0)?\\\'1\\\':\\\'0\\\'}).y(\"\");2s.2x(H);w=1j(H);d(!w.Q){W();7};6 m=w.m;6 o=w.o;1h(6 i=0;i<m.j;i++){6 k=m[i];6 z=o[i];d(9+1-z>0){6 X=u.E(k-9+z,9+1-z);n[u].l(X)}t{};W()}})})}})};5 W(){$(\"#L\").U(`2w${Y.1g(n).j}2y`);$(\"#Z\").U(`${Y.1g(n).c(5(e,i){7`<p><q T=\"V:1y\">2t：</q>${e}</p><p><q T=\"V:1y\">2v：</q>${n[e].j>0?n[e].c(5(1E){7`<q T=\"V:2l;\">${1E}</q>`}).y(\"  \"):\\\'29，28<a 2b=\"25://J.K.s/24/27\" 26=\"2c\">2i</a>2k\\\'}</p>`;}).y(\"\")}`);};5 1x(8,9){8=8.A();1i=\"】\".r(9)+8+\"】\".r(9);6 b=[];1h(6 i=1;i<8.j+9;i++){b.l(1i.E(i,9))};7 b;};5 1j(8){6 S=8.2e(/1+/g);d(!S){7{Q:2d}};6 o=S.c(5(e,i){7 e.j});6 1n=\"0\"+8;6 m=[];6 k=0;1u(1q){k=1n.2g(\\\'2f\\\',k);d(k==-1){2j}t{m.l(k);k++}};7{o:o,m:m,Q:1q}};5 1m(8,9,r){8=8.A();6 b=[];1u(8.j>9){b.l(8.2h(0,9));8=8.E(9-r,2a)};d(8.j>0){b.l(8)};b=b.c(5(e,i){d(e.j<12){7 e+C}t{7 e}});7 b}});\',62,159,\'|||||function|var|return|str|perlen||arr|map|if||||script||length|index|push|indexs|sentences|lens||span|repeat|com|else|sentence|url|indexAndLen|div|join|len|trim|invalides|fill|loadScript|substr|jss|Promise|mine_str|layer|jingyan|baidu|status|firstCheck|resolve|null|readyState|find|title|matchs|style|html|color|show|mine_word|Object|contents|common|isTitleValid||data|ajax|when|apply|toCheck|done|results2|errno|forEach|arguments|Array|prototype|call|keys|for|str2|getIndexAndLen|jquery|填充字符|splite|str1|id|onreadystatechange|true|allText|document|all|while|results|reduction|splite2|orange|then|js|bootcss|cdn|e2|e3|btn|shade|name|val|filter|检测中|alert|src|onload|appendChild|body|loaded|complete|reject|createElement|typeof|innerText|normal|concat|toArray|new|jQuery|strong||editor|edit|http|target|content|请在|多个敏感词|999999|href|_0|false|match|01|indexOf|substring|新草稿页面|break|手动把这句话填入标题以精确检测|red|setTimeout|重新检测|200|yes|layero|replace|console|所在句子|检测通过|词汇|检测到|log|句话含敏感词\'.split(\'|\'),0,{}))";
-            
+
+        public static string JsSaveDraft =
+                "(function(){var a = document.getElementsByClassName['save-draft']; a[0].click();})();";
 
         public static string ErrableUsingErrBoard(string js, string preMsg="模块载入...", string doneMsg="开始运行.")
         {

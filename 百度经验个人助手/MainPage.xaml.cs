@@ -32,7 +32,8 @@ namespace 百度经验个人助手
     /// </summary>
     public sealed partial class MainPage : Page
     {
-
+        public bool isAssistEditorActivated { get; private set; } = false;
+        public bool isAssistEditorEditing { get; set; } = false;
 
         public MainPage()
         {
@@ -409,7 +410,7 @@ namespace 百度经验个人助手
         /// <param name="e"></param>
         private async void buttonSetCookie_Click(object sender, RoutedEventArgs e)
         {
-            if(App.currentMainPage.StackPanelWebViewCover.Visibility == Visibility.Collapsed)
+            if(isAssistEditorActivated)
             {
                 await Utility.ShowMessageDialog("请重启应用再修改Cookie", "本次启动使用了辅助编辑功能，造成Cookie锁定，无法修改。\n请重新启动应用程序再修改。");
                 return;
@@ -1008,6 +1009,7 @@ namespace 百度经验个人助手
             ShowLoading("访问jingyan.baidu.com...");
             webViewMain.Navigate(new Uri("https://jingyan.baidu.com/"));
             App.currentMainPage.StackPanelWebViewCover.Visibility = Visibility.Collapsed;
+            isAssistEditorActivated = true;
 
             //List<Uri> allowedUris = new List<Uri>();
             //allowedUris.Add(new Uri("https://jingyan.baidu.com/"));
@@ -1278,6 +1280,11 @@ namespace 百度经验个人助手
         private void buttonWebViewSecondaryClose_Tapped(object sender, TappedRoutedEventArgs e)
         {
             SecondWebViewVisibility = false;
+        }
+
+        public async Task SaveDraft()
+        {
+            await JSCodeString.RunJs(webViewMain, JSCodeString.JsSaveDraft);
         }
     }
 }

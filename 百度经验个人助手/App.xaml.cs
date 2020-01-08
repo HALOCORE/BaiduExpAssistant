@@ -1,20 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.System;
+using Windows.UI.Notifications;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace 百度经验个人助手
@@ -32,6 +23,7 @@ namespace 百度经验个人助手
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.EnteredBackground += EnteredBackgroundHandler;
             this.UnhandledException += async (sender, e) =>
             {
                 if (e.Exception.Message.StartsWith("ERROR-REPORT-FAILED"))
@@ -49,12 +41,12 @@ namespace 百度经验个人助手
                 string relvar = "senderType=" + sender.GetType() + "\nsender=" + sender.ToString();
                 await Utility.FireErrorReport("未知错误", relvar, e.Exception, e.Message);
             };
-            
+
             ApplicationView.PreferredLaunchViewSize = new Size(1200, 750);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Auto;
         }
 
-        public static MainPage currentMainPage; 
+        public static MainPage currentMainPage;
 
         /// <summary>
         /// 在应用程序由最终用户正常启动时进行调用。
@@ -123,10 +115,36 @@ namespace 百度经验个人助手
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: 保存应用程序状态并停止任何后台活动
+            //ShowWindowsNotice("注意，百度经验个人助手已被挂起", "内存数据将被清除");
             deferral.Complete();
         }
 
+        private void ShowWindowsNotice(string header, string detail)
+        {
+            var t = Windows.UI.Notifications.ToastTemplateType.ToastText02;
+            //在模板添加xml要的标题
+            var content = Windows.UI.Notifications.ToastNotificationManager.GetTemplateContent(t);
+            //需要using Windows.Data.Xml.Dom;
+            Windows.Data.Xml.Dom.XmlNodeList xml = content.GetElementsByTagName("text");
+            xml[0].AppendChild(content.CreateTextNode(header));
+            xml[1].AppendChild(content.CreateTextNode(detail));
+            //需要using Windows.UI.Notifications;
+            Windows.UI.Notifications.ToastNotification toast = new ToastNotification(content);
+            ToastNotificationManager.CreateToastNotifier().Show(toast);
+        }
+
+        private void EnteredBackgroundHandler(object sender, EnteredBackgroundEventArgs e)
+        { 
+            if (App.currentMainPage.isAssistEditorEditing)
+            {
+                Utility.LogEvent("Editing_EnterBackground");
+                ShowWindowsNotice("辅助编辑器进入后台，保存草稿提醒", "Windows会根据电量/内存情况清理后台。建议在最小化之前保存草稿。");
+            }
+            else if (App.currentMainPage.isAssistEditorActivated)
+            {
+                //ShowWindowsNotice("百度经验个人助手已被暂停", "百度经验个人助手被移入后台，程序暂停运行，暂停超过时长会被清理。");
+            }
+        }
 
     }
 }

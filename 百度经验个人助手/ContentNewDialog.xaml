@@ -33,11 +33,14 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
                         <StackPanel Margin="4" Padding="8">
-                            <TextBlock FontSize="26" Margin="5">感谢反馈，数据分析Bug范围进一步缩小</TextBlock>
-                            <TextBlock  Margin="5" TextWrapping="Wrap">一旦问题被精确定位，会被尽快修复。</TextBlock>
+                            <TextBlock FontSize="26" Margin="5">UI优化，程序被送入后台时提醒</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">另外编辑经验时，底部增加了基本项（勾选原创，简介等）检查。</TextBlock>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
+            </ListViewItem>
+            <ListViewItem>
+                <TextBlock FontSize="20">版本日志：1.6.3 版本增加功能</TextBlock>
             </ListViewItem>
             <ListViewItem HorizontalContentAlignment="Stretch" Visibility="Visible">
                 <Grid HorizontalAlignment="Stretch">

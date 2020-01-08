@@ -274,7 +274,7 @@
                             <TextBlock
                                 Grid.Column="0"
                                 FontSize="30" Margin="0,26,0,0"
-                                FontWeight="Thin"
+                                FontWeight="Bold"
                                 
                                 VerticalAlignment="Top" HorizontalAlignment="Center"
                             >
@@ -289,9 +289,7 @@
                                 Grid.Column="0"
                                 FontSize="24" Margin="0,64,0,0"
                                 FontWeight="Thin"
-                                
-                                VerticalAlignment="Top" HorizontalAlignment="Center"
-                            >
+                                VerticalAlignment="Top" HorizontalAlignment="Center">
                                 <TextBlock.Foreground>
                                     <LinearGradientBrush EndPoint="0,1">
                                         <GradientStop Color="WhiteSmoke" Offset="0.5"/>
@@ -299,16 +297,16 @@
                                     </LinearGradientBrush>
                                 </TextBlock.Foreground>
                                 Edit Assistant</TextBlock>
+                            <TextBlock x:Name="textUserName"
+                               Grid.Column="0"
+                               FontSize="20" Margin="20"
+                               VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                               Opacity="0.4">用户名: -</TextBlock>
                         </Grid>
                         
                     </Button>
                     
-                    <TextBlock x:Name="textUserName"
-                               Grid.Column="0"
-                               FontSize="20" Margin="20"
-                               VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                               Opacity="0.3"
-                    >用户名: -</TextBlock>
+                    
                 </Grid>
             </Border>
             <StackPanel
@@ -599,11 +597,12 @@
                             <Setter Property="Foreground" Value="DimGray"></Setter>
                         </Style>
                     </StackPanel.Resources>
-                    <TextBlock FontSize="30" Margin="10">搜索悬赏请先获取</TextBlock>
-                    <TextBlock FontSize="20" Margin="10">"获取"按钮左边输入起止页数</TextBlock>
-                    <TextBlock FontSize="20" Margin="10">举例：10-100表示10~100页</TextBlock>
+                    <TextBlock FontSize="30" Margin="10" FontWeight="Thin">搜索悬赏请先获取</TextBlock>
+                    <TextBlock FontSize="20" Margin="10" FontWeight="Thin">"获取"按钮左边输入起止页数</TextBlock>
+                    <TextBlock FontSize="20" Margin="10" FontWeight="Thin">举例：10-100表示10~100页</TextBlock>
+                    <TextBlock FontSize="30" Margin="10">一次获取，可多次悬赏搜索</TextBlock>
                     <TextBlock FontSize="30" Margin="10">搜索多个关键词空格隔开</TextBlock>
-                    <TextBlock FontSize="30" Margin="10">最后点击悬赏搜索</TextBlock>
+                    
                 </StackPanel>
                 <ListView x:Name="listViewSearchExps" Height="auto"
                       Grid.Row="2"
@@ -638,7 +637,7 @@
 
         </Grid>
 
-        <Grid x:Name="gridSecond" Visibility="Collapsed" Background="White" Opacity="1">
+        <Grid x:Name="gridSecond" Visibility="Visible" Background="White" Opacity="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="1*"/>
@@ -808,7 +807,7 @@
                     自动补全 (Beta) ：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
-                    1. Tab键呼出自动补全框
+                    1. Tab键呼出补全框，键盘↑↓/鼠标点击选择
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.8">
                     2. Tab键插入补全框第一条/插入新条目
@@ -816,14 +815,17 @@
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.75">
                     3. Enter键直接插入补全框内容
                 </TextBlock>
-                <TextBlock FontSize="20" Foreground="Gray" Opacity="0.7">
-                    4. 也可键盘↑↓/鼠标点击选择条目
-                </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
                     自定义 (Alpha) ：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
                     1. 可以用代码写自定义功能（已读所有消息等）
+                </TextBlock>
+                <TextBlock FontSize="24" Foreground="DimGray" Margin="0,8,0,0" Opacity="1">
+                    注意事项：
+                </TextBlock>
+                <TextBlock FontSize="20" Foreground="DimGray" FontWeight="Bold" Opacity="1">
+                    最小化会被暂停，暂停超过时长会被后台清理
                 </TextBlock>
             </StackPanel>
             <WebView x:Name="webViewMain" Grid.Column="1"></WebView>

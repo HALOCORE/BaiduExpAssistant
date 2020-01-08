@@ -139,6 +139,7 @@
     </Compile>
     <Compile Include="DataTemplateSelectors.cs" />
     <Compile Include="ExpManager.cs" />
+    <Compile Include="ExtendedExecutionHelper.cs" />
     <Compile Include="GuideManager.cs" />
     <Compile Include="JSCodeString.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -167,6 +168,7 @@
     <Content Include="Assets\betterInc.png" />
     <Content Include="Assets\code\AutoComplete.js" />
     <Content Include="Assets\code\BigPic.js" />
+    <Content Include="Assets\code\Checker.js" />
     <Content Include="Assets\code\jquery.autocompleter.css" />
     <Content Include="Assets\code\PicInsert.js" />
     <Content Include="Assets\code\test01.css" />
