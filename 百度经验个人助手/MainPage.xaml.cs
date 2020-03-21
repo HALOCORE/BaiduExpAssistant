@@ -1290,5 +1290,9 @@ namespace 百度经验个人助手
             StorageManager.editSettings.ifLoadAutoComplete = checkboxAutoComplete.IsChecked == true;
             await StorageManager.SaveEditSettings();
         }
+
+        private void WebViewSecondary_LoadCompleted(object sender, Windows.UI.Xaml.Navigation.NavigationEventArgs e)
+        {
+        }
     }
 }

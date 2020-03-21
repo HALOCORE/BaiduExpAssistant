@@ -111,8 +111,8 @@ namespace 百度经验个人助手
             await Task.Run(new Action(d));
             if (_isErrorInCalcDeltaExps)
             {
-                await Utility.ShowMessageDialog("本次分析有少许条目错误。重复名称不是Bug但是重复ID是Bug，请告知开发者", "遇到重复的经验ID");
-                await Utility.FireErrorReport("数据分析时发现重复的经验ID", "[exp]");
+                await Utility.ShowMessageDialog("运算错误，可能是重复ID造成（更新过程正好有经验通过审核）", "建议重新更新。如果反复出现，请告知开发者。");
+                await Utility.FireErrorReport("数据分析出错", "[exp]");
             }
         }
 

@@ -637,7 +637,13 @@ namespace 百度经验个人助手
                 else if (respstr.IndexOf("\"errno\":302") >= 0)
                 {
                     Utility.LogEvent("OK_TakeRewardAlready");
-                    respstr = "你可能已经领取过经验。领取不成功(302)。";
+                    respstr = "你可能已经领取过经验(302错误)。领取不成功。";
+                    //isGetSucceed = true;
+                }
+                else if (respstr.IndexOf("\"errno\":301") >= 0)
+                {
+                    Utility.LogEvent("OK_TakeRewardAlready");
+                    respstr = "经验已被他人领取(301错误)。领取不成功。";
                     //isGetSucceed = true;
                 }
                 else if (respstr.IndexOf("\"errno\":2") >= 0)
@@ -649,7 +655,7 @@ namespace 百度经验个人助手
                 else
                 {
                     Utility.LogEvent("ERROR_TakeRewardUnknown" + respstr);
-                    respstr = "未知错误类型 (非302或2错误。可告知开发者 wang1223989563) \n错误信息: " + respstr;
+                    respstr = "未知错误类型 (非302、301或2错误。可告知开发者 wang1223989563) \n错误信息: " + respstr;
                     isCritical = true;
                 }
 

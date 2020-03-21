@@ -571,7 +571,7 @@
                                     <TextBlock FontSize="10">时尚</TextBlock>
                                 </ComboBoxItem>
                             </ComboBox>
-                            <TextBox x:Name="textCacheRewardFromTo" Foreground="AliceBlue" FontSize="14" MinWidth="50" Text="0-100" Height="12" Padding="4,3,4,5">
+                            <TextBox x:Name="textCacheRewardFromTo" Foreground="AliceBlue" FontSize="14" MinWidth="50" Text="0-100" Padding="4,2,4,2">
 
                             </TextBox>
                             <Button x:Name="buttonCacheReward" FontSize="15" Foreground="WhiteSmoke" Background="DeepSkyBlue" Opacity="0.7"
@@ -781,13 +781,13 @@
                     5. 自动添加n个空白步骤
                 </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
-                    雷区检测：
+                    雷区检测（标题法）：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.75">
                     Thanks to 孢子真好玩
                 </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
-                    简介图与大图 (Alhpa) ：
+                    简介图与大图 (Alpha) ：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
                     1. 输入标题自动生成简介图，一键保存到文件
@@ -799,16 +799,16 @@
                     3. 一键插入所有图片到步骤中
                 </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
-                    自动补全 (Beta) ：
+                    自动补全 (2.0) ：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
-                    1. Tab键呼出补全框，键盘↑↓/鼠标点击选择
+                    1. Tab键插入自动补全项
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.8">
-                    2. Tab键插入补全框第一条/插入新条目
+                    2. 如果有多条自动补全项，上下键选择
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.75">
-                    3. Enter键直接插入补全框内容
+                    3. 选中文本，点击“记忆”可以将其记忆为自动补全条目
                 </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
                     自定义 (Alpha) ：
@@ -826,7 +826,7 @@
             <WebView x:Name="webViewMain" Grid.Column="1"></WebView>
             <Border x:Name="borderWebViewSecondary" Grid.Column="1" Margin="50" BorderThickness="3" BorderBrush="DarkGray"  Visibility="Visible">
                 <Grid>
-                    <WebView x:Name="webViewSecondary"></WebView>
+                    <WebView x:Name="webViewSecondary" LoadCompleted="WebViewSecondary_LoadCompleted"></WebView>
                     <Button x:Name="buttonWebViewSecondaryClose" Padding="8" Opacity="0.7" Background="LightGray" HorizontalAlignment="Right" VerticalAlignment="Top" Tapped="buttonWebViewSecondaryClose_Tapped">
                         <SymbolIcon Foreground="Black" Symbol="Cancel"/>
                     </Button>

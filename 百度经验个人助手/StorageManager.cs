@@ -186,7 +186,7 @@ namespace 百度经验个人助手
             if (duplicateCount > 0)
             {
                 Utility.LogEvent("ERROR_DataPackDuplicate_REPORT");
-                await Utility.ShowMessageDialog("发现重复的经验ID", "这是一个Bug，请告知开发者");
+                await Utility.ShowMessageDialog("发现重复的经验ID，可能是由于更新过程中有经验通过审核", "需要重新更新。如果反复出现，可以提交错误");
                 await Utility.FireErrorReport("CheckRemoveDuplicate 发现重复的经验ID", "[exp]\ntotal=" + contentExpsCount + "\nactual=" + contentExps.Count);
             }
             else if(contentExps.Count != contentExpsCount)
@@ -197,7 +197,8 @@ namespace 百度经验个人助手
                 {
                     err = "经验个数不符，原因是发现某页的已发布经验数不等于预期的总经验数";
                 }
-                await Utility.ShowMessageDialog(err, "为了进一步定位Bug，可提交错误报告给开发者");
+                err += "(很可能是由于更新过程中有经验通过审核)";
+                await Utility.ShowMessageDialog(err, "需要重新更新。如果反复出现，可提交错误报告给开发者");
                 await Utility.FireErrorReport("CheckRemoveDuplicate " + err, "[exp]\ntotal=" + contentExpsCount + "\nactual=" + contentExps.Count);
             }
         }
@@ -476,8 +477,8 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.6.7";
-        public const string FUNC_VER = "1.6.6";
+        public const string VER = "1.6.8";
+        public const string FUNC_VER = "1.6.8";
 
         private static string _editSettingsFileName = "EditSettings.xml";
         private static string _settingsFileName = "Settings.xml";

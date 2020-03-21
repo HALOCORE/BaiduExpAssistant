@@ -178,9 +178,9 @@
     <Content Include="Assets\CookieSet.gif" />
     <Content Include="Assets\editAuto.png" />
     <Content Include="Assets\editBig.png" />
-    <Content Include="Assets\features\1.3.9ACAlpha.gif" />
     <Content Include="Assets\code\test01.html" />
     <Content Include="Assets\features\1.6.2.gif" />
+    <Content Include="Assets\features\1.6.8ac.gif" />
     <Content Include="Assets\WhatIsBDUSS.png" />
     <Content Include="Properties\Default.rd.xml">
       <SubType>Designer</SubType>
