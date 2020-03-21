@@ -723,15 +723,10 @@
                         </LinearGradientBrush>
                     </Button.Background>
                     简介图与大图 [α]</Button>
-                <Button x:Name="buttonAutoComplete" Click="buttonAutoComplete_Click">
-                    <Button.Background>
-                        <LinearGradientBrush>
-                            <GradientStop Color="#BBFFA500"/>
-                            <GradientStop Color="#CCFF69B4" Offset="0.70"/>
-                        </LinearGradientBrush>
-                    </Button.Background>
-                    自动补全 [β]
-                </Button>
+                <CheckBox x:Name="checkboxAutoComplete" IsChecked="True" Margin="15 0 5 0" 
+                          RequestedTheme="Light" Checked="CheckboxAutoComplete_CheckEvent" Unchecked="CheckboxAutoComplete_CheckEvent">
+                    <TextBlock>自动补全 V2.0</TextBlock>
+                </CheckBox>
                 <Button x:Name="buttonDIY" Click="buttonDIY_Click" Visibility="Visible">
                     <Button.Background>
                         <LinearGradientBrush>

@@ -111,6 +111,7 @@ namespace 百度经验个人助手
                     try
                     {
                         await JSCodeString.AddScriptUri(webView, "ms-appx-web:///Assets/code/Checker.js");
+                        await App.currentMainPage.LoadAutoCompleteAsync();
                     }
                     catch (Exception e)
                     {

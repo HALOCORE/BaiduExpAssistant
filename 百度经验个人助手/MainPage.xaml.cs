@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using Windows.Graphics.Imaging;
+//using JiebaNet.Segmenter;
 
 //“空白页”项模板在 http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409 上有介绍
 
@@ -157,6 +158,7 @@ namespace 百度经验个人助手
 
             ShowLoading("读取Edit设置...");
             await StorageManager.ReadEditSettings();
+            checkboxAutoComplete.IsChecked = StorageManager.editSettings.ifLoadAutoComplete;
 
             ShowLoading("读取DIY功能设置...");
             await StorageManager.ReadDIYToolsSettings();
@@ -1068,7 +1070,7 @@ namespace 百度经验个人助手
             buttonTestMine.IsEnabled = isTestMine;
             buttonAutoFill.IsEnabled = isEdit;
             buttonBigPicture.IsEnabled = isEdit;
-            buttonAutoComplete.IsEnabled = isEdit;
+            checkboxAutoComplete.IsEnabled = isEdit;
             buttonDIY.IsEnabled = isEdit;
         }
 
@@ -1192,16 +1194,14 @@ namespace 百度经验个人助手
             return input;
         }
 
-        private async void buttonAutoComplete_Click(object sender, RoutedEventArgs e)
+        public async Task LoadAutoCompleteAsync()
         {
-            Utility.LogEvent("OK_AutoCompleteCalled");
-            ShowLoading("初始化...");
+            if (!checkboxAutoComplete.IsChecked == true) return;
+            Utility.LogEvent("OK_LoadAutoCompleteCalled");
             try
             {
-                await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/jquery.autocompleter.js");
-                await JSCodeString.AddCssUri(webViewMain, "ms-appx-web:///Assets/code/jquery.autocompleter.css");
                 await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/AutoComplete.js");
-                ShowLoading("加载组件中...");
+                ShowLoading("加载自动补全...");
                 string data = await StorageManager.ReadAutoCompleteData("");
                 await Task.Delay(500);
                 
@@ -1211,21 +1211,19 @@ namespace 百度经验个人助手
                 }
                 else
                 {
-                    //希望执行js代码： InitAutoComplete("{...}")，
-                    //data就是一个json字符串："{...}"
-
+                    //希望执行js代码： InitAutoComplete("[...]")，
                     await JSCodeString.RunJs(webViewMain, 
                         "InitAutoComplete(\""
                         + GetTransString(data)
                         + "\")"
                         );
-                    //"InitAutoComplete(\"\\\"ms-appdata:///local/AutoCompleteData/default.json\\\"\");");
                 }
-                
             }
             catch (Exception ee)
             {
-                await Utility.ShowMessageDialog("加载 [自动补全] 出现问题", "当前页面可能不是编辑器页面。"); // ee.GetType().ToString() + '\n' +  ee.Message);
+                await Utility.ShowMessageDialog("加载 [自动补全] 出现问题", "如果当前页面确实是编辑器页面，可将错误截图给开发者 (wang1223989563)\n" + ee.GetType().ToString() + '\n' +  ee.Message);
+                Utility.LogEvent("ERROR_LoadAutoCompleteFailed");
+                //await Utility.FireErrorReport("自动补全加载出错", "[edit]", ee);
             }
             HideLoading();
         }
@@ -1269,11 +1267,9 @@ namespace 百度经验个人助手
 
         private async void TextBlock_Tapped_1(object sender, TappedRoutedEventArgs e)
         {
-            //error test
-            //var bmap = await GetWebViewImageAsync(600.0/240, 600, 240);
-            //await StorageManager.SaveWritableBitmapAsync(bmap);
-
-            //imageProfile.Source = bmap;
+            //ConfigManager.ConfigFileBaseDir = "ms-appx:///Assets/jiebadict";
+            //var segmenter = new JiebaSegmenter();
+            //var segments = segmenter.Cut("我来到北京清华大学", cutAll: true);
             throw new Exception("异常捕获测试 Catch Exception Test");
         }
 
@@ -1285,6 +1281,14 @@ namespace 百度经验个人助手
         public async Task SaveDraft()
         {
             await JSCodeString.RunJs(webViewMain, JSCodeString.JsSaveDraft);
+        }
+
+        private async void CheckboxAutoComplete_CheckEvent(object sender, RoutedEventArgs e)
+        {
+            if (StorageManager.editSettings == null) return;
+            if (StorageManager.editSettings.ifLoadAutoComplete == checkboxAutoComplete.IsChecked) return;
+            StorageManager.editSettings.ifLoadAutoComplete = checkboxAutoComplete.IsChecked == true;
+            await StorageManager.SaveEditSettings();
         }
     }
 }

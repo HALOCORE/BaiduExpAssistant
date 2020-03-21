@@ -232,7 +232,7 @@ namespace 百度经验个人助手
             ifCheckOrigin = true;
             ifAddStep = true;
             addStepCount = 3;
-
+            ifLoadAutoComplete = true;
         }
 
         [XmlIgnore] public string strTitle2Brief;
@@ -282,7 +282,7 @@ namespace 百度经验个人助手
         [XmlElement("ifAddStep")] public bool ifAddStep;
         [XmlElement("addStepCount")] public int addStepCount;
 
-
+        [XmlElement("ifLoadAutoComplete")] public bool ifLoadAutoComplete;
     }
 
 

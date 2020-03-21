@@ -11,7 +11,7 @@
     <AssemblyName>百度经验个人助手</AssemblyName>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.17134.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -169,7 +169,6 @@
     <Content Include="Assets\code\AutoComplete.js" />
     <Content Include="Assets\code\BigPic.js" />
     <Content Include="Assets\code\Checker.js" />
-    <Content Include="Assets\code\jquery.autocompleter.css" />
     <Content Include="Assets\code\PicInsert.js" />
     <Content Include="Assets\code\test01.css" />
     <Content Include="Assets\code\test02.html" />
@@ -179,7 +178,6 @@
     <Content Include="Assets\CookieSet.gif" />
     <Content Include="Assets\editAuto.png" />
     <Content Include="Assets\editBig.png" />
-    <Content Include="Assets\code\jquery.autocompleter.js" />
     <Content Include="Assets\features\1.3.9ACAlpha.gif" />
     <Content Include="Assets\code\test01.html" />
     <Content Include="Assets\features\1.6.2.gif" />
@@ -251,7 +249,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>5.2.4</Version>
+      <Version>6.2.10</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Services.Store.Engagement">
       <Version>10.1901.28001</Version>
@@ -273,6 +271,9 @@
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">
       <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
