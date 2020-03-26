@@ -12,7 +12,7 @@
     SecondaryButtonText="反馈"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     Width="400"
-    Height="430"
+    Height="490"
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
     >
 <ContentDialog.Background>
@@ -39,7 +39,6 @@
                     </Setter>
                 </Style>
             </StackPanel.Resources>
-            <Button x:Name="buttonTip1" Click="buttonTip1_Click">如何导出数据到Excel?</Button>
             <Button x:Name="buttonTip2" Click="buttonTip2_Click">如何统计总浏览?</Button>
             <Button x:Name="buttonTip3" Click="buttonTip3_Click">如何搜索悬赏?</Button>
             <Button x:Name="buttonTip4" Click="buttonTip4_Click">如何进行浏览量排序?</Button>
@@ -47,6 +46,9 @@
             <Button x:Name="buttonTip6" Click="buttonTip6_Click">如何和统计浏览量增加量？</Button>
             <Button x:Name="buttonTip7" Click="buttonTip7_Click">自动填写基本设置 / 大图查看？</Button>
             <Button x:Name="buttonTip8" Click="buttonTip8_Click">如何自动填写分类？</Button>
+            <Button x:Name="buttonTip9" Click="ButtonTip9_Click">如何使用自动补全？</Button>
+            <Button x:Name="buttonTip10" Click="ButtonTip10_Click">如何一键插入图片？</Button>
+            <Button x:Name="buttonTip1" Click="buttonTip1_Click">如何导出数据到Excel?</Button>
         </StackPanel>
     </Grid>
 </ContentDialog>

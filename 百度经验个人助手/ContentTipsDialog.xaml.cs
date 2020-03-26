@@ -72,5 +72,15 @@ namespace 百度经验个人助手
         {
             Launcher.LaunchUriAsync(new Uri("https://jingyan.baidu.com/article/5d6edee2cf952599eadeec9d.html"));
         }
+
+        private void ButtonTip9_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.LaunchUriAsync(new Uri("https://jingyan.baidu.com/article/6dad5075ae2a41e023e36e96.html"));
+        }
+
+        private void ButtonTip10_Click(object sender, RoutedEventArgs e)
+        {
+            Launcher.LaunchUriAsync(new Uri("https://jingyan.baidu.com/article/ac6a9a5eb1dbfc6b643eac3e.html"));
+        }
     }
 }

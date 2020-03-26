@@ -110,7 +110,9 @@ namespace 百度经验个人助手
                     App.currentMainPage.isAssistEditorEditing = true;
                     try
                     {
-                        await JSCodeString.AddScriptUri(webView, "ms-appx-web:///Assets/code/Checker.js");
+                        await AddScriptUri(webView, "ms-appx-web:///Assets/code/Checker.js");
+                        await AddScriptUri(webView, "ms-appx-web:///Assets/code/lib/alertify.js");
+                        await AddCssUri(webView, "ms-appx-web:///Assets/code/lib/alertify.com.css");
                         await App.currentMainPage.LoadAutoCompleteAsync();
                     }
                     catch (Exception e)

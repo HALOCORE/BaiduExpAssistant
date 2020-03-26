@@ -537,19 +537,27 @@ namespace 百度经验个人助手
                     int expectedExpCount = 20;
                     if (j == pagesCount - 1) expectedExpCount = (currentDataPack.contentExpsCount + 19) % 20 + 1;
                     int totalExpectedCount = currentDataPack.contentExpsCount;
-                    if (!(await GetContentsSubStep_ParseContentPage(j, expectedExpCount, totalExpectedCount)))
+                    if (!await GetContentsSubStep_ParseContentPage(j, expectedExpCount, totalExpectedCount))
                     {
-                        Utility.LogEvent("ERROR_ParseContentFailed");
-                        await Utility.ShowMessageDialog("意外问题，程序收集错误后结束", "数据获取成功但是解析失败。获取页 " + i + " 无要寻找的经验条目，可能是用户中途退出登录，也可能是Baidu经验页面有调整（可能性最低）。"
-                                                        + "\n一般情况下，这是一个容易解决的问题，看到此对话框可以截图给开发者并询问解决方法。");
+                        Utility.LogEvent("WARN_ParseContentFailed_1");
+                        await GetContentsSubStep_CookiedGetContentPage(j);
+                        if (!await GetContentsSubStep_ParseContentPage(j, expectedExpCount, totalExpectedCount))
+                        {
+                            Utility.LogEvent("WARN_ParseContentFailed_2");
+                            await GetContentsSubStep_CookiedGetContentPage(j);
+                            if (!await GetContentsSubStep_ParseContentPage(j, expectedExpCount, totalExpectedCount))
+                            {
+                                Utility.LogEvent("ERROR_ParseContentFailed_3");
+                                await Utility.ShowMessageDialog("意外问题，程序收集错误后结束", "数据获取成功，但是连续解析失败3次。获取页 " + i + " 无要寻找的经验条目，可能是用户中途退出登录，也可能是Baidu经验页面有调整（可能性最低）。"
+                                                                + "\n一般情况下，这是一个容易解决的问题，看到此对话框可以截图给开发者并询问解决方法。");
 
-                        Utility.LogEvent("ASSERT_UpdateExpNull");
+                                //REPORT
+                                string relvars = "page-id=" + i + "\nhtml content=" + htmlContentPages[j];
+                                await Utility.FireErrorReport("更新EXP 重试3次仍然Content页面匹配失败", relvars);
 
-                        //REPORT
-                        string relvars = "page-id=" + i + "\nhtml content=" + htmlContentPages[j];
-                        await Utility.FireErrorReport("更新EXP Content页面匹配失败", relvars);
-
-                        App.Current.Exit();
+                                App.Current.Exit();
+                            }
+                        }
                     }
                 }
             }

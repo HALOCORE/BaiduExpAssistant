@@ -1053,13 +1053,6 @@ namespace 百度经验个人助手
         private void buttonTestBroswer_Click(object sender, RoutedEventArgs e)
         {
             Launcher.LaunchUriAsync(new Uri("https://jingyan.baidu.com/"));
-            //导航到Assets/code/test01.html，
-            //必须使用ms -appx-web:
-            //webViewMain.ScriptNotify += (o, args) =>
-            //{
-            //    Utility.ShowMessageDialog(o.ToString(), args.Value);
-            //};
-            //webViewMain.Navigate(new Uri("ms-appx-web:///Assets/code/test01.html"));
         }
 
         public void WebSetUpdate(bool isMainPage, bool isDraft, bool isEdit, bool isTestMine)
@@ -1177,9 +1170,6 @@ namespace 百度经验个人助手
 
         private async void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            //await JSCodeString.AddCssUri(webViewMain, "ms-appx-web:///Assets/code/test01.css");
-            //await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/jquery.autocompleter.js");
-            //await Utility.ShowMessageDialog("添加完毕", "添加完毕");
         }
 
         public static string GetTransString(string input)
@@ -1293,6 +1283,11 @@ namespace 百度经验个人助手
 
         private void WebViewSecondary_LoadCompleted(object sender, Windows.UI.Xaml.Navigation.NavigationEventArgs e)
         {
+        }
+
+        private async void ButtonOpenSource_Click(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("https://github.com/HALOCORE/BaiduExpAssistant"));
         }
     }
 }

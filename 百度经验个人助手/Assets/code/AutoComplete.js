@@ -1,7 +1,3 @@
-/**
- * Created by HP on 2018/8/15.
- */
-
 function InitAutoComplete(myData) {
     "use strict";
     var hinterData = null;
@@ -32,6 +28,7 @@ function InitAutoComplete(myData) {
     let hintersResult = [];
     let selectionText = "";
     let selectionRect = null;
+    let isSelectionChanged = false;
     let isHintersShowup = false;
     let isDirty = false;
 
@@ -87,6 +84,68 @@ function InitAutoComplete(myData) {
             }
             curdict["_FNS_"].push(data);
         }
+    }
+
+    function deleteHinterData(label) {
+        if (label.length === 0) return;
+
+        isDirty = true;
+        console.log("<<<deleteHinterData>>>", label);
+        let isEntryFound = false;
+        for (let i = 0; i < hinterData.length; i++) {
+            if (hinterData[i].label === label) {
+                isEntryFound = true;
+                let val = hinterData[i].label;
+                if ("value" in hinterData[i]) val = hinterData[i]["value"];
+                console.log("value is:", val);
+                delete hinterValueDict[val];
+                hinterData.splice(i, 1);
+                break;
+            }
+        }
+        if (isEntryFound === false) {
+            console.error("delete entry not found. label=", label);
+        }
+        let hi = label;
+        for (let j = hi.length - 2; j >= 0; j--) {
+            let curdict = hinterDataDict;
+            let isNormal = true;
+            for (let k = j; k >= 0; k--) {
+                if (!(hi[k] in curdict)) {
+                    console.error("delete entry not found. label=", label);
+                    isNormal = false;
+                    break;
+                }
+                curdict = curdict[hi[k]];
+            }
+            if(!isNormal) break;
+            if (!("_FNS_" in curdict)) {
+                console.error("_FNS_ not exist. label=", label);
+            }
+            let fnslist = curdict["_FNS_"];
+            let isfnFound = false;
+            for (let i = 0; i < fnslist.length; i++) {
+                if (fnslist[i].label === label) {
+                    isfnFound = true;
+                    fnslist.splice(i, 1);
+                    break;
+                }
+            }
+            if(!isfnFound) console.error("delete entry not in _FNS_. label=", label);
+        }
+    }
+
+    function askUserDeleteHinterData(label) {
+        console.log("<<<askUserDeleteHinterData>>>");
+        alertify.confirm("确定删除条目？ " + label, function (e) {
+            if (e) {
+                deleteHinterData(label);
+                fullUpdate(true);
+            } else {
+                console.log("askUserDeleteHinterData canceled.");
+            }
+        });
+        
     }
 
     function updateMatchedHinters() {
@@ -169,9 +228,12 @@ function InitAutoComplete(myData) {
             if (selectionText in hinterValueDict) {
                 button.disabled = true;
                 button.textContent = "√ 已记忆";
-            } else {
+            } else if (selectionText.length < 42) {
                 button.disabled = false;
                 button.textContent = "+ 记忆";
+            } else {
+                button.disabled = true;
+                button.textContent = "⚠ 记忆条目太长";
             }
             //window.external.notify("NOTIFY: ddd | ddd | OK")
         } else {
@@ -222,11 +284,31 @@ function InitAutoComplete(myData) {
             let grayNode = document.createElement("span");
             grayNode.innerText = grayText;
             grayNode.style.color = "burlywood";
+            grayNode.style.userSelect = "none";
             let normalNode = document.createElement("span");
             normalNode.innerText = normalText;
             normalNode.style.color = "black";
+            normalNode.style.userSelect = "none";
+            let deleteClickable = document.createElement("button");
+            deleteClickable.innerText = "×";
+            deleteClickable.style.color = "black";
+            deleteClickable.style.background = "white";
+            deleteClickable.style.opacity = 0.45;
+            deleteClickable.style.float = "right";
+            deleteClickable.style.borderRadius = "50px";
+            deleteClickable.style.borderWidth = "0px";
+            deleteClickable.style.marginTop = "2.5px";
+            deleteClickable.style.fontSize = "18px";
+            deleteClickable.style.lineHeight = "20px";
+            deleteClickable.style.textAlign = "center";
+            deleteClickable.style.width = "18px";
+            deleteClickable.style.height = "18px";
+            deleteClickable.style.marginLeft = "10px";
+            deleteClickable.style.display = "inline-block";
+            deleteClickable.addEventListener("click", () => askUserDeleteHinterData(text));
             elem.appendChild(grayNode);
             elem.appendChild(normalNode);
+            elem.appendChild(deleteClickable);
             hinter.appendChild(elem);
         }
         hinter.style.left = (boundingRect.left - bodyRect.left) + "px";
@@ -276,14 +358,30 @@ function InitAutoComplete(myData) {
         document.getSelection().addRange(newRange);
     }
 
+    let _oldStartContainer = null;
+    let _oldStartOffset = null;
+    let _oldEndContainer = null;
+    let _oldEndOffset = null;
     function updateSelectionInfo() {
         let sel = null;
         try {
             sel = window.getSelection().getRangeAt(0);
         } catch (e) { }
         if (!sel) return;
+        isSelectionChanged = false;
+        if (_oldStartContainer !== sel.startContainer) isSelectionChanged = true;
+        if (_oldStartOffset !== sel.startOffset) isSelectionChanged = true;
+        if (_oldEndContainer !== sel.endContainer) isSelectionChanged = true;
+        if (_oldEndOffset !== sel.endOffset) isSelectionChanged = true;
+        if (isSelectionChanged) {
+            _oldStartContainer = sel.startContainer;
+            _oldStartOffset = sel.startOffset;
+            _oldEndContainer = sel.endContainer;
+            _oldEndOffset = sel.endOffset;
+        }
         let contents = sel.cloneContents();
         selectionText = contents.textContent.trim();
+        selectionRect = sel.getBoundingClientRect();
         if (isChildOfClass(sel.startContainer, "edui-body-container")) {
             let inputTextsBefore = [];
             let curtext = sel.startContainer.textContent.substr(0, sel.startOffset);
@@ -301,7 +399,8 @@ function InitAutoComplete(myData) {
             if (inputTextBefore.length > 60) {
                 inputTextBefore = inputTextBefore.substr(inputTextBefore.length - 60);
             }
-            selectionRect = sel.getBoundingClientRect();
+        } else {
+            inputTextBefore = "";
         }
     }
 
@@ -310,19 +409,23 @@ function InitAutoComplete(myData) {
         updateTextHinter();
     }
 
-    function fullAdderUpdate() {
+    function fullIntervalUpdate() {
         updateSelectionInfo();
+        if (isSelectionChanged) {
+            console.log("isSelectionChanged. updateTextHinter...");
+            updateTextHinter();
+        }
         updateHinterDataAdder();
     }
 
     function hinterInitialize() {
         initHinterData();
         window.addEventListener("keydown", (e) => {
-            console.log(e);
+            console.log("key:", e.key, " code:", e.code);
             if (e.key === 'Tab') {
                 e.preventDefault();
                 insertSelectedHinter();
-                setTimeout(fullUpdate, 50);
+                setTimeout(fullUpdate, 30);
                 return;
             }
             if (isHintersShowup) {
@@ -344,7 +447,7 @@ function InitAutoComplete(myData) {
             setTimeout(fullUpdate, 50);
         });
         //window.addEventListener("change", (e) => console.log(e));
-        setInterval(fullAdderUpdate, 350);
+        setInterval(fullIntervalUpdate, 250);
     }
     hinterInitialize();
 
@@ -372,6 +475,10 @@ function InitAutoComplete(myData) {
         info2.style.color = "brown";
         info2.style.fontSize = '14px';
         info2.innerText = "增加条目：选中一段文字，点击“+记忆”";
+        var info3 = document.createElement('p');
+        info3.style.color = "brown";
+        info3.style.fontSize = '14px';
+        info3.innerText = "删除条目：点击条目右侧的“×”并确认";
         var bs = jQuery("#brief-section")[0];
         bs.prepend(info2);
         bs.prepend(info1);
