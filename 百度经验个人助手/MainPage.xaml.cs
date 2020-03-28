@@ -392,9 +392,11 @@ namespace 百度经验个人助手
         /// <returns>Cookie是否成功使用</returns>
         public async Task<bool> UpdateMain()
         {
-            ShowLoading("联网获取个人主页...");
+            ShowLoading("联网获取个人主页...\n" + ExpManager.CurrentCookieDisplayValue);
             if (!await ExpManager.GetMain()) return false;
-            
+            ShowLoading("储存完整Cookie...\n");
+            await ExpManager.SaveCurrentCookie();
+
             ShowLoading("读取个人上次数据...");
             await UpdateMainSubStep_InitDataPacks();
             HideLoading();

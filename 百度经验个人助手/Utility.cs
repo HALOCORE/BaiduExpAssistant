@@ -102,6 +102,12 @@ namespace 百度经验个人助手
             }
         }
 
+        public static string StringEscaped(string input)
+        {
+            input = input.Replace("\\", "\\\\");
+            return input;
+        }
+
         public static string Transferred(string input)
         {
             input = input.Replace("&", "&amp;");

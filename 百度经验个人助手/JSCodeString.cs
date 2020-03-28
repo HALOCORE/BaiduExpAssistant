@@ -20,7 +20,19 @@ namespace 百度经验个人助手
         #region Special Info During Navigation
         public static bool isCookieInsertSucceed = false;
         public static string planToGoUrl = "";
+        public static string latestJsEvaluated = "";
         #endregion
+
+        private static async Task<string> WrapInvokeScriptAsync(WebView sender, string scriptName, IEnumerable<string> arguments)
+        {
+            string result = await sender.InvokeScriptAsync(scriptName, arguments);
+            latestJsEvaluated = scriptName + "\n==========\n";
+            foreach(string arg in arguments)
+            {
+                latestJsEvaluated += arg + "\n";
+            }
+            return result;
+        }
 
         #region WebView Set
         //每当一个Navigation完成看是否是主页（插入Cookie).
@@ -32,13 +44,7 @@ namespace 百度经验个人助手
             WebView sender,
             WebViewNavigationCompletedEventArgs e)
         {
-            string js0 =
-                "var script = document.createElement(\"script\");\r\n"
-                + " script.type = \"text/javascript\";\r\n"
-                + "script.text = url;\r\n"
-                + "document.body.appendChild(script);";
-
-            // Utility.ShowMessageDialog("InsertCookieAndRefresh", sender.Source.AbsoluteUri);
+            //Windows.Web.Http.Filters.HttpBaseProtocolFilter filter = new Windows.Web.Http.Filters.HttpBaseProtocolFilter();      
             if (sender.Source.AbsoluteUri.EndsWith("jingyan.baidu.com/") || sender.Source.AbsoluteUri.EndsWith("jingyan.baidu.com"))
             {
                 isCookieInsertSucceed = false; //assume false.
@@ -48,14 +54,14 @@ namespace 百度经验个人助手
                     Utility.ShowMessageDialog("请返回设置有效的Cookie（请勿在此登录）", "当前Cookie信息无效，无法保持登录。请返回设置Cookie。\n请勿在此登录！");
                     return;
                 }
-                string curCookie = await sender.InvokeScriptAsync(
+                string htmlDoc = await WrapInvokeScriptAsync(sender,
                     "eval",
                     new string[]
                     {
                         "document.documentElement.outerHTML;"
                     });
                 
-                if (curCookie.Contains(ExpManager.newMainUserName))
+                if (htmlDoc.Contains(ExpManager.newMainUserName))
                 {
                     _insertCookieCount = 0;
                     isCookieInsertSucceed = true;
@@ -70,25 +76,14 @@ namespace 百度经验个人助手
                 }
 
                 _insertCookieCount += 1;
-                App.currentMainPage.ShowLoading("添加Cookie...");
+                App.currentMainPage.ShowLoading("添加Cookie...\n" + ExpManager.CurrentCookieDisplayValue);
 
-                string bduss = "";
-                foreach (HttpCookiePairHeaderValue cp in ExpManager.client.DefaultRequestHeaders.Cookie)
-                {
-                    if (cp.Name == "BDUSS")
-                    {
-                        bduss = cp.Value.ToString();
-                        break;
-                    }
-                }
-                if (bduss == "") return;
+                string js = "var cookieStr = \""
+                      + Utility.StringEscaped(ExpManager.CurrentCookie)
+                      + "\"; document.cookie = cookieStr;";
+                js = ErrableUsingNotify(js);
 
-                string js = ""; //构建脚本
-                js += "var str = \"BDUSS\" + \"=\" + escape(\""
-                      + bduss
-                      + "\"); document.cookie = str;";
-
-                await sender.InvokeScriptAsync("eval", new string[] { js });
+                await WrapInvokeScriptAsync(sender, "eval", new string[] { js });
 
                 //相当于刷新页面了。e是事件参数。
                 // still assume isCookieInsertSucceed = false. 
@@ -177,6 +172,8 @@ namespace 百度经验个人助手
                 else if (args.Value.StartsWith("ERROR: "))
                 {
                     await Utility.ShowMessageDialog("javascript 运行异常", args.Value);
+                    Utility.LogEvent("ERROR_JSRUN");
+                    await Utility.FireErrorReport("未知的JS运行异常", "latestJsEvaluated=" + latestJsEvaluated, null, args.Value);
                 }
                 else if (args.Value.StartsWith("GOTO: ") || args.Value.StartsWith("2ND-GOTO: "))
                 {
@@ -413,7 +410,7 @@ namespace 百度经验个人助手
                 App.currentMainPage.ShowNotify("运行无效", strDomainNotSupported);
                 return;
             }
-            await webview.InvokeScriptAsync("eval", new string[] {js});
+            await WrapInvokeScriptAsync(webview, "eval", new string[] {js});
         }
 
         public static async Task RunJss(WebView webview, string[] jss)
@@ -423,7 +420,7 @@ namespace 百度经验个人助手
                 App.currentMainPage.ShowNotify("运行无效", strDomainNotSupported);
                 return;
             }
-            await webview.InvokeScriptAsync("eval", jss);
+            await WrapInvokeScriptAsync(webview, "eval", jss);
         }
 
         public static async Task RunJs2(WebView webview, string js, string js2)
@@ -433,7 +430,7 @@ namespace 百度经验个人助手
                 App.currentMainPage.ShowNotify("运行无效", strDomainNotSupported);
                 return;
             }
-            await webview.InvokeScriptAsync("eval", new string[] { js + js2 });
+            await WrapInvokeScriptAsync(webview, "eval", new string[] { js + js2 });
         }
 
         public static string strDomainNotSupported = "百度经验 (jingyan.baidu.com) 之外的页面不支持";

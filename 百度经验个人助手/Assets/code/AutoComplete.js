@@ -480,6 +480,7 @@ function InitAutoComplete(myData) {
         info3.style.fontSize = '14px';
         info3.innerText = "删除条目：点击条目右侧的“×”并确认";
         var bs = jQuery("#brief-section")[0];
+        bs.prepend(info3);
         bs.prepend(info2);
         bs.prepend(info1);
         bs.prepend(info0);

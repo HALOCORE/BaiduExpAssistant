@@ -38,7 +38,10 @@
             <TextBlock Grid.Column="1">错误名称，异常类型，堆栈，造成错误的程序变量，出错之前的操作事件</TextBlock>
         </Grid>
         <TextBlock Margin="3" Grid.Row="2">提交信息预览：</TextBlock>
-        <TextBox x:Name="textBoxErrorReportPreview" FontSize="14" AcceptsReturn="True" Margin="3" Grid.Row="3" InputScope="Text" IsReadOnly="True" Background="WhiteSmoke"></TextBox>
+        <ScrollViewer Margin="3" Grid.Row="3" BorderThickness="1" BorderBrush="Black">
+            <TextBox x:Name="textBoxErrorReportPreview" FontSize="14" AcceptsReturn="True" 
+                     InputScope="Text" IsReadOnly="True" Background="WhiteSmoke" BorderThickness="0"></TextBox>
+        </ScrollViewer>
         <TextBlock Margin="3" Grid.Row="4">其它告知开发者（1223989563@qq.com）：</TextBlock>
         <TextBox x:Name="textBoxErrorNote" AcceptsReturn="True" Margin="3" Grid.Row="5" InputScope="Text" PlaceholderText="可选，比如如何操作重现错误，错误是一直出现，还是偶尔出现等"></TextBox>
     </Grid>

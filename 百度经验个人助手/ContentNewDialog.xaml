@@ -18,12 +18,30 @@
             <LinearGradientBrush.Transform>
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
-            <GradientStop Color="LightGoldenrodYellow"  Offset="0.7"/>
+            <GradientStop Color="#FF82B5FF"  Offset="0.7"/>
             <GradientStop Color="GhostWhite"/>
         </LinearGradientBrush>
     </ContentDialog.Background>
-    <Grid Width="600" Height="450" Margin="20">
+    <Grid Width="650" Height="450" Margin="20">
         <ListView HorizontalContentAlignment="Stretch">
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42" Foreground="Red">⭐</TextBlock>
+                        <StackPanel Margin="4" Padding="8">
+                            <TextBlock FontSize="26" Margin="5" Foreground="Purple">尝试修复每次打开都被识别为不同设备的问题</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap"  Foreground="Purple">目前认为，原因是BDUSS验证成功后，程序未保存完整cookie。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem>
+                <TextBlock FontSize="20">版本日志：1.6.9 版本增加功能</TextBlock>
+            </ListViewItem>
             <ListViewItem HorizontalContentAlignment="Stretch" Visibility="Visible">
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
@@ -36,7 +54,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
                         <StackPanel Margin="8">
-                            <TextBlock FontSize="26" Margin="5">自动补全重构(V2.0)，输入方式改进</TextBlock>
+                            <TextBlock FontSize="26" Margin="5">自动补全重构(V2.1)，输入方式改进</TextBlock>
                             <TextBlock  Margin="5" TextWrapping="Wrap">另外，增加了领取不存在的悬赏、更新过程中经验通过审核的错误提醒。</TextBlock>
 
                         </StackPanel>
@@ -131,7 +149,7 @@
                     </StackPanel>
                 </Grid>
             </ListViewItem>
-            
+
             <ListViewItem>
                 <TextBlock FontSize="20">版本日志：1.5.7 版本增加功能</TextBlock>
             </ListViewItem>

@@ -12,12 +12,10 @@ using System.Text.RegularExpressions;
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
 using System.IO;
-using Windows.Graphics.Imaging;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Collections;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using Windows.UI;
@@ -121,10 +119,18 @@ namespace 百度经验个人助手
                                                  "</span><a class=\"title query-item-id\"[^<]*? data-queryId=\"(.*?)\">(.*?)</a>";
 
         public static string urlPrefix = "https://jingyan.baidu.com";
+        public static string[] criticalCookieNames =
+        {
+            "BDUSS",
+        };
         public static string[] requiredCookieNames =
         {
-            "BDUSS"
-           /* "BAIDUID", "BIDUPSID", *///"PSTM",//"PS_REFER", "bdshare_firstime",
+            "BDUSS",
+            "BAIDUID",
+            "BIDUPSID",
+            //"PS_REFER",
+            //"PSTM",
+            // "bdshare_firstime",
             //"__cfduid", "MCITY",//"BDORZ", "H_PS_PSSID", "PSINO"
         };
         public static string setcookieFailedInfo =
@@ -165,32 +171,95 @@ namespace 百度经验个人助手
         /// <returns></returns>
         public static bool SetCookie(string newCookie)
         {
-            clearJingyanCookie(); //清除Cookie
+            ClearCookie(); //清除Cookie
+            client.DefaultRequestHeaders.Cookie.Clear();
             newCookie = newCookie.Trim();
             if (newCookie.Substring(newCookie.Length - 1) != ";") newCookie += ';';
             ExpManager.cookie = newCookie;
 
-            MatchCollection mc = Regex.Matches(newCookie, "(\\w*?)=.*?;");
+            MatchCollection mc = Regex.Matches(newCookie, "(\\w*?)=(.*?);");
+            string url = "https://jingyan.baidu.com";
+            var cookieManager = protocolFilter.CookieManager;
             foreach (string rcook in requiredCookieNames)
             {
                 bool find = false;
                 foreach (Match m in mc)
                 {
-                    if (m.Groups[1].ToString() == rcook)
+                    string name = m.Groups[1].ToString();
+                    string val = m.Groups[2].ToString();
+                    if (name == rcook)
                     {
                         find = true;
-                        client.DefaultRequestHeaders.Cookie.TryParseAdd(m.Groups[0].ToString());
+                        Debug.WriteLine("SetCookie find:" + name + "=" + val);
+                        var ncookie = new HttpCookie(name, "baidu.com", "");
+                        ncookie.Value = val;
+                        cookieManager.SetCookie(ncookie);
                         break;
                     }
                 }
                 if (!find)
                 {
-                    client.DefaultRequestHeaders.Cookie.Clear();
-                    return false;
+                    bool isCritical = false;
+                    foreach (string mcook in criticalCookieNames)
+                    {
+                        if (mcook == rcook) isCritical = true;
+                    }
+                    if(isCritical)
+                    {
+                        ClearCookie();
+                        return false;
+                    }
                 }
-
             }
             return true;
+        }
+
+        public static async Task SaveCurrentCookie()
+        {
+            await StorageManager.SaveCookie(CurrentCookie);
+        }
+
+        public static string CurrentCookie
+        {
+            get
+            {
+                Debug.WriteLine("=====CurrentCookie-Property-Get=====");
+                Dictionary<string, string> cookiesDict = new Dictionary<string, string>();
+                foreach (var cookie in client.DefaultRequestHeaders.Cookie)
+                {
+                    cookiesDict[cookie.Name] = cookie.Value;
+                    Debug.WriteLine("CurrentCookie-DEFAULT: " + cookie.Name + "=" + cookie.Value);
+                }
+                var cookieManager = protocolFilter.CookieManager;
+                var cookies = cookieManager.GetCookies(new Uri("https://jingyan.baidu.com"));
+                foreach (var cookie in cookies)
+                {
+                    cookiesDict[cookie.Name] = cookie.Value;
+                    Debug.WriteLine("CurrentCookie-MANAGER: " + cookie.Name + "=" + cookie.Value);
+                }
+                string cookieVal = "";
+                foreach (var keyVal in cookiesDict)
+                {
+                    cookieVal += keyVal.Key + "=" + keyVal.Value + ";";
+                }
+                Debug.WriteLine("cookieVal: " + cookieVal);
+                return cookieVal;
+            }
+        }
+
+        public static string CurrentCookieDisplayValue
+        {
+            get
+            {
+                string cookieVal = "";
+                string[] cookies = CurrentCookie.Split(";");
+                foreach (var cookie in cookies)
+                {
+                    if(cookie.Length > 25) cookieVal += cookie.Substring(0, 22) + "...\n";
+                    else cookieVal += cookie + "\n";
+                }
+                return cookieVal;
+            }
         }
 
 
@@ -825,7 +894,7 @@ namespace 百度经验个人助手
         }
 
         #region ABOUT COOKIE
-        private static void clearJingyanCookie()
+        public static void ClearCookie()
         {
             string url = "https://jingyan.baidu.com";
             var cookieManager = protocolFilter.CookieManager;
