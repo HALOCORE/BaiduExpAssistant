@@ -18,7 +18,7 @@
             <LinearGradientBrush.Transform>
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
-            <GradientStop Color="#FF82B5FF"  Offset="0.7"/>
+            <GradientStop Color="#FFFFBB82"  Offset="0.7"/>
             <GradientStop Color="GhostWhite"/>
         </LinearGradientBrush>
     </ContentDialog.Background>
@@ -33,8 +33,23 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42" Foreground="Red">⭐</TextBlock>
                         <StackPanel Margin="4" Padding="8">
-                            <TextBlock FontSize="26" Margin="5" Foreground="Purple">尝试修复每次打开都被识别为不同设备的问题</TextBlock>
-                            <TextBlock  Margin="5" TextWrapping="Wrap"  Foreground="Purple">目前认为，原因是BDUSS验证成功后，程序未保存完整cookie。</TextBlock>
+                            <TextBlock FontSize="26" Margin="5" Foreground="Purple">尝试定位百度经验的空页面Bug</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap"  Foreground="Purple">如果发现确实系经验丢失造成，请向百度经验官方反馈。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="4" Padding="8">
+                            <TextBlock FontSize="26" Margin="5">尝试修复每次打开都被识别为不同设备的问题</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">目前认为，原因是BDUSS验证成功后，程序未保存完整cookie。</TextBlock>
                         </StackPanel>
                     </StackPanel>
                 </Grid>

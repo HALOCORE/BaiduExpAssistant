@@ -481,7 +481,18 @@ namespace 百度经验个人助手
             //return true;
         }
 
-        private static async Task<bool> GetContentsSubStep_ParseContentPage(int pg, int expectedCount, int totalExpectedCount) //TODO: why error showed page 0 Error, first page still get?
+        private static async Task<bool> GetContentsSubStep_CheckPageNotEmpty(int pn)
+        {
+            string result = await ExpManager.SimpleRequestUrl(
+                "https://jingyan.baidu.com/user/nucpage/content?tab=exp&expType=published&pn=" + pn,
+                "https://jingyan.baidu.com/user/nuc"
+            );
+            MatchCollection mcTitleAndUrl = Regex.Matches(result, regexContentExpTitleAndUrl);
+            if (mcTitleAndUrl.Count == 0) return false;
+            else return true;
+        }
+
+            private static async Task<bool> GetContentsSubStep_ParseContentPage(int pg, int expectedCount, int totalExpectedCount) //TODO: why error showed page 0 Error, first page still get?
         {
             Utility.LogLocalEvent("ParseContentPage " + pg);
             string html = htmlContentPages[pg];
@@ -617,11 +628,59 @@ namespace 百度经验个人助手
                             if (!await GetContentsSubStep_ParseContentPage(j, expectedExpCount, totalExpectedCount))
                             {
                                 Utility.LogEvent("ERROR_ParseContentFailed_3");
-                                await Utility.ShowMessageDialog("意外问题，程序收集错误后结束", "数据获取成功，但是连续解析失败3次。获取页 " + i + " 无要寻找的经验条目，可能是用户中途退出登录，也可能是Baidu经验页面有调整（可能性最低）。"
-                                                                + "\n一般情况下，这是一个容易解决的问题，看到此对话框可以截图给开发者并询问解决方法。");
+                                string errMsg = "发现错误页，尝试定位问题经验(可能是百度经验的Bug)...";
+                                App.currentMainPage.ShowLoading(errMsg);
+                                string checkProgress = "";
+                                string checkProgressSub = "";
+                                int k = j * 20 - 19;
+                                if (k < 0) k = 0; //not sure
+                                bool[] isValids = new bool[20];
+                                for (int kk = 0; kk < 20; kk++) isValids[kk] = false;
+                                for(; k < j * 20 + 19; k++)
+                                {
+                                    bool isNotEmpty = await GetContentsSubStep_CheckPageNotEmpty(k);
+                                    if(isNotEmpty)
+                                    {
+                                        for(int k2 = 0; k2 < 20; k2 ++)
+                                        {
+                                            if(j * 20 + k2 >= k && j * 20 + k2 < k + 20)
+                                            {
+                                                isValids[k2] = true;
+                                            }
+                                        }
+                                    }
+                                    checkProgress = "检查pn=" + k + ", ";
+                                    checkProgressSub = "";
+                                    for (int k3 = 0; k3 < 20; k3++)
+                                    {
+                                        if (isValids[k3] == true) checkProgressSub += "✅";
+                                        else checkProgressSub += "✖";
+                                    }
+                                    checkProgress = checkProgress + checkProgressSub;
+                                    App.currentMainPage.ShowLoading(errMsg + "\n" + checkProgress);
+                                }
+                                string missingExps = "";
+                                string pubMissingExps = "";
+                                for (int k4 = 0; k4 < 20; k4++)
+                                {
+                                    if(isValids[k4] == false)
+                                    {
+                                        missingExps += "第" + (k4 + 1) + "篇，";
+                                        int pn = k4 + j * 20;
+                                        pubMissingExps += "第" + (pn / 7 + 1) + "页、";
+                                    }
+                                }
+                                await Utility.ShowMessageDialog("请打开个人中心，确认第 " + (j + 1) + " 页的异常情况",
+                                    "如果是空白，考虑是百度经验的Bug，请向百度经验官方反馈问题." + 
+                                    "\n第" + (j + 1) + "页的经验有效性情况为" + checkProgressSub + 
+                                    "\n其中" + missingExps + "疑似出问题." + 
+                                    "\n建议进一步查看自己的公共名片页（一页7篇经验的页面）的" + pubMissingExps + "查看是否都能正常打开。");
+
+                                await Utility.ShowMessageDialog("即将收集错误信息", 
+                                    "程序将在收集错误后结束。数据获取成功，但是连续解析失败3次。\n经验页 " + (j + 1) + " 无经验条目，可能是百度经验页面调整，或者百度经验出了Bug。");
 
                                 //REPORT
-                                string relvars = "page-id=" + i + "\nhtml content=" + htmlContentPages[j];
+                                string relvars = "page-id=" + i + "\ncheckProgress=" + checkProgress + "\npubMissingExps=" + missingExps +  "\nhtml content=" + htmlContentPages[j];
                                 await Utility.FireErrorReport("更新EXP 重试3次仍然Content页面匹配失败", relvars);
 
                                 App.Current.Exit();
