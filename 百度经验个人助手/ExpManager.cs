@@ -174,6 +174,7 @@ namespace 百度经验个人助手
             ClearCookie(); //清除Cookie
             client.DefaultRequestHeaders.Cookie.Clear();
             newCookie = newCookie.Trim();
+            if (newCookie.Length == 0) return false;
             if (newCookie.Substring(newCookie.Length - 1) != ";") newCookie += ';';
             ExpManager.cookie = newCookie;
 
@@ -422,7 +423,17 @@ namespace 百度经验个人助手
             await GetMainSubStep_CookiedGetMain();
             if (!await GetMainSubStep_ParseMain()) return false; //parse error
 
-            if(!noPortrait) newMainPortrait = await GetMainSubStep_CookielessGetPic(newMainPortraitUrl); //possible to be NULL, but MainPage will handle this.
+            if (!noPortrait)
+            {
+                try
+                {
+                    newMainPortrait = await GetMainSubStep_CookielessGetPic(newMainPortraitUrl); 
+                    //possible to be NULL, but MainPage will handle this.
+                } catch(Exception)
+                {
+                    Utility.LogEvent("WARN_GetPortraitFailed");
+                }
+            }
             return true;
         }
 
@@ -636,7 +647,7 @@ namespace 百度经验个人助手
                                 if (k < 0) k = 0; //not sure
                                 bool[] isValids = new bool[20];
                                 for (int kk = 0; kk < 20; kk++) isValids[kk] = false;
-                                for(; k < j * 20 + 19; k++)
+                                for(; k < j * 20 + 20; k++)
                                 {
                                     bool isNotEmpty = await GetContentsSubStep_CheckPageNotEmpty(k);
                                     if(isNotEmpty)

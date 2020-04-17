@@ -477,7 +477,8 @@ namespace 百度经验个人助手
             buttonSetCookieProgress.Visibility = Visibility.Collapsed;
             if (isValid)
             {
-                await StorageManager.SaveCookie(ExpManager.cookie);
+                await ExpManager.SaveCurrentCookie();
+                //await StorageManager.SaveCookie(ExpManager.cookie);
                 buttonSetCookieText.Text = "√ Cookie";
                 await Utility.ShowMessageDialog("设置完成", "Cookie有效，可以更新信息了。\n点击头像进入辅助编辑器。");
                 Utility.LogEvent("YES_SetCookieSucceed");
