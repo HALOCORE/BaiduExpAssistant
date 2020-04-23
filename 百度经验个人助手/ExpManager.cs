@@ -492,15 +492,50 @@ namespace 百度经验个人助手
             //return true;
         }
 
-        private static async Task<bool> GetContentsSubStep_CheckPageNotEmpty(int pn)
+        private static ContentExpEntry[] _imperfectExps = new ContentExpEntry[20];
+        private static int _imperfectBaseIndex = -1;
+        public static int imperfectJumpCount = 0;
+        private static async Task<bool> GetContentsSubStep_ImperfectParse(int pn)
         {
-            string result = await ExpManager.SimpleRequestUrl(
+            string html = await ExpManager.SimpleRequestUrl(
                 "https://jingyan.baidu.com/user/nucpage/content?tab=exp&expType=published&pn=" + pn,
                 "https://jingyan.baidu.com/user/nuc"
             );
-            MatchCollection mcTitleAndUrl = Regex.Matches(result, regexContentExpTitleAndUrl);
-            if (mcTitleAndUrl.Count == 0) return false;
-            else return true;
+            Utility.LogLocalEvent("CheckPageNotEmpty-" + pn);
+
+            MatchCollection mcTitleAndUrl = Regex.Matches(html, regexContentExpTitleAndUrl);
+            MatchCollection mcView = Regex.Matches(html, regexContentExpView);
+            MatchCollection mcVote = Regex.Matches(html, regexContentExpVote);
+            MatchCollection mcCollect = Regex.Matches(html, regexContentExpCollect);
+            MatchCollection mcDate = Regex.Matches(html, regexContentExpDate);
+
+            if (!(mcTitleAndUrl.Count == mcView.Count &&
+                  mcView.Count == mcVote.Count &&
+                  mcVote.Count == mcCollect.Count &&
+                  mcCollect.Count == mcDate.Count))
+            {
+                return false;
+            }
+            if (mcTitleAndUrl.Count == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < mcTitleAndUrl.Count; ++i)
+            {
+                int absIndex = pn + i;
+                if(absIndex >= _imperfectBaseIndex && absIndex < _imperfectBaseIndex + 20)
+                {
+                    _imperfectExps[absIndex - _imperfectBaseIndex] = new ContentExpEntry(
+                        mcTitleAndUrl[i].Groups[1].Value,
+                        urlPrefix + mcTitleAndUrl[i].Groups[2].Value,
+                        int.Parse(mcView[i].Groups[1].Value),
+                        int.Parse(mcVote[i].Groups[1].Value),
+                        int.Parse(mcCollect[i].Groups[1].Value),
+                        mcDate[i].Groups[1].Value
+                    );
+                }
+            }
+            return true;
         }
 
             private static async Task<bool> GetContentsSubStep_ParseContentPage(int pg, int expectedCount, int totalExpectedCount) //TODO: why error showed page 0 Error, first page still get?
@@ -587,7 +622,7 @@ namespace 百度经验个人助手
         public static async Task GetContents(TextBlock textShow, ListView itemShow)
         {
             GetContentsSubStep_NewDataPack();
-
+            imperfectJumpCount = 0;
             itemShow.ItemsSource = currentDataPack.contentExps;
 
             int pagesCount = ExpManager.currentDataPack.contentPagesCount;
@@ -639,54 +674,63 @@ namespace 百度经验个人助手
                             if (!await GetContentsSubStep_ParseContentPage(j, expectedExpCount, totalExpectedCount))
                             {
                                 Utility.LogEvent("ERROR_ParseContentFailed_3");
-                                string errMsg = "发现错误页，尝试定位问题经验(可能是百度经验的Bug)...";
+                                string errMsg = "发现错误页(可能是百度经验的Bug)\n尝试跳过缺失的经验进行解析...";
                                 App.currentMainPage.ShowLoading(errMsg);
                                 string checkProgress = "";
                                 string checkProgressSub = "";
-                                int k = j * 20 - 19;
-                                if (k < 0) k = 0; //not sure
-                                bool[] isValids = new bool[20];
-                                for (int kk = 0; kk < 20; kk++) isValids[kk] = false;
-                                for(; k < j * 20 + 20; k++)
+                                int rmin = j * 20 - 19;
+                                if (rmin < 0) rmin = 0;
+                                int rmax = j * 20 + 20;
+                                //if (rmax > )
+                                //initialize imperfect data
+                                for (int k2 = 0; k2 < 20; k2++) _imperfectExps[k2] = null;
+                                _imperfectBaseIndex = j * 20;
+                                int maxIndex = currentDataPack.contentExpsCount;
+                                for(int k = rmin; k < rmax; k++)
                                 {
-                                    bool isNotEmpty = await GetContentsSubStep_CheckPageNotEmpty(k);
-                                    if(isNotEmpty)
-                                    {
-                                        for(int k2 = 0; k2 < 20; k2 ++)
-                                        {
-                                            if(j * 20 + k2 >= k && j * 20 + k2 < k + 20)
-                                            {
-                                                isValids[k2] = true;
-                                            }
-                                        }
-                                    }
-                                    checkProgress = "检查pn=" + k + ", ";
+                                    await GetContentsSubStep_ImperfectParse(k);
+                                    checkProgress = "尝试pn=" + k + ", ";
                                     checkProgressSub = "";
                                     for (int k3 = 0; k3 < 20; k3++)
                                     {
-                                        if (isValids[k3] == true) checkProgressSub += "✅";
+                                        if (k3 + _imperfectBaseIndex >= maxIndex && _imperfectExps[k3] == null) checkProgressSub += "⚪";
+                                        else if (k3 + _imperfectBaseIndex >= maxIndex && _imperfectExps[k3] != null) checkProgressSub += "⚠";
+                                        else if (_imperfectExps[k3] != null) checkProgressSub += "✅";
                                         else checkProgressSub += "✖";
                                     }
                                     checkProgress = checkProgress + checkProgressSub;
                                     App.currentMainPage.ShowLoading(errMsg + "\n" + checkProgress);
                                 }
+                                App.currentMainPage.HideLoading();
                                 string missingExps = "";
                                 string pubMissingExps = "";
+                                int missingExpCount = 0;
                                 for (int k4 = 0; k4 < 20; k4++)
                                 {
-                                    if(isValids[k4] == false)
+                                    if(_imperfectExps[k4] == null && k4 + _imperfectBaseIndex < maxIndex)
                                     {
+                                        missingExpCount += 1;
                                         missingExps += "第" + (k4 + 1) + "篇，";
                                         int pn = k4 + j * 20;
                                         pubMissingExps += "第" + (pn / 7 + 1) + "页、";
                                     }
                                 }
+                                imperfectJumpCount += missingExpCount;
                                 await Utility.ShowMessageDialog("请打开个人中心，确认第 " + (j + 1) + " 页的异常情况",
                                     "如果是空白，考虑是百度经验的Bug，请向百度经验官方反馈问题." + 
                                     "\n第" + (j + 1) + "页的经验有效性情况为" + checkProgressSub + 
                                     "\n其中" + missingExps + "疑似出问题." + 
                                     "\n建议进一步查看自己的公共名片页（一页7篇经验的页面）的" + pubMissingExps + "查看是否都能正常打开。");
 
+                                bool shouldContinue = await Utility.ShowConfirmDialog("就此退出，还是忽略缺失的经验(" + missingExpCount + "篇) 并继续更新？", "如果继续，缺失的经验条目被跳过，经验总数将不对应.");
+                                if (shouldContinue)
+                                {
+                                    for (int tt = 0; tt < _imperfectExps.Length; ++tt)
+                                    {
+                                        if(_imperfectExps[tt] != null) currentDataPack.contentExps.Add(_imperfectExps[tt]);
+                                    }
+                                    continue; // continue on next page.
+                                }
                                 await Utility.ShowMessageDialog("即将收集错误信息", 
                                     "程序将在收集错误后结束。数据获取成功，但是连续解析失败3次。\n经验页 " + (j + 1) + " 无经验条目，可能是百度经验页面调整，或者百度经验出了Bug。");
 

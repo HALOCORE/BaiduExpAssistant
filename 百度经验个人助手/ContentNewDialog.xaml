@@ -18,7 +18,7 @@
             <LinearGradientBrush.Transform>
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
-            <GradientStop Color="#FFFFBB82"  Offset="0.7"/>
+            <GradientStop Color="#FFC5C9D2"  Offset="0.7"/>
             <GradientStop Color="GhostWhite"/>
         </LinearGradientBrush>
     </ContentDialog.Background>
@@ -33,7 +33,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42" Foreground="Red">⭐</TextBlock>
                         <StackPanel Margin="4" Padding="8">
-                            <TextBlock FontSize="26" Margin="5" Foreground="Purple">尝试定位百度经验的空页面Bug</TextBlock>
+                            <TextBlock FontSize="26" Margin="5" Foreground="Purple">对于空页面Bug，尝试跳过缺失经验进行解析</TextBlock>
                             <TextBlock  Margin="5" TextWrapping="Wrap"  Foreground="Purple">如果发现确实系经验丢失造成，请向百度经验官方反馈。</TextBlock>
                         </StackPanel>
                     </StackPanel>
