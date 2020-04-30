@@ -36,7 +36,7 @@ namespace 百度经验个人助手
     {
         public bool isAssistEditorActivated { get; private set; } = false;
         public bool isAssistEditorEditing { get; set; } = false;
-
+        public bool isJsDebugConsole = false;
         public bool isCheckboxInitDone = false;
         public bool isCheckedAutoComplete { get { return checkboxAutoComplete.IsChecked == true; } }
         public bool isCheckedBigPic { get { return checkboxBigPic.IsChecked == true; } }
@@ -1329,6 +1329,20 @@ namespace 百度经验个人助手
         private async void ButtonOpenSource_Click(object sender, RoutedEventArgs e)
         {
             await Launcher.LaunchUriAsync(new Uri("https://github.com/HALOCORE/BaiduExpAssistant"));
+        }
+
+        private void textIsJsDebug_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            isJsDebugConsole = !isJsDebugConsole;
+            if(isJsDebugConsole)
+            {
+                ShowNotify("调试模式开启", "调试模式会拖慢运行速度", Symbol.Message);
+                textIsJsDebug.Text = "调式模式: 开启";
+            }
+            else
+            {
+                textIsJsDebug.Text = "调式模式: 关闭";
+            }
         }
     }
 }

@@ -178,6 +178,7 @@ function InitAutoComplete(myData) {
     }
 
     function isChildOfClass(elem, className) {
+        if (!elem) return false;
         if (!elem.className) return isChildOfClass(elem.parentElement, className);
         if (elem.className.indexOf(className) >= 0) return true;
         if (elem === document.body) return false;

@@ -96,7 +96,9 @@ namespace 百度经验个人助手
 
         }
 
-        public static string extensionPrefixMsAppxWeb = "ms-appx-web:///Assets/BaiduExpAssistant.Lite/ExpA.Lite/tools/";
+        public static string codeLibsMsAppxWeb = "ms-appx-web:///Assets/code/lib/";
+        public static string extensionLibsMsAppxWeb = "ms-appx-web:///Assets/BaiduExpAssistant.Lite/ExpA.Lite/libs/";
+        public static string extensionToolsMsAppxWeb = "ms-appx-web:///Assets/BaiduExpAssistant.Lite/ExpA.Lite/tools/";
         public static void SetWebView(WebView webView, WebView secondWebView)
         {
 
@@ -107,25 +109,51 @@ namespace 百度经验个人助手
                     App.currentMainPage.isAssistEditorEditing = true;
                     try
                     {
-                        if(App.currentMainPage.isCheckedBasicCheck)
+                        if (App.currentMainPage.isJsDebugConsole)
+                        {
+                            App.currentMainPage.ShowLoading("🚧 加载调试辅助...");
+                            await AddScriptUri(webView, codeLibsMsAppxWeb + "eruda.js");
+                            Debug.WriteLine("## eruda.js loaded.");
+                            await Task.Delay(200);
+                            try
+                            {
+                                await RunJs(webView, "eruda.init()");
+                                Debug.WriteLine("## eruda.js init.");
+                            }
+                            catch (Exception)
+                            {
+                                Debug.WriteLine("## eruda.js failed.");
+                                App.currentMainPage.ShowNotify("调试辅助已忽略", "非必须模块，加载不成功", Symbol.Message);
+                            }
+                        }
+                        
+                        App.currentMainPage.ShowLoading("加载基础库...");
+                        await AddScriptUri(webView, extensionLibsMsAppxWeb + "react.development.js");
+                        await Task.Delay(50);
+                        await AddScriptUri(webView, extensionLibsMsAppxWeb + "react-dom.development.js");
+                        await Task.Delay(200);
+                        await AddScriptUri(webView, extensionToolsMsAppxWeb + "AllComps.js");
+                        await AddScriptUri(webView, extensionToolsMsAppxWeb + "AllPoly.js");
+
+                        if (App.currentMainPage.isCheckedBasicCheck)
                         {
                             Utility.LogEvent("OK_FuncCheckBasicCalled");
                             App.currentMainPage.ShowLoading("加载基本检查...");
-                            await AddScriptUri(webView, extensionPrefixMsAppxWeb + "Checker.js");
+                            await AddScriptUri(webView, extensionToolsMsAppxWeb + "Checker.js");
                         }
                         
                         if(App.currentMainPage.isCheckedBigPic)
                         {
                             Utility.LogEvent("OK_FuncBigPicCalled");
                             App.currentMainPage.ShowLoading("加载大图片框...");
-                            await AddScriptUri(webView, extensionPrefixMsAppxWeb + "BigPic.js");
+                            await AddScriptUri(webView, extensionToolsMsAppxWeb + "BigPic.js");
                         }
 
                         if (App.currentMainPage.isCheckedPicInsert)
                         {
                             Utility.LogEvent("OK_FuncPicInsertCalled");
                             App.currentMainPage.ShowLoading("加载插入图片...");
-                            await AddScriptUri(webView, extensionPrefixMsAppxWeb + "PicInsert.js");
+                            await AddScriptUri(webView, extensionToolsMsAppxWeb + "PicInsert.js");
                         }
 
                         if (App.currentMainPage.isCheckedBriefPic)
@@ -135,7 +163,7 @@ namespace 百度经验个人助手
                             try
                             {
                                 await InjectCommonData(webView);
-                                await AddScriptUri(webView, extensionPrefixMsAppxWeb + "BriefPic.js");
+                                await AddScriptUri(webView, extensionToolsMsAppxWeb + "BriefPic.js");
                                 Utility.LogEvent("YES_BigPicInstSucceed");
                             }
                             catch (Exception e)
@@ -149,8 +177,8 @@ namespace 百度经验个人助手
                         {
                             Utility.LogEvent("OK_FuncAutoCompleteCalled");
                             App.currentMainPage.ShowLoading("加载自动补全...");
-                            await AddScriptUri(webView, "ms-appx-web:///Assets/code/lib/alertify.js");
-                            await AddCssUri(webView, "ms-appx-web:///Assets/code/lib/alertify.com.css");
+                            await AddScriptUri(webView, codeLibsMsAppxWeb + "alertify.js");
+                            await AddCssUri(webView, codeLibsMsAppxWeb + "alertify.com.css");
                             await App.currentMainPage.LoadAutoCompleteAsync();
                         }
 
@@ -209,7 +237,11 @@ namespace 百度经验个人助手
 
             webView.ScriptNotify += async (o, args) =>
             {
-                if (args.Value.StartsWith("DATA: "))
+                if (args.Value.StartsWith("TEST_NOTIFY"))
+                {
+                    Debug.WriteLine("# 测试 window.external.notify.");
+                }
+                else if (args.Value.StartsWith("DATA: "))
                 {
                     string jsonData = args.Value.Substring(6);
                     await StorageManager.SaveAutoCompleteData("", jsonData);
