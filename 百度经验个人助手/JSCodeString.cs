@@ -135,6 +135,7 @@ namespace 百度经验个人助手
                             try
                             {
                                 await InjectCommonData(webView);
+                                await AddScriptUri(webView, extensionPrefixMsAppxWeb + "BriefPic.js");
                                 Utility.LogEvent("YES_BigPicInstSucceed");
                             }
                             catch (Exception e)

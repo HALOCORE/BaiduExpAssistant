@@ -722,15 +722,8 @@
                             <GradientStop Color="#DD58D8A3" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
-                    雷区检测</Button>
-                <Button x:Name="buttonBigPicture" Click="buttonBigPicture_Click">
-                    <Button.Background>
-                        <LinearGradientBrush>
-                            <GradientStop Color="#BB7CFC00"/>
-                            <GradientStop Color="#DD58D8A3" Offset="0.70"/>
-                        </LinearGradientBrush>
-                    </Button.Background>
-                    简介图与大图 [α]</Button>
+                    雷区检测
+                </Button>
                 <CheckBox x:Name="checkboxPicInsert" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
                     <TextBlock>插入图片 v1.2</TextBlock>

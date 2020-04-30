@@ -37,6 +37,7 @@ namespace 百度经验个人助手
         public bool isAssistEditorActivated { get; private set; } = false;
         public bool isAssistEditorEditing { get; set; } = false;
 
+        public bool isCheckboxInitDone = false;
         public bool isCheckedAutoComplete { get { return checkboxAutoComplete.IsChecked == true; } }
         public bool isCheckedBigPic { get { return checkboxBigPic.IsChecked == true; } }
         public bool isCheckedBasicCheck { get { return checkboxBasicCheck.IsChecked == true; } }
@@ -165,7 +166,15 @@ namespace 百度经验个人助手
 
             ShowLoading("读取Edit设置...");
             await StorageManager.ReadEditSettings();
+            Debug.WriteLine("## ReadEditSettings，设置各个CheckBox");
+            checkboxBasicCheck.IsChecked = StorageManager.editSettings.ifLoadBasicCheck;
             checkboxAutoComplete.IsChecked = StorageManager.editSettings.ifLoadAutoComplete;
+            checkboxBigPic.IsChecked = StorageManager.editSettings.ifLoadBigPic;
+            checkboxBriefPic.IsChecked = StorageManager.editSettings.ifLoadBriefPic;
+            checkboxPicInsert.IsChecked = StorageManager.editSettings.ifLoadPicInsert;
+            isCheckboxInitDone = true;
+            Debug.WriteLine("## CheckBox Vals:" + checkboxAutoComplete.IsChecked + checkboxBasicCheck.IsChecked +
+                checkboxBigPic.IsChecked + checkboxBriefPic.IsChecked + checkboxPicInsert.IsChecked);
 
             ShowLoading("读取DIY功能设置...");
             await StorageManager.ReadDIYToolsSettings();
@@ -1071,15 +1080,15 @@ namespace 百度经验个人助手
             buttonDraft.IsEnabled = isDraft;
             buttonEdit.IsEnabled = isEdit;
             buttonTestMine.IsEnabled = isTestMine;
+            
             buttonAutoFill.IsEnabled = isEdit;
-            buttonBigPicture.IsEnabled = isEdit;
-            checkboxAutoComplete.IsEnabled = isEdit;
             buttonDIY.IsEnabled = isEdit;
-        }
 
-        private async void buttonBigPicture_Click(object sender, RoutedEventArgs e)
-        {
-            //move to JSCodeString
+            checkboxAutoComplete.IsEnabled = isEdit;
+            checkboxBriefPic.IsEnabled = isEdit;
+            checkboxBasicCheck.IsEnabled = isEdit;
+            checkboxBigPic.IsEnabled = isEdit;
+            checkboxPicInsert.IsEnabled = isEdit;
         }
 
 
@@ -1268,11 +1277,17 @@ namespace 百度经验个人助手
 
         private async void CheckboxAnyFunc_CheckEvent(object sender, RoutedEventArgs e)
         {
-            if (StorageManager.editSettings == null)
+            CheckBox cbox = sender as CheckBox;
+            string name = cbox != null ? cbox.Name : "<unknown>";
+            if (!isCheckboxInitDone)
             {
-                Debug.WriteLine("启动阶段Func Checkbox变化.");
+                Debug.WriteLine("## 启动阶段Func Checkbox变化: " + name);
                 return;
+            } else
+            {
+                Debug.WriteLine("## Func Checkbox 变化: " + name);
             }
+
             bool isDirty = false;
             
             if (StorageManager.editSettings.ifLoadAutoComplete != isCheckedAutoComplete)

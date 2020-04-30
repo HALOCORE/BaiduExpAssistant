@@ -183,12 +183,11 @@
     <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\popup.js" />
     <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\AllPoly.js" />
     <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\BigPic.js" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\BriefPic.js" />
     <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\Checker.js" />
     <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\PicInsert.js" />
     <Content Include="Assets\betterInc.png" />
     <Content Include="Assets\code\AutoComplete.js" />
-    <Content Include="Assets\code\BigPic.js" />
-    <Content Include="Assets\code\Checker.js" />
     <Content Include="Assets\code\lib\alertify.com.css" />
     <Content Include="Assets\code\lib\alertify.js" />
     <Content Include="Assets\code\PicInsert.js" />
