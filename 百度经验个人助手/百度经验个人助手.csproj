@@ -101,6 +101,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\manifest.json" />
+    <None Include="Assets\BaiduExpAssistant.Lite\LICENSE" />
+    <None Include="Assets\BaiduExpAssistant.Lite\README.md" />
     <None Include="Assets\code\default.json" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +172,19 @@
     <Content Include="Assets\8-5-4.jpg" />
     <Content Include="Assets\8-5-5.jpg" />
     <Content Include="Assets\8-5-6.jpg" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\.gitignore" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\background.js" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\images\128.png" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\images\16.png" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\images\32.png" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\images\48.png" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\popup.css" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\popup.html" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\popup.js" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\AllPoly.js" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\BigPic.js" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\Checker.js" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\PicInsert.js" />
     <Content Include="Assets\betterInc.png" />
     <Content Include="Assets\code\AutoComplete.js" />
     <Content Include="Assets\code\BigPic.js" />

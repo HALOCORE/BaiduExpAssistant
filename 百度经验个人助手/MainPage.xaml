@@ -731,9 +731,25 @@
                         </LinearGradientBrush>
                     </Button.Background>
                     简介图与大图 [α]</Button>
+                <CheckBox x:Name="checkboxPicInsert" IsChecked="True" Margin="15 0 5 0" 
+                          RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
+                    <TextBlock>插入图片 v1.2</TextBlock>
+                </CheckBox>
+                <CheckBox x:Name="checkboxBigPic" IsChecked="True" Margin="15 0 5 0" 
+                          RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
+                    <TextBlock>大图片框 v1.1</TextBlock>
+                </CheckBox>
+                <CheckBox x:Name="checkboxBriefPic" IsChecked="True" Margin="15 0 5 0" 
+                          RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
+                    <TextBlock>简介图 v1.0</TextBlock>
+                </CheckBox>
+                <CheckBox x:Name="checkboxBasicCheck" IsChecked="True" Margin="15 0 5 0" 
+                          RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
+                    <TextBlock>基本检查 v1.0</TextBlock>
+                </CheckBox>
                 <CheckBox x:Name="checkboxAutoComplete" IsChecked="True" Margin="15 0 5 0" 
-                          RequestedTheme="Light" Checked="CheckboxAutoComplete_CheckEvent" Unchecked="CheckboxAutoComplete_CheckEvent">
-                    <TextBlock>自动补全 V2.1</TextBlock>
+                          RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
+                    <TextBlock>自动补全 v2.1</TextBlock>
                 </CheckBox>
                 <Button x:Name="buttonDIY" Click="buttonDIY_Click" Visibility="Visible">
                     <Button.Background>

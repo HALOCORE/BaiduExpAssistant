@@ -12,6 +12,7 @@ using Windows.Web.Http.Headers;
 using Windows.Data.Json;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Graphics.Imaging;
+using System.Diagnostics;
 
 namespace 百度经验个人助手
 {
@@ -95,6 +96,7 @@ namespace 百度经验个人助手
 
         }
 
+        public static string extensionPrefixMsAppxWeb = "ms-appx-web:///Assets/BaiduExpAssistant.Lite/ExpA.Lite/tools/";
         public static void SetWebView(WebView webView, WebView secondWebView)
         {
 
@@ -105,14 +107,57 @@ namespace 百度经验个人助手
                     App.currentMainPage.isAssistEditorEditing = true;
                     try
                     {
-                        await AddScriptUri(webView, "ms-appx-web:///Assets/code/Checker.js");
-                        await AddScriptUri(webView, "ms-appx-web:///Assets/code/lib/alertify.js");
-                        await AddCssUri(webView, "ms-appx-web:///Assets/code/lib/alertify.com.css");
-                        await App.currentMainPage.LoadAutoCompleteAsync();
+                        if(App.currentMainPage.isCheckedBasicCheck)
+                        {
+                            Utility.LogEvent("OK_FuncCheckBasicCalled");
+                            App.currentMainPage.ShowLoading("加载基本检查...");
+                            await AddScriptUri(webView, extensionPrefixMsAppxWeb + "Checker.js");
+                        }
+                        
+                        if(App.currentMainPage.isCheckedBigPic)
+                        {
+                            Utility.LogEvent("OK_FuncBigPicCalled");
+                            App.currentMainPage.ShowLoading("加载大图片框...");
+                            await AddScriptUri(webView, extensionPrefixMsAppxWeb + "BigPic.js");
+                        }
+
+                        if (App.currentMainPage.isCheckedPicInsert)
+                        {
+                            Utility.LogEvent("OK_FuncPicInsertCalled");
+                            App.currentMainPage.ShowLoading("加载插入图片...");
+                            await AddScriptUri(webView, extensionPrefixMsAppxWeb + "PicInsert.js");
+                        }
+
+                        if (App.currentMainPage.isCheckedBriefPic)
+                        {
+                            Utility.LogEvent("OK_FuncBriefPicCalled");
+                            App.currentMainPage.ShowLoading("加载简介图...");
+                            try
+                            {
+                                await InjectCommonData(webView);
+                                Utility.LogEvent("YES_BigPicInstSucceed");
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("加载简介图失败: " + e.Message);
+                                await Utility.ShowMessageDialog("加载简介图失败", "异常问题，请联系开发者 1223989563@qq.com");
+                            }
+                        }
+
+                        if (App.currentMainPage.isCheckedAutoComplete)
+                        {
+                            Utility.LogEvent("OK_FuncAutoCompleteCalled");
+                            App.currentMainPage.ShowLoading("加载自动补全...");
+                            await AddScriptUri(webView, "ms-appx-web:///Assets/code/lib/alertify.js");
+                            await AddCssUri(webView, "ms-appx-web:///Assets/code/lib/alertify.com.css");
+                            await App.currentMainPage.LoadAutoCompleteAsync();
+                        }
+
+                        App.currentMainPage.HideLoading();
                     }
                     catch (Exception e)
                     {
-                        App.currentMainPage.ShowNotify("检查功能未加载", e.Message, Symbol.Cancel);
+                        App.currentMainPage.ShowNotify("有模块加载失败", e.Message, Symbol.Cancel);
                     }
                 }
                 else

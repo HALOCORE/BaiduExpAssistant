@@ -298,6 +298,10 @@ namespace 百度经验个人助手
         [XmlElement("addStepCount")] public int addStepCount;
 
         [XmlElement("ifLoadAutoComplete")] public bool ifLoadAutoComplete;
+        [XmlElement("ifLoadBasicCheck")] public bool ifLoadBasicCheck;
+        [XmlElement("ifLoadBigPic")] public bool ifLoadBigPic;
+        [XmlElement("ifLoadPicInsert")] public bool ifLoadPicInsert;
+        [XmlElement("ifLoadBriefPic")] public bool ifLoadBriefPic;
     }
 
 

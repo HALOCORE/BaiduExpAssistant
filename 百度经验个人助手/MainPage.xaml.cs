@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using Windows.Graphics.Imaging;
+using System.Diagnostics;
 //using JiebaNet.Segmenter;
 
 //“空白页”项模板在 http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409 上有介绍
@@ -35,6 +36,12 @@ namespace 百度经验个人助手
     {
         public bool isAssistEditorActivated { get; private set; } = false;
         public bool isAssistEditorEditing { get; set; } = false;
+
+        public bool isCheckedAutoComplete { get { return checkboxAutoComplete.IsChecked == true; } }
+        public bool isCheckedBigPic { get { return checkboxBigPic.IsChecked == true; } }
+        public bool isCheckedBasicCheck { get { return checkboxBasicCheck.IsChecked == true; } }
+        public bool isCheckedPicInsert { get { return checkboxPicInsert.IsChecked == true; } }
+        public bool isCheckedBriefPic { get { return checkboxBriefPic.IsChecked == true; } }
 
         public MainPage()
         {
@@ -1072,22 +1079,7 @@ namespace 百度经验个人助手
 
         private async void buttonBigPicture_Click(object sender, RoutedEventArgs e)
         {
-            ShowLoading("初始化大图片框...");
-            Utility.LogEvent("OK_BigPictureCalled");
-            try
-            {
-                await JSCodeString.InjectCommonData(webViewMain);
-                await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/BigPic.js");
-                Utility.LogEvent("YES_BigPictureSucceed");
-                ShowLoading("初始化图片插入...");
-                await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/PicInsert.js");
-                Utility.LogEvent("YES_BigPicInstSucceed");
-            }
-            catch (Exception)
-            {
-                await Utility.ShowMessageDialog("添加 Script 失败", "异常问题，请联系开发者 1223989563@qq.com");
-            }
-            HideLoading();
+            //move to JSCodeString
         }
 
 
@@ -1189,7 +1181,6 @@ namespace 百度经验个人助手
 
         public async Task LoadAutoCompleteAsync()
         {
-            if (!checkboxAutoComplete.IsChecked == true) return;
             Utility.LogEvent("OK_LoadAutoCompleteCalled");
             try
             {
@@ -1218,7 +1209,6 @@ namespace 百度经验个人助手
                 Utility.LogEvent("ERROR_LoadAutoCompleteFailed");
                 //await Utility.FireErrorReport("自动补全加载出错", "[edit]", ee);
             }
-            HideLoading();
         }
 
         public async Task<WriteableBitmap> GetWebViewImageAsync(double ratio, int reWidth, int reHeight)
@@ -1276,12 +1266,45 @@ namespace 百度经验个人助手
             await JSCodeString.RunJs(webViewMain, JSCodeString.JsSaveDraft);
         }
 
-        private async void CheckboxAutoComplete_CheckEvent(object sender, RoutedEventArgs e)
+        private async void CheckboxAnyFunc_CheckEvent(object sender, RoutedEventArgs e)
         {
-            if (StorageManager.editSettings == null) return;
-            if (StorageManager.editSettings.ifLoadAutoComplete == checkboxAutoComplete.IsChecked) return;
-            StorageManager.editSettings.ifLoadAutoComplete = checkboxAutoComplete.IsChecked == true;
-            await StorageManager.SaveEditSettings();
+            if (StorageManager.editSettings == null)
+            {
+                Debug.WriteLine("启动阶段Func Checkbox变化.");
+                return;
+            }
+            bool isDirty = false;
+            
+            if (StorageManager.editSettings.ifLoadAutoComplete != isCheckedAutoComplete)
+            {
+                isDirty = true;
+                StorageManager.editSettings.ifLoadAutoComplete = isCheckedAutoComplete;
+            }
+            
+            if (StorageManager.editSettings.ifLoadBasicCheck != isCheckedBasicCheck)
+            {
+                isDirty = true;
+                StorageManager.editSettings.ifLoadBasicCheck = isCheckedBasicCheck;
+            }
+            
+            if (StorageManager.editSettings.ifLoadBigPic != isCheckedBigPic)
+            {
+                isDirty = true;
+                StorageManager.editSettings.ifLoadBigPic = isCheckedBigPic;
+            }
+            
+            if (StorageManager.editSettings.ifLoadBriefPic != isCheckedBriefPic)
+            {
+                isDirty = true;
+                StorageManager.editSettings.ifLoadBriefPic = isCheckedBriefPic;
+            }
+            
+            if (StorageManager.editSettings.ifLoadPicInsert != isCheckedPicInsert)
+            {
+                isDirty = true;
+                StorageManager.editSettings.ifLoadPicInsert = isCheckedPicInsert;
+            }
+            if(isDirty) await StorageManager.SaveEditSettings();
         }
 
         private void WebViewSecondary_LoadCompleted(object sender, Windows.UI.Xaml.Navigation.NavigationEventArgs e)
