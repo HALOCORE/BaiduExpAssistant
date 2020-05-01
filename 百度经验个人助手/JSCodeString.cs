@@ -111,29 +111,30 @@ namespace 百度经验个人助手
 
             webView.NavigationCompleted += async (view, args) =>
             {
-                if(args.Uri.AbsoluteUri.ToLower().IndexOf("/edit/content") > 0)
+                if (App.currentMainPage.isJsDebugConsole)
+                {
+                    App.currentMainPage.ShowLoading("🚧 加载调试辅助...");
+                    try
+                    {
+                        await AddScriptUri(webView, codeLibsMsAppxWeb + "eruda.js");
+                        Debug.WriteLine("## eruda.js loaded.");
+                        await Task.Delay(200);
+                        await RunJs(webView, "eruda.init()");
+                        Debug.WriteLine("## eruda.js init.");
+                    }
+                    catch (Exception)
+                    {
+                        Debug.WriteLine("## eruda.js failed.");
+                        App.currentMainPage.ShowNotify("调试辅助已忽略", "非必须模块，加载不成功", Symbol.Message);
+                    }
+                    App.currentMainPage.HideLoading();
+                }
+
+                if (args.Uri.AbsoluteUri.ToLower().IndexOf("/edit/content") > 0)
                 {
                     App.currentMainPage.isAssistEditorEditing = true;
                     try
                     {
-                        if (App.currentMainPage.isJsDebugConsole)
-                        {
-                            App.currentMainPage.ShowLoading("🚧 加载调试辅助...");
-                            await AddScriptUri(webView, codeLibsMsAppxWeb + "eruda.js");
-                            Debug.WriteLine("## eruda.js loaded.");
-                            await Task.Delay(200);
-                            try
-                            {
-                                await RunJs(webView, "eruda.init()");
-                                Debug.WriteLine("## eruda.js init.");
-                            }
-                            catch (Exception)
-                            {
-                                Debug.WriteLine("## eruda.js failed.");
-                                App.currentMainPage.ShowNotify("调试辅助已忽略", "非必须模块，加载不成功", Symbol.Message);
-                            }
-                        }
-                        
                         App.currentMainPage.ShowLoading("加载基础库...");
                         await AddScriptUri(webView, extensionLibsMsAppxWeb + "react.development.js");
                         await Task.Delay(50);
@@ -238,8 +239,45 @@ namespace 百度经验个人助手
                 HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, argss.Uri);
                 req.Headers.Referer = argss.Referrer;
 
-
                 ((WebView)sender).NavigateWithHttpRequestMessage(req);
+            };
+
+            webView.NavigationStarting += async (o, args) =>
+            {
+                return;
+                //code below have some problems.
+                await RunJs(webView, "window.realCreateElement = false; window.realCreateElementDone = false;");
+                Debug.WriteLine("# NavigationStarting add DOMContentLoaded handler.");
+                string oldStatus = "";
+                for (int i=0; i<40; i++)
+                {
+                    //await RunJs(webView, "window.external.notify('OMG');");
+                    string status = await RunJs(webView, "document.readyState");
+                    Debug.WriteLine("# NavigationStarting document state: " + status);
+
+                    string status2 = await RunJs(webView, "document.createElement.toString()");
+                    Debug.WriteLine("# NavigationStarting document.createElement state: " + status2);
+
+                    if (status != oldStatus)
+                    {
+                        if(status == "complete")
+                        {
+                            //await RunJs(webView, "document.addEventListener('DOMContentLoaded', function(event) { window.realCreateElement = window.document.createElement;  });");
+                            await RunJs(webView, "window.realCreateElement = window.document.createElement;");
+
+                            //await RunJs(webView, "window.console.log = () => {return console.warn(...arguments);};");
+                            string result = await RunJs(webView, "window.document.createElement = () => {return window.realCreateElement(...arguments); };");
+                            Debug.WriteLine("# NavigationStarting hacking result: " + result);
+
+                            string status3 = await RunJs(webView, "document.createElement.toString()");
+                            Debug.WriteLine("# NavigationStarting document.createElement state: " + status3);
+
+                            break;
+                        }
+                        oldStatus = status;
+                    }
+                    await Task.Delay(20);
+                }
             };
 
             webView.ScriptNotify += async (o, args) =>
@@ -518,34 +556,34 @@ namespace 百度经验个人助手
             }
         }
 
-        public static async Task RunJs(WebView webview, string js)
+        public static async Task<string> RunJs(WebView webview, string js)
         {
             if (!CheckJingyanDomain(webview))
             {
                 App.currentMainPage.ShowNotify("运行无效", strDomainNotSupported);
-                return;
+                return "ERROR: 非百度经验";
             }
-            await WrapInvokeScriptAsync(webview, "eval", new string[] {js});
+            return await WrapInvokeScriptAsync(webview, "eval", new string[] {js});
         }
 
-        public static async Task RunJss(WebView webview, string[] jss)
+        public static async Task<string> RunJss(WebView webview, string[] jss)
         {
             if (!CheckJingyanDomain(webview))
             {
                 App.currentMainPage.ShowNotify("运行无效", strDomainNotSupported);
-                return;
+                return "ERROR: 非百度经验";
             }
-            await WrapInvokeScriptAsync(webview, "eval", jss);
+            return await WrapInvokeScriptAsync(webview, "eval", jss);
         }
 
-        public static async Task RunJs2(WebView webview, string js, string js2)
+        public static async Task<string> RunJs2(WebView webview, string js, string js2)
         {
             if (!CheckJingyanDomain(webview))
             {
                 App.currentMainPage.ShowNotify("运行无效", strDomainNotSupported);
-                return;
+                return "ERROR: 非百度经验";
             }
-            await WrapInvokeScriptAsync(webview, "eval", new string[] { js + js2 });
+            return await WrapInvokeScriptAsync(webview, "eval", new string[] { js + js2 });
         }
 
         public static string strDomainNotSupported = "百度经验 (jingyan.baidu.com) 之外的页面不支持";
