@@ -396,37 +396,79 @@ namespace 百度经验个人助手
                     Utility.LogEvent("YES_CommonDataSucceed");
                     App.currentMainPage.ShowNotify("数据保存成功", "保存组别为" + groupId);
                 }
-                else if (args.Value.StartsWith("SAVE-PIC: ") || args.Value.StartsWith("SAVEAS-PIC: "))
+                else if (args.Value.StartsWith("SAVE-PIC: ") || args.Value.StartsWith("SAVEAS-PIC: ") || args.Value.StartsWith("GET-PIC-FOR-UPLOAD: "))
                 {
+                    bool isSave = args.Value.StartsWith("SAVE-PIC: ");
                     bool isSaveAs = args.Value.StartsWith("SAVEAS-PIC: ");
-                    string[] data = args.Value.Replace("SAVEAS-PIC: ", "").Replace("SAVE-PIC: ", "").Trim().Split('|');
+                    bool isGetPic = args.Value.StartsWith("GET-PIC-FOR-UPLOAD: ");
+                    string[] data = args.Value.Replace("SAVEAS-PIC: ", "").Replace("SAVE-PIC: ", "").Replace("GET-PIC-FOR-UPLOAD: ", "").Trim().Split('|');
                     if (data.Length != 3)
                     {
-                        await Utility.ShowMessageDialog("保存图片调用格式不正确", "正确格式为 SAVEAS-PIC/SAVE-PIC: 宽高比 | 宽度 | 高度");
+                        await Utility.ShowMessageDialog("保存图片调用格式不正确", "正确格式为 SAVEAS-PIC/SAVE-PIC/GET-PIC-FOR-UPLOAD: : 宽高比 | 宽度 | 高度");
                         return;
                     }
                     else
                     {
                         App.currentMainPage.ShowLoading("保存简介图...");
+                        double ratio = 1;
+                        int width = 100;
+                        int height = 100;
+                        WriteableBitmap img = null;
                         try
                         {
-                            double ratio = Convert.ToDouble(data[0].Trim());
-                            int width = Convert.ToInt32(data[1].Trim());
-                            int height = Convert.ToInt32(data[2].Trim());
-                            WriteableBitmap img = await App.currentMainPage.GetWebViewImageAsync(ratio, width, height);
-                            bool isSaved = await StorageManager.SaveWritableBitmapAsync(img, isSaveAs);
-                            App.currentMainPage.HideLoading();
-                            if (!isSaved)
-                            {
-                                App.currentMainPage.ShowNotify("取消保存", "简介图未保存", Symbol.Cancel);
-                            }
+                            ratio = Convert.ToDouble(data[0].Trim());
+                            width = Convert.ToInt32(data[1].Trim());
+                            height = Convert.ToInt32(data[2].Trim());
+                            img = await App.currentMainPage.GetWebViewImageAsync(ratio, width, height);
                         }
                         catch (Exception e)
                         {
-                            await Utility.ShowMessageDialog("保存图片失败", "未能保存到文件");
-                            await Utility.ShowDetailedError("错误详细信息", e);
-                            App.currentMainPage.HideLoading();
-                            return;
+                            await Utility.ShowMessageDialog("图片生成失败", e.Message);
+                        }
+                        if (img != null)
+                        {
+                            if (isGetPic)
+                            {
+                                try
+                                {
+                                    string base64 = await Utility.WritableBitmapToPngBase64Async(img);
+                                    await WrapInvokeScriptAsync(
+                                            webView, "external_getUploadPicSucceed",
+                                            new string[] { base64 });
+                                    App.currentMainPage.HideLoading();
+                                }
+                                catch (Exception e)
+                                {
+                                    await Utility.ShowMessageDialog("图片转码和发送失败", e.Message);
+                                    App.currentMainPage.HideLoading();
+                                    try
+                                    {
+                                        await WrapInvokeScriptAsync(
+                                            webView, "external_getUploadPicFailed",
+                                            new string[] { e.Message });
+                                    }
+                                    catch (Exception) { }
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    bool isSaved = await StorageManager.SaveWritableBitmapAsync(img, isSaveAs);
+                                    App.currentMainPage.HideLoading();
+                                    if (!isSaved)
+                                    {
+                                        App.currentMainPage.ShowNotify("取消保存", "简介图未保存", Symbol.Cancel);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    await Utility.ShowMessageDialog("保存简介图片失败", "未能保存到文件");
+                                    await Utility.ShowDetailedError("错误详细信息", e);
+                                    App.currentMainPage.HideLoading();
+                                    return;
+                                }
+                            }
                         }
                     }
                 }
@@ -438,7 +480,7 @@ namespace 百度经验个人助手
                     {
                         WriteableBitmap img = await ExpManager.SimpleRequestImage(url);
                         Debug.WriteLine("WriteableBitmap img: W:" + img.PixelWidth + " H:" + img.PixelHeight);
-                       
+
                         string base64 = await Utility.WritableBitmapToPngBase64Async(img);
                         await WrapInvokeScriptAsync(
                                 webView, "external_getImageSucceed",
