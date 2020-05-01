@@ -11,6 +11,7 @@ using Windows.Foundation;
 using Windows.Graphics.Imaging;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Diagnostics;
 
 namespace 百度经验个人助手
 {
@@ -102,6 +103,42 @@ namespace 百度经验个人助手
             }
         }
 
+        public static async Task<string> WritableBitmapToPngBase64Async(WriteableBitmap bitmap)
+        {
+            Stream pixelStream = bitmap.PixelBuffer.AsStream();
+            byte[] pixels = new byte[pixelStream.Length];
+            await pixelStream.ReadAsync(pixels, 0, pixels.Length);
+
+            Debug.WriteLine("# WritableBitmapToPngBase64Async called.");
+            //byte[] outputData = new byte[pixelStream.Length * 2];
+            //IBuffer outputBuffer = outputData.AsBuffer();
+            IRandomAccessStream outputStream = new InMemoryRandomAccessStream();
+            Guid BitmapEncoderGuid = BitmapEncoder.PngEncoderId;
+            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoderGuid, outputStream);
+
+            Debug.WriteLine("# WritableBitmapToPngBase64Async ready to SetPixelData.");
+            encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Straight,
+                                (uint)bitmap.PixelWidth,
+                                (uint)bitmap.PixelHeight,
+                                96.0,
+                                96.0,
+                                pixels);
+            await encoder.FlushAsync();
+
+            Debug.WriteLine("# WritableBitmapToPngBase64Async normalStream setPosition to 0");
+            Stream normalStream = outputStream.AsStream();
+            normalStream.Position = 0;
+
+            var reader = new DataReader(normalStream.AsInputStream());
+            var bytes = new byte[normalStream.Length];
+            await reader.LoadAsync((uint)normalStream.Length);
+            reader.ReadBytes(bytes);
+
+            normalStream.Dispose();
+            pixelStream.Dispose();
+            outputStream.Dispose();
+            return "data:image/png;base64," + Convert.ToBase64String(bytes);
+        }
         public static string StringEscaped(string input)
         {
             input = input.Replace("\\", "\\\\");

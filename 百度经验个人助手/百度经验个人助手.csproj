@@ -102,7 +102,6 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\manifest.json" />
-    <None Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\tools\AllComps.jsx" />
     <None Include="Assets\BaiduExpAssistant.Lite\LICENSE" />
     <None Include="Assets\BaiduExpAssistant.Lite\README.md" />
     <None Include="Assets\code\default.json" />

@@ -35,6 +35,13 @@ namespace 百度经验个人助手
             return result;
         }
 
+        //暂时用 WrapInvokeScriptAsync 来调用顶级方法
+        //private static async Task<string> RunJsFuncStringParams(WebView webview, string funcName, IEnumerable<string> arguments)
+        //{
+        //    string[] transformedArgs;
+        //    string evalString = funcName + "(" + string.Join(", ", transformedArgs) + ");";
+        //}
+
         #region WebView Set
         //每当一个Navigation完成看是否是主页（插入Cookie).
 
@@ -382,6 +389,36 @@ namespace 百度经验个人助手
                             await Utility.ShowDetailedError("错误详细信息", e);
                             App.currentMainPage.HideLoading();
                             return;
+                        }
+                    }
+                }
+                else if (args.Value.StartsWith("IMAGE-GET: "))
+                {
+                    string url = args.Value.Replace("IMAGE-GET: ", "").Trim();
+                    Debug.WriteLine("## IMAGE-GET: " + url);
+                    try
+                    {
+                        WriteableBitmap img = await ExpManager.SimpleRequestImage(url);
+                        Debug.WriteLine("WriteableBitmap img: W:" + img.PixelWidth + " H:" + img.PixelHeight);
+                       
+                        string base64 = await Utility.WritableBitmapToPngBase64Async(img);
+                        await WrapInvokeScriptAsync(
+                                webView, "external_getImageSucceed",
+                                new string[] { url, base64 });
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine("## image failed:" + e.Message);
+                        try
+                        {
+                            await WrapInvokeScriptAsync(
+                                webView, "external_getImageFailed",
+                                new string[] { url, e.Message });
+                        }
+                        catch (Exception e2)
+                        {
+                            Debug.WriteLine("## image failed callback failed:" + e2.Message);
+                            App.currentMainPage.ShowNotify("JS API调用失败", "window.external.getImageFailed", Symbol.Cancel);
                         }
                     }
                 }

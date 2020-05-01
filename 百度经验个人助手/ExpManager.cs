@@ -84,7 +84,7 @@ namespace 百度经验个人助手
         public static string newMainPortraitUrl;
         public static string newMainBdStoken; // not show to users. for reward request.
         public static string newMainBdstt; // not show to users. for reward request.
-        public static BitmapImage newMainPortrait;
+        public static WriteableBitmap newMainPortrait;
 
         public static DataPack currentDataPack; // mains are set but not used
         public static string[] htmlContentPages;
@@ -276,12 +276,12 @@ namespace 百度经验个人助手
 
         }
 
-        private static async Task<BitmapImage> GetMainSubStep_CookielessGetPic(string picUrl)
+        public static async Task<WriteableBitmap> SimpleRequestImage(string picUrl)
         {
             Uri myUri = new Uri(picUrl);
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, myUri);
             req.Headers.Host = new HostName(myUri.Host);
-            req.Headers.Cookie.Clear();
+            //req.Headers.Cookie.Clear();
             HttpResponseMessage response = null;
             try
             {
@@ -304,23 +304,18 @@ namespace 百度经验个人助手
             IHttpContent icont = response.Content;
 
             IBuffer buffer = await icont.ReadAsBufferAsync();
-
-
             IRandomAccessStream irStream = new InMemoryRandomAccessStream();
-            BitmapImage img = new BitmapImage();
-
             await irStream.WriteAsync(buffer);
             irStream.Seek(0);
 
-            await img.SetSourceAsync(irStream);
+            WriteableBitmap bitmap = await BitmapFactory.FromStream(irStream);
 
             irStream.Dispose();
             icont.Dispose();
             response.Dispose();
             req.Dispose();
 
-            return img;
-
+            return bitmap;
         }
         private static async Task<bool> GetMainSubStep_ParseMain()
         {
@@ -427,7 +422,7 @@ namespace 百度经验个人助手
             {
                 try
                 {
-                    newMainPortrait = await GetMainSubStep_CookielessGetPic(newMainPortraitUrl); 
+                    newMainPortrait = (await SimpleRequestImage(newMainPortraitUrl)); 
                     //possible to be NULL, but MainPage will handle this.
                 } catch(Exception)
                 {
