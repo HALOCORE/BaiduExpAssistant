@@ -1193,24 +1193,11 @@ namespace 百度经验个人助手
             Utility.LogEvent("OK_LoadAutoCompleteCalled");
             try
             {
-                await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/AutoComplete.js");
                 ShowLoading("加载自动补全...");
                 string data = await StorageManager.ReadAutoCompleteData("");
-                await Task.Delay(500);
-                
-                if (data == "")
-                {
-                    await JSCodeString.RunJs(webViewMain, "InitAutoComplete();");
-                }
-                else
-                {
-                    //希望执行js代码： InitAutoComplete("[...]")，
-                    await JSCodeString.RunJs(webViewMain, 
-                        "InitAutoComplete(\""
-                        + GetTransString(data)
-                        + "\")"
-                        );
-                }
+                await JSCodeString.RunJs(webViewMain,
+                    "window._AssistantAutoCompleteData =\"" + GetTransString(data) + "\";");
+                await JSCodeString.AddScriptUri(webViewMain, "ms-appx-web:///Assets/code/AutoComplete.js");
             }
             catch (Exception ee)
             {

@@ -726,11 +726,11 @@
                 </CheckBox>
                 <CheckBox x:Name="checkboxBigPic" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
-                    <TextBlock>大图片框 v1.1</TextBlock>
+                    <TextBlock>大图片框 v1.3</TextBlock>
                 </CheckBox>
                 <CheckBox x:Name="checkboxBriefPic" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
-                    <TextBlock>简介图 v1.0</TextBlock>
+                    <TextBlock>简介图 v1.4</TextBlock>
                 </CheckBox>
                 <CheckBox x:Name="checkboxBasicCheck" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
@@ -738,9 +738,9 @@
                 </CheckBox>
                 <CheckBox x:Name="checkboxAutoComplete" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
-                    <TextBlock>自动补全 v2.1</TextBlock>
+                    <TextBlock>自动补全 v2.2</TextBlock>
                 </CheckBox>
-                <TextBlock  Margin="15 10 5 10" x:Name="textIsJsDebug" Tapped="textIsJsDebug_Tapped">调试模式: 关闭</TextBlock>
+                <TextBlock  Margin="15 10 5 10" x:Name="textIsJsDebug" Tapped="textIsJsDebug_Tapped" Foreground="Gray">调试模式: 关闭</TextBlock>
                 <Button x:Name="buttonDIY" Click="buttonDIY_Click" Visibility="Visible">
                     <Button.Background>
                         <LinearGradientBrush>
@@ -801,7 +801,7 @@
                     Thanks to 孢子真好玩
                 </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
-                    简介图与大图 (Alpha) ：
+                    简介图、大图片框、插入图片：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
                     1. 输入标题自动生成简介图，一键保存到文件
@@ -813,7 +813,7 @@
                     3. 一键插入所有图片到步骤中
                 </TextBlock>
                 <TextBlock FontSize="24" Margin="0,8,0,0" Foreground="Gray" Opacity="1">
-                    自动补全 (2.0) ：
+                    自动补全：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="Gray" Opacity="0.9">
                     1. Tab键插入自动补全项

@@ -30,6 +30,35 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                        <StackPanel Margin="4" Padding="8">
+                            <TextBlock FontSize="26" Margin="5">简介图：支持一键上传，无需另存为</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">简介图设置增加保存提醒，图片加载稳定性提高。</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                    <Border Grid.Row="1" Margin="6"  BorderThickness="3" BorderBrush="MediumPurple" Width="500">
+                        <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="500" 
+                                gif:AnimationBehavior.SourceUri="Assets/features/1.6.2.gif"
+                                Source="Assets/features/brief.gif" Stretch="Fill"
+                                Opacity="0.7"
+                        >
+                        </Image>
+                    </Border>
+                </Grid>
+                
+            </ListViewItem>
+            
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42" Foreground="Red">⭐</TextBlock>
                         <StackPanel Margin="4" Padding="8">
@@ -110,26 +139,13 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
                         <StackPanel Margin="8">
                             <TextBlock FontSize="26" Margin="5">简介图支持自动两行文字，支持另存为</TextBlock>
                             <TextBlock  Margin="5" TextWrapping="Wrap">提醒：添加图片时要考虑网络图片加载速度。</TextBlock>
-
                         </StackPanel>
                     </StackPanel>
-                    <Border Grid.Row="1" Margin="6"  BorderThickness="3" BorderBrush="MediumPurple" Width="400">
-                        <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="400" Height="185"
-                                gif:AnimationBehavior.SourceUri="Assets/features/1.6.2.gif"
-                                Source="Assets/features/1.6.2.gif" Stretch="Fill"
-                                Opacity="0.7"
-                        >
-                        </Image>
-                    </Border>
                 </Grid>
             </ListViewItem>
             <ListViewItem>

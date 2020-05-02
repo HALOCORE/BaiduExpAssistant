@@ -104,7 +104,6 @@
     <None Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\manifest.json" />
     <None Include="Assets\BaiduExpAssistant.Lite\LICENSE" />
     <None Include="Assets\BaiduExpAssistant.Lite\README.md" />
-    <None Include="Assets\code\default.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -194,15 +193,14 @@
     <Content Include="Assets\code\lib\alertify.com.css" />
     <Content Include="Assets\code\lib\alertify.js" />
     <Content Include="Assets\code\lib\eruda.js" />
-    <Content Include="Assets\code\PicInsert.js" />
     <Content Include="Assets\CookieClickContent.gif" />
     <Content Include="Assets\CookieInit.gif" />
     <Content Include="Assets\CookieSelect.gif" />
     <Content Include="Assets\CookieSet.gif" />
     <Content Include="Assets\editAuto.png" />
     <Content Include="Assets\editBig.png" />
-    <Content Include="Assets\features\1.6.2.gif" />
     <Content Include="Assets\features\1.6.8ac.gif" />
+    <Content Include="Assets\features\brief.gif" />
     <Content Include="Assets\WhatIsBDUSS.png" />
     <Content Include="Properties\Default.rd.xml">
       <SubType>Designer</SubType>

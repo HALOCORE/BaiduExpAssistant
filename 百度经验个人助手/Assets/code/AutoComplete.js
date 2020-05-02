@@ -1,9 +1,12 @@
-function InitAutoComplete(myData) {
+console.log("========== AutoComplete.js ==========");
+function InitAutoComplete() {
     "use strict";
     var hinterData = null;
+    let myData = window._AssistantAutoCompleteData;
     if (myData) {
         try {
             hinterData = JSON.parse(myData);
+            console.log("# InitAutoComplete parse data succeed.");
         }
         catch (e) {
             hinterData = null;
@@ -489,5 +492,6 @@ function InitAutoComplete(myData) {
     catch (e) {
     }
 }
-
+InitAutoComplete();
+console.log("^^^^^^^^^^ AutoComplete.js ^^^^^^^^^^");
 

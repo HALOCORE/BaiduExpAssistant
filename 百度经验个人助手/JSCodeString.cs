@@ -133,21 +133,22 @@ namespace 百度经验个人助手
                 if (args.Uri.AbsoluteUri.ToLower().IndexOf("/edit/content") > 0)
                 {
                     App.currentMainPage.isAssistEditorEditing = true;
+                    string loadingStatus = "init\n";
                     try
                     {
                         App.currentMainPage.ShowLoading("加载基础库...");
                         await AddScriptUri(webView, extensionLibsMsAppxWeb + "react.development.js");
-                        await Task.Delay(50);
                         await AddScriptUri(webView, extensionLibsMsAppxWeb + "react-dom.development.js");
-                        await Task.Delay(200);
+                        loadingStatus += "react-done\n";
                         await AddScriptUri(webView, extensionToolsMsAppxWeb + "AllComps.js");
                         await AddScriptUri(webView, extensionToolsMsAppxWeb + "AllPoly.js");
-
+                        loadingStatus += "allpoly-done\n";
                         if (App.currentMainPage.isCheckedBasicCheck)
                         {
                             Utility.LogEvent("OK_FuncCheckBasicCalled");
                             App.currentMainPage.ShowLoading("加载基本检查...");
                             await AddScriptUri(webView, extensionToolsMsAppxWeb + "Checker.js");
+                            loadingStatus += "checker-done\n";
                         }
                         
                         if(App.currentMainPage.isCheckedBigPic)
@@ -155,6 +156,7 @@ namespace 百度经验个人助手
                             Utility.LogEvent("OK_FuncBigPicCalled");
                             App.currentMainPage.ShowLoading("加载大图片框...");
                             await AddScriptUri(webView, extensionToolsMsAppxWeb + "BigPic.js");
+                            loadingStatus += "bigpic-done\n";
                         }
 
                         if (App.currentMainPage.isCheckedPicInsert)
@@ -162,6 +164,7 @@ namespace 百度经验个人助手
                             Utility.LogEvent("OK_FuncPicInsertCalled");
                             App.currentMainPage.ShowLoading("加载插入图片...");
                             await AddScriptUri(webView, extensionToolsMsAppxWeb + "PicInsert.js");
+                            loadingStatus += "picinsert-done\n";
                         }
 
                         if (App.currentMainPage.isCheckedBriefPic)
@@ -173,6 +176,7 @@ namespace 百度经验个人助手
                                 await InjectCommonData(webView);
                                 await AddScriptUri(webView, extensionToolsMsAppxWeb + "BriefPic.js");
                                 Utility.LogEvent("YES_BigPicInstSucceed");
+                                loadingStatus += "briefpic-done\n";
                             }
                             catch (Exception e)
                             {
@@ -188,6 +192,7 @@ namespace 百度经验个人助手
                             await AddScriptUri(webView, codeLibsMsAppxWeb + "alertify.js");
                             await AddCssUri(webView, codeLibsMsAppxWeb + "alertify.com.css");
                             await App.currentMainPage.LoadAutoCompleteAsync();
+                            loadingStatus += "autocomplete-done\n";
                         }
 
                         App.currentMainPage.HideLoading();
@@ -195,6 +200,7 @@ namespace 百度经验个人助手
                     catch (Exception e)
                     {
                         App.currentMainPage.ShowNotify("有模块加载失败", e.Message, Symbol.Cancel);
+                        await Utility.FireErrorReport("JS模块加载失败", "loadingStatus = " + loadingStatus);
                     }
                 }
                 else
@@ -366,6 +372,28 @@ namespace 百度经验个人助手
                         await Utility.ShowMessageDialog("Javascript Notify 消息提示调用不正确", "格式为:\nSHOW-DIALOG: 标题 | 说明");
                     }
                     await Utility.ShowMessageDialog(nParams[0].Trim(), nParams[1].Trim());
+                }
+                else if (args.Value.StartsWith("CONFIRM: "))
+                {
+                    string info = args.Value.Replace("CONFIRM: ", "");
+                    string[] nParams = info.Split('|');
+                    if (nParams.Length != 2)
+                    {
+                        await Utility.ShowMessageDialog("Javascript Notify 消息提示调用不正确", "格式为:\nCONFIRM: 标题 | 说明");
+                    }
+                    else
+                    {
+                        bool isConfirmed = await Utility.ShowConfirmDialog(nParams[0].Trim(), nParams[1].Trim());
+                        try
+                        {
+                            string callee = isConfirmed ? "external_confirmCallbackYes" : "external_confirmCallbackNo";
+                            await WrapInvokeScriptAsync(webView, callee, new string[] { });
+                        }
+                        catch (Exception e)
+                        {
+                            App.currentMainPage.ShowNotify("js调用失败", "external_confirmCallback");
+                        }
+                    }
                 }
                 else if (args.Value.StartsWith("LAUNCH: "))
                 {
