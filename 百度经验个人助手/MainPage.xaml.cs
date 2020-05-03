@@ -38,6 +38,8 @@ namespace 百度经验个人助手
         public bool isAssistEditorEditing { get; set; } = false;
         public bool isJsDebugConsole = false;
         public bool isCheckboxInitDone = false;
+        
+        //LOADFUNC Config Code
         public bool isCheckedAutoComplete { get { return checkboxAutoComplete.IsChecked == true; } }
         public bool isCheckedBigPic { get { return checkboxBigPic.IsChecked == true; } }
         public bool isCheckedBasicCheck { get { return checkboxBasicCheck.IsChecked == true; } }
@@ -167,6 +169,7 @@ namespace 百度经验个人助手
             ShowLoading("读取Edit设置...");
             await StorageManager.ReadEditSettings();
             Debug.WriteLine("## ReadEditSettings，设置各个CheckBox");
+            //LOADFUNC Config Code
             checkboxBasicCheck.IsChecked = StorageManager.editSettings.ifLoadBasicCheck;
             checkboxAutoComplete.IsChecked = StorageManager.editSettings.ifLoadAutoComplete;
             checkboxBigPic.IsChecked = StorageManager.editSettings.ifLoadBigPic;
@@ -1276,7 +1279,8 @@ namespace 百度经验个人助手
             }
 
             bool isDirty = false;
-            
+
+            //LOADFUNC Config Code
             if (StorageManager.editSettings.ifLoadAutoComplete != isCheckedAutoComplete)
             {
                 isDirty = true;

@@ -42,9 +42,8 @@
                         </StackPanel>
                     </StackPanel>
                     <Border Grid.Row="1" Margin="6"  BorderThickness="3" BorderBrush="MediumPurple" Width="500">
-                        <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="500" 
-                                gif:AnimationBehavior.SourceUri="Assets/features/1.6.2.gif"
-                                Source="Assets/features/brief.gif" Stretch="Fill"
+                        <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="500" Height="270" 
+                                gif:AnimationBehavior.SourceUri="Assets/features/brief.gif" Stretch="Fill"
                                 Opacity="0.7"
                         >
                         </Image>
@@ -105,8 +104,7 @@
                     </StackPanel>
                     <Border Grid.Row="1" Margin="6"  BorderThickness="3" BorderBrush="MediumPurple" Width="550">
                         <Image  VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="550" Height="185"
-                                gif:AnimationBehavior.SourceUri="Assets/features/1.6.8ac.gif"
-                                Source="Assets/features/1.6.2.gif" Stretch="Fill"
+                                gif:AnimationBehavior.SourceUri="Assets/features/1.6.8ac.gif" Stretch="Fill"
                                 Opacity="0.7"
                         >
                         </Image>

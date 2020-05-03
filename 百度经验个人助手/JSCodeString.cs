@@ -118,8 +118,9 @@ namespace 百度经验个人助手
                     {
                         await AddScriptUri(webView, codeLibsMsAppxWeb + "eruda.js");
                         Debug.WriteLine("## eruda.js loaded.");
-                        await Task.Delay(200);
+                        await Task.Delay(250);
                         await RunJs(webView, "eruda.init()");
+                        await Task.Delay(50);
                         Debug.WriteLine("## eruda.js init.");
                     }
                     catch (Exception)
@@ -138,11 +139,15 @@ namespace 百度经验个人助手
                     {
                         App.currentMainPage.ShowLoading("加载基础库...");
                         await AddScriptUri(webView, extensionLibsMsAppxWeb + "react.development.js");
+                        await Task.Delay(50); //unknown reason. ReactDOM is undefined occurs on first start.
                         await AddScriptUri(webView, extensionLibsMsAppxWeb + "react-dom.development.js");
+                        await Task.Delay(200); //unknown reason. ReactDOM is undefined occurs on first start.
                         loadingStatus += "react-done\n";
                         await AddScriptUri(webView, extensionToolsMsAppxWeb + "AllComps.js");
                         await AddScriptUri(webView, extensionToolsMsAppxWeb + "AllPoly.js");
                         loadingStatus += "allpoly-done\n";
+
+                        //LOADFUNC Config Code
                         if (App.currentMainPage.isCheckedBasicCheck)
                         {
                             Utility.LogEvent("OK_FuncCheckBasicCalled");
