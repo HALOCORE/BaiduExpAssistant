@@ -18,8 +18,8 @@
             <LinearGradientBrush.Transform>
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
-            <GradientStop Color="#FFC5C9D2"  Offset="0.7"/>
-            <GradientStop Color="GhostWhite"/>
+            <GradientStop Color="#FFF8DBFF"  Offset="0.8"/>
+            <GradientStop Color="#FFFFF5F2"/>
         </LinearGradientBrush>
     </ContentDialog.Background>
     <Grid Width="650" Height="450" Margin="20">
@@ -37,8 +37,8 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
                         <StackPanel Margin="4" Padding="8">
-                            <TextBlock FontSize="26" Margin="5">简介图：支持一键上传，无需另存为</TextBlock>
-                            <TextBlock  Margin="5" TextWrapping="Wrap">简介图设置增加保存提醒，图片加载稳定性提高。</TextBlock>
+                            <TextBlock FontSize="26" Margin="5">简介图：支持图片选择，改进一键上传</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap">简介图设置保存方式改进，增加设置保存提醒。</TextBlock>
                         </StackPanel>
                     </StackPanel>
                     <Border Grid.Row="1" Margin="6"  BorderThickness="3" BorderBrush="MediumPurple" Width="500">

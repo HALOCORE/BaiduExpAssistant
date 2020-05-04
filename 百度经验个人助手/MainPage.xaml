@@ -730,7 +730,7 @@
                 </CheckBox>
                 <CheckBox x:Name="checkboxBriefPic" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
-                    <TextBlock>简介图 v1.4</TextBlock>
+                    <TextBlock>简介图 v1.6</TextBlock>
                 </CheckBox>
                 <CheckBox x:Name="checkboxBasicCheck" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
