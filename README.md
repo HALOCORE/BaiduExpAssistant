@@ -5,4 +5,4 @@ UWP app for Baidu Exp writers (Unofficial). Data analysis, searching, and enhanc
 
 Current Status: 1.1k+ downloads  
 
-A small part of BaiduExpAssistant(UWP) editor's functionally is also available in a [Chrome extension](https://chrome.google.com/webstore/detail/ankgklgfkanhkeodnfjhecfhcjccpacm).
+A subset of BaiduExpAssistant(UWP) editor's functionalities is also available in a [Chrome extension](https://chrome.google.com/webstore/detail/ankgklgfkanhkeodnfjhecfhcjccpacm).
