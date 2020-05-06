@@ -25,6 +25,7 @@ using Windows.UI;
 using Windows.Data.Json;
 using Windows.System;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Diagnostics;
 
 namespace 百度经验个人助手
 {
@@ -501,7 +502,7 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.8.3";
+        public const string VER = "1.8.5";
         public const string FUNC_VER = "1.8.3";
 
         private static string _editSettingsFileName = "EditSettings.xml";
@@ -1197,6 +1198,60 @@ namespace 百度经验个人助手
 
         #endregion
 
+        public static async Task TryWriteImageCacheAsync(string url, WriteableBitmap bmp)
+        {
+            string fileName = GetValidFileName(url) + ".png";
+            Guid BitmapEncoderGuid = BitmapEncoder.PngEncoderId;
+            try
+            {
+                StorageFolder folder = await GetSubFolderAsync(ApplicationData.Current.LocalFolder, "CACHE-IMAGE");
+                StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+
+                using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                {
+                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoderGuid, stream);
+                    Stream pixelStream = bmp.PixelBuffer.AsStream();
+                    byte[] pixels = new byte[pixelStream.Length];
+                    await pixelStream.ReadAsync(pixels, 0, pixels.Length);
+
+                    encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Straight,
+                                        (uint)bmp.PixelWidth,
+                                        (uint)bmp.PixelHeight,
+                                        96.0,
+                                        96.0,
+                                        pixels);
+                    await encoder.FlushAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("# 图片缓存失败:" + e.Message);
+            }
+        }
+
+        public static async Task<WriteableBitmap> TryReadImageCacheAsync(string url)
+        {
+            string fileName = GetValidFileName(url) + ".png";
+            Guid BitmapDecoderGuid = BitmapDecoder.PngDecoderId;
+            try
+            {
+                StorageFolder folder = await GetSubFolderAsync(ApplicationData.Current.LocalFolder, "CACHE-IMAGE");
+                StorageFile file = await folder.GetFileAsync(fileName);
+                if (file == null) return null;
+                using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(BitmapDecoderGuid, stream);
+                    WriteableBitmap image = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                    await image.SetSourceAsync(stream);
+                    return image;
+                }
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine("# 读取Image缓存失败:" + e.Message);
+            }
+            return null;
+        }
         public static async Task<bool> SaveWritableBitmapAsync(WriteableBitmap bmp, bool isSaveAs)
         {
             string fileName = DateTime.UtcNow.Ticks + ".png";

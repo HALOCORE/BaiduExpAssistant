@@ -207,6 +207,13 @@ namespace 百度经验个人助手
                         App.currentMainPage.ShowNotify("有模块加载失败", e.Message, Symbol.Cancel);
                         await Utility.FireErrorReport("JS模块加载失败", "loadingStatus = " + loadingStatus);
                     }
+
+                    try
+                    {
+                        await AddScriptUri(webView, "https://cdn.bootcss.com/layer/3.1.0/layer.js");
+                        await AddCssUri(webView, "https://cdn.bootcss.com/layer/3.1.0/theme/default/layer.css?v=3.1.0");
+                    }
+                    catch (Exception) { }
                 }
                 else
                 {
@@ -511,7 +518,26 @@ namespace 百度经验个人助手
                     Debug.WriteLine("## IMAGE-GET: " + url);
                     try
                     {
-                        WriteableBitmap img = await ExpManager.SimpleRequestImage(url);
+                        bool isCaching = true;
+                        if (url.StartsWith("nocache-"))
+                        {
+                            isCaching = false;
+                            url = url.Replace("nocache-", "");
+                        }
+                        if (url.StartsWith("https://exp-picture")) isCaching = false;
+
+                        WriteableBitmap img = null;
+                        if (isCaching) img = await StorageManager.TryReadImageCacheAsync(url);
+                        if (img == null)
+                        {
+                            img = await ExpManager.SimpleRequestImage(url);
+                            if (img == null) throw new ArgumentNullException("img");
+                            if (isCaching) await StorageManager.TryWriteImageCacheAsync(url, img);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("# 来自图片缓存: " + url);
+                        }
                         Debug.WriteLine("WriteableBitmap img: W:" + img.PixelWidth + " H:" + img.PixelHeight);
 
                         string base64 = await Utility.WritableBitmapToPngBase64Async(img);

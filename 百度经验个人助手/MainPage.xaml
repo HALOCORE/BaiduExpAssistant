@@ -718,7 +718,10 @@
                             <GradientStop Color="#DD58D8A3" Offset="0.70"/>
                         </LinearGradientBrush>
                     </Button.Background>
-                    雷区检测
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>雷区检测</TextBlock>
+                        <TextBlock FontSize="14" VerticalAlignment="Center" Padding="10 2 2 2">(标题法)</TextBlock>
+                    </StackPanel>
                 </Button>
                 <CheckBox x:Name="checkboxPicInsert" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
@@ -730,7 +733,7 @@
                 </CheckBox>
                 <CheckBox x:Name="checkboxBriefPic" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
-                    <TextBlock>简介图 v1.6</TextBlock>
+                    <TextBlock>简介图 v1.7</TextBlock>
                 </CheckBox>
                 <CheckBox x:Name="checkboxBasicCheck" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
