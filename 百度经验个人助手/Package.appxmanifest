@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="8684UNIONS.3039718ACF865" Publisher="CN=2D98E920-8988-41FF-A2C2-A34E07137B2A" Version="1.8.5.0" />
+  <Identity Name="8684UNIONS.3039718ACF865" Publisher="CN=2D98E920-8988-41FF-A2C2-A34E07137B2A" Version="1.8.6.0" />
   <mp:PhoneIdentity PhoneProductId="af21b038-491b-4505-a5e8-a9b7ee2c0b16" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>百度经验个人助手</DisplayName>

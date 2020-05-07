@@ -239,7 +239,7 @@ namespace 百度经验个人助手
             string cookieGet = await StorageManager.GetCookieTry();
             if (cookieGet != null)
             {
-                if (!ExpManager.SetCookie(cookieGet))
+                if (!(await ExpManager.SetCookie(cookieGet)))
                 {
                     await Utility.ShowMessageDialog("请重新设置Cookie", "Cookie文件内容不正确");
                     HideLoading();
@@ -478,7 +478,7 @@ namespace 百度经验个人助手
                 return;
             }
 
-            bool isCookieOK = ExpManager.SetCookie(scd.userInputCookie);
+            bool isCookieOK = await ExpManager.SetCookie(scd.userInputCookie);
             if (!isCookieOK)
             {
                 await Utility.ShowMessageDialog("Cookie添加", ExpManager.setcookieFailedInfo);
@@ -1021,7 +1021,7 @@ namespace 百度经验个人助手
 
         private async void buttonMainPage_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(ExpManager.cookie))
+            if (string.IsNullOrEmpty(ExpManager.selectedCookie))
             {
                 Utility.ShowMessageDialog("请先设置Cookie", "设置Cookie完成后，可以保持登录进入编辑器。\n禁止在此暴露账号密码进行登陆。");
                 return;

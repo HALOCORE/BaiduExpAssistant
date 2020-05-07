@@ -1,0 +1,37 @@
+﻿<ContentDialog
+    x:Class="百度经验个人助手.CookieSelectDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:百度经验个人助手"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Cookie选择">
+    <ContentDialog.Background>
+        <LinearGradientBrush>
+            <GradientStop Color="#FFC3F6FF"></GradientStop>
+            <GradientStop Color="#FFBAC8FF" Offset="0.8"></GradientStop>
+        </LinearGradientBrush>
+    </ContentDialog.Background>
+    <Grid>
+        <ListView Width="400" Height="300" x:Name="listViewAllCookies" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding}" 
+                      HorizontalContentAlignment="Stretch"
+                      ItemClick="listViewAllCookies_ItemClick" BorderThickness="2" Margin="0,10,0,10" IsItemClickEnabled="True">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="MinHeight" Value="20"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="5" Padding="10">
+                        <Border.Background>
+                            <SolidColorBrush Color="White" Opacity="0.3"/>
+                        </Border.Background>
+                        <TextBlock Padding="0" FontSize="12" Height="100" TextWrapping="Wrap" Text="{Binding}"/>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</ContentDialog>

@@ -514,10 +514,11 @@ namespace 百度经验个人助手
                 }
                 else if (args.Value.StartsWith("IMAGE-GET: "))
                 {
-                    string url = args.Value.Replace("IMAGE-GET: ", "").Trim();
-                    Debug.WriteLine("## IMAGE-GET: " + url);
+                    string originalUrl = args.Value.Replace("IMAGE-GET: ", "").Trim();
+                    Debug.WriteLine("## IMAGE-GET: " + originalUrl);
                     try
                     {
+                        string url = originalUrl;
                         bool isCaching = true;
                         if (url.StartsWith("nocache-"))
                         {
@@ -525,7 +526,7 @@ namespace 百度经验个人助手
                             url = url.Replace("nocache-", "");
                         }
                         if (url.StartsWith("https://exp-picture")) isCaching = false;
-
+                        if (url.StartsWith("http://exp-picture")) isCaching = false; //don't know.
                         WriteableBitmap img = null;
                         if (isCaching) img = await StorageManager.TryReadImageCacheAsync(url);
                         if (img == null)
@@ -543,7 +544,7 @@ namespace 百度经验个人助手
                         string base64 = await Utility.WritableBitmapToPngBase64Async(img);
                         await WrapInvokeScriptAsync(
                                 webView, "external_getImageSucceed",
-                                new string[] { url, base64 });
+                                new string[] { originalUrl, base64 });
                     }
                     catch (Exception e)
                     {
@@ -552,7 +553,7 @@ namespace 百度经验个人助手
                         {
                             await WrapInvokeScriptAsync(
                                 webView, "external_getImageFailed",
-                                new string[] { url, e.Message });
+                                new string[] { originalUrl, e.Message });
                         }
                         catch (Exception e2)
                         {

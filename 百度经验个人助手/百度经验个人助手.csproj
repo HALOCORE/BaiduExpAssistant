@@ -101,9 +101,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <None Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\manifest.json" />
-    <None Include="Assets\BaiduExpAssistant.Lite\LICENSE" />
-    <None Include="Assets\BaiduExpAssistant.Lite\README.md" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\ExpA.Lite\manifest.json" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\LICENSE" />
+    <Content Include="Assets\BaiduExpAssistant.Lite\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -142,6 +142,9 @@
     </Compile>
     <Compile Include="ContentWelcomeDialog.xaml.cs">
       <DependentUpon>ContentWelcomeDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CookieSelectDialog.xaml.cs">
+      <DependentUpon>CookieSelectDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataTemplateSelectors.cs" />
     <Compile Include="ExpManager.cs" />
@@ -259,6 +262,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ContentWelcomeDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CookieSelectDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

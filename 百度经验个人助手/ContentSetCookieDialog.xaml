@@ -43,7 +43,7 @@
         <TextBlock Grid.Column="1" Grid.Row="0"
             FontSize="16" VerticalAlignment="Center" Margin="10,0,0,0"> 方式二：粘贴Cookie中的BDUSS</TextBlock>
         <TextBox x:Name="way1Text" TextWrapping="Wrap" Grid.Row="1" Grid.Column="0" PlaceholderText="请粘贴整个Cookie，以提取BDUSS"
-                 Margin = "5"  FontSize="14" InputScope="NativeScript"/>
+                 Margin = "5"  FontSize="14" InputScope="NativeScript" AcceptsReturn="True"/>
         <StackPanel Grid.Column="1" Grid.Row="1" Margin="5">
             <StackPanel.Resources>
                 <Style TargetType="Button">

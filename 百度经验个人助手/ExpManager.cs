@@ -2,31 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using Windows.Web.Http;
-using Windows.Networking;
-using Windows.Foundation;
 using System.Text;
 using System.Text.RegularExpressions;
-using Windows.Storage.Streams;
+using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
+using Windows.Networking;
+using Windows.Storage.Streams;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
-using System.Collections;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
-using Windows.UI;
-using Windows.UI.Xaml;
-using Windows.Web.Http.Headers;
+using Windows.Web.Http;
+using Windows.Web.Http.Filters;
 using HttpClient = Windows.Web.Http.HttpClient;
 using HttpMethod = Windows.Web.Http.HttpMethod;
 using HttpRequestMessage = Windows.Web.Http.HttpRequestMessage;
 using HttpResponseMessage = Windows.Web.Http.HttpResponseMessage;
-using System.Threading;
-using Windows.Web.Http.Filters;
 
 namespace 百度经验个人助手
 {
@@ -60,7 +53,8 @@ namespace 百度经验个人助手
         public static bool isCookieValid = false;
         public static bool isVerifying = false;
 
-        public static string cookie;
+        public static string allCookie;
+        public static string selectedCookie;
         public static HttpClient client;
         public static HttpBaseProtocolFilter protocolFilter;
         public static string htmlMain;
@@ -167,16 +161,36 @@ namespace 百度经验个人助手
         /// <summary>
         /// 输入Cookie字符串，提取需要的并设置HttpClient
         /// </summary>
-        /// <param name="newCookie"></param>
+        /// <param name="cookieStr"></param>
         /// <returns></returns>
-        public static bool SetCookie(string newCookie)
+        public static async Task<bool> SetCookie(string cookieStr)
         {
             ClearCookie(); //清除Cookie
             client.DefaultRequestHeaders.Cookie.Clear();
-            newCookie = newCookie.Trim();
+            var cookies = cookieStr
+                .Split("<======>")
+                .Select(x => x.Trim())
+                .Where(x => x != "").ToArray(); 
+            
+            string selectedCookie = "";
+            if (cookies.Length == 0) return false;
+            else if (cookies.Length == 1)
+            {
+                selectedCookie = cookies[0];
+            }
+            else
+            {
+                CookieSelectDialog diag = new CookieSelectDialog(cookies);
+                await diag.ShowAsync();
+                selectedCookie = diag.selectedCookie;
+            }
+            ExpManager.allCookie = string.Join("\n<======>\n", cookies);
+            ExpManager.selectedCookie = selectedCookie;
+
+            //process
+            string newCookie = ExpManager.selectedCookie;
             if (newCookie.Length == 0) return false;
             if (newCookie.Substring(newCookie.Length - 1) != ";") newCookie += ';';
-            ExpManager.cookie = newCookie;
 
             MatchCollection mc = Regex.Matches(newCookie, "(\\w*?)=(.*?);");
             string url = "https://jingyan.baidu.com";
@@ -217,7 +231,7 @@ namespace 百度经验个人助手
 
         public static async Task SaveCurrentCookie()
         {
-            await StorageManager.SaveCookie(CurrentCookie);
+            await StorageManager.SaveCookie(allCookie, selectedCookie, CurrentCookie);
         }
 
         public static string CurrentCookie
@@ -278,6 +292,7 @@ namespace 百度经验个人助手
 
         public static async Task<WriteableBitmap> SimpleRequestImage(string picUrl)
         {
+            Debug.WriteLine("# SimpleRequestImage: " + picUrl);
             Uri myUri = new Uri(picUrl);
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, myUri);
             req.Headers.Host = new HostName(myUri.Host);

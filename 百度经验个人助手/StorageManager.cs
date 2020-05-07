@@ -502,7 +502,7 @@ namespace 百度经验个人助手
         private static StorageFolder _currentUserFolder;
         private static StorageFolder _currentUserRecentFolder;
 
-        public const string VER = "1.8.5";
+        public const string VER = "1.8.6";
         public const string FUNC_VER = "1.8.3";
 
         private static string _editSettingsFileName = "EditSettings.xml";
@@ -973,14 +973,20 @@ namespace 百度经验个人助手
             return storedCookie;
         }
 
-        public static async Task SaveCookie(string cookie)
+        public static async Task SaveCookie(string allCookie, string selectedCookie, string cookie)
         {
+            string toWrite = allCookie.Replace(selectedCookie, cookie);
+            if (!toWrite.Contains(cookie))
+            {
+                await Utility.FireErrorReport("SaveCookie保存出错", "allCookie=" + allCookie + "\nselectedCookie=" + selectedCookie + "\ncookie=" + cookie);
+                return;
+            }
             StorageFile file =
                 await _storageFolder.CreateFileAsync("Cookie.txt", CreationCollisionOption.ReplaceExisting);
 
             Stream fs = await file.OpenStreamForWriteAsync();
             StreamWriter sw = new StreamWriter(fs);
-            sw.Write(cookie);
+            sw.Write(toWrite);
 
             sw.Dispose();
             fs?.Dispose();
