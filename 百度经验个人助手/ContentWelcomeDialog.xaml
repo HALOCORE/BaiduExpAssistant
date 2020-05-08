@@ -27,12 +27,19 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <TextBlock FontSize="20" Margin="10">如果要统计检索个人经验数据，需要进行本设置保持登录。</TextBlock>
-        <TextBlock FontSize="20" Margin="10" Grid.Row="1">如果只搜索悬赏令，无需这个设置流程。</TextBlock>
-        <TextBlock FontSize="20" Margin="10" Grid.Row="2">第一次使用，请从新手教程开始。</TextBlock>
+        <TextBlock FontSize="20" Margin="10">如果要统计检索经验数据、编写经验，需要进行Cookie设置。</TextBlock>
+        
+        <TextBlock FontSize="20" Margin="10" Grid.Row="1">第一次使用，请从新手教程开始。</TextBlock>
+        <TextBlock FontSize="18" Margin="10" Grid.Row="3" Foreground="Gray">如果只搜索悬赏令，不在这里领取悬赏，无需这个设置流程。</TextBlock>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="4">
+            <TextBlock FontSize="18" Margin="10" FontWeight="Bold">若希望设定 “多个账号”, 需使用特殊的设置方式. </TextBlock>
+            <Button x:Name="buttonMultiHelp" Tapped="buttonMultiHelp_Tapped">多个账号如何设置?</Button>
+        </StackPanel>
     </Grid>
 </ContentDialog>

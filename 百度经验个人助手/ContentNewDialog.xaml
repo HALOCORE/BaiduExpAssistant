@@ -30,6 +30,24 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="8" FontSize="42" Foreground="Red">⭐</TextBlock>
+                        <StackPanel Margin="4" Padding="8">
+                            <TextBlock FontSize="26" Margin="5" Foreground="Purple">支持设定多个Cookie，启动时做出选择</TextBlock>
+                            <TextBlock  Margin="5" TextWrapping="Wrap"  Foreground="Purple">小幅改进简介图(v1.8). 通过图像缓存提升再次加载图片的速度. 详见简介图设置.</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ListViewItem>
+            <ListViewItem>
+                <TextBlock FontSize="20">版本日志：1.8.3 版本增加功能</TextBlock>
+            </ListViewItem>
+            <ListViewItem HorizontalContentAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -49,9 +67,7 @@
                         </Image>
                     </Border>
                 </Grid>
-                
             </ListViewItem>
-            
             <ListViewItem HorizontalContentAlignment="Stretch">
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
