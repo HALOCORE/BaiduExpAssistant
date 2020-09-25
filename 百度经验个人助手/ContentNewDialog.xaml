@@ -24,6 +24,13 @@
     </ContentDialog.Background>
     <Grid Width="650" Height="450" Margin="20">
         <ListView HorizontalContentAlignment="Stretch">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                <StackPanel Margin="4" Padding="8">
+                    <TextBlock FontSize="26" Margin="5">插入图片 / 大图片框：兼容经验编辑器改动</TextBlock>
+                    <TextBlock  Margin="5" TextWrapping="Wrap">百度经验编辑器的更新，造成插入图片和大图片框失效，已修正。</TextBlock>
+                </StackPanel>
+            </StackPanel>
             <ListViewItem HorizontalContentAlignment="Stretch">
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>

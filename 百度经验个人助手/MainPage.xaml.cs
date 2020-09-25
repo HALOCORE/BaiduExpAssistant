@@ -1120,6 +1120,7 @@ namespace 百度经验个人助手
             Utility.LogEvent("OK_AutoFillCalled");
             try
             {
+                await JSCodeString.RunJs(webViewMain, JSCodeString.JsPageFixed);
                 await JSCodeString.RunJs(
                     webViewMain, 
                     JSCodeString.JsAutoFillTitle +
@@ -1165,11 +1166,11 @@ namespace 百度经验个人助手
                     );
                 }
 
-                    
-                    
+                await JSCodeString.RunJs(webViewMain, JSCodeString.JsPageRelease);
             }
             catch (Exception ee)
             {
+                await JSCodeString.RunJs(webViewMain, JSCodeString.JsPageRelease);
                 await Utility.ShowMessageDialog("自动填写出现问题", "当前页面可能不是编辑器页面，或者设置有问题（含有特殊字符，或者设置格式错误）");
             }
             HideLoading();

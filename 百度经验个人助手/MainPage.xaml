@@ -725,11 +725,11 @@
                 </Button>
                 <CheckBox x:Name="checkboxPicInsert" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
-                    <TextBlock>插入图片 v1.2</TextBlock>
+                    <TextBlock>插入图片 v1.3</TextBlock>
                 </CheckBox>
                 <CheckBox x:Name="checkboxBigPic" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
-                    <TextBlock>大图片框 v1.3</TextBlock>
+                    <TextBlock>大图片框 v1.4</TextBlock>
                 </CheckBox>
                 <CheckBox x:Name="checkboxBriefPic" IsChecked="True" Margin="15 0 5 0" 
                           RequestedTheme="Light" Checked="CheckboxAnyFunc_CheckEvent" Unchecked="CheckboxAnyFunc_CheckEvent">
@@ -837,7 +837,10 @@
                     注意事项：
                 </TextBlock>
                 <TextBlock FontSize="20" Foreground="DimGray" FontWeight="Bold" Opacity="1">
-                    最小化会被暂停，暂停超过时长会被后台清理
+                    1. 最小化会被暂停，暂停超过时长会被后台清理
+                </TextBlock>
+                <TextBlock FontSize="20" Foreground="DimGray" FontWeight="Bold" Opacity="1">
+                    2. 自动补全会拦截tab键
                 </TextBlock>
             </StackPanel>
             <WebView x:Name="webViewMain" Grid.Column="1"></WebView>

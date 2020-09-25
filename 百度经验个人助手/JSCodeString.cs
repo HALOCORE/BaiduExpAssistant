@@ -139,12 +139,13 @@ namespace 百度经验个人助手
                     {
                         App.currentMainPage.ShowLoading("加载基础库...");
                         await AddScriptUri(webView, extensionLibsMsAppxWeb + "react.development.js");
-                        await Task.Delay(50); //unknown reason. ReactDOM is undefined occurs on first start.
+                        await Task.Delay(100); //unknown reason. ReactDOM is undefined occurs on first start.
                         await AddScriptUri(webView, extensionLibsMsAppxWeb + "react-dom.development.js");
                         await Task.Delay(200); //unknown reason. ReactDOM is undefined occurs on first start.
                         loadingStatus += "react-done\n";
                         await AddScriptUri(webView, extensionToolsMsAppxWeb + "AllComps.js");
                         await AddScriptUri(webView, extensionToolsMsAppxWeb + "AllPoly.js");
+                        await Task.Delay(50); //avoid failure.
                         loadingStatus += "allpoly-done\n";
 
                         //LOADFUNC Config Code
@@ -608,6 +609,9 @@ namespace 百度经验个人助手
 
         public static string JsSaveDraft =
                 "(function(){var a = document.getElementsByClassName['save-draft']; a[0].click();})();";
+
+        public static string JsPageFixed = "document.body.style.position = 'fixed';";
+        public static string JsPageRelease = "document.body.style.position = '';";
 
         public static string ErrableUsingErrBoard(string js, string preMsg="模块载入...", string doneMsg="开始运行.")
         {
