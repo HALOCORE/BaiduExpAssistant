@@ -18,12 +18,22 @@
             <LinearGradientBrush.Transform>
                 <CompositeTransform TranslateY="1"/>
             </LinearGradientBrush.Transform>
-            <GradientStop Color="#FFF8DBFF"  Offset="0.8"/>
-            <GradientStop Color="#FFFFF5F2"/>
+            <GradientStop Color="#FFB9E9FF"  Offset="0.8"/>
+            <GradientStop Color="#FFF2FFF3"/>
         </LinearGradientBrush>
     </ContentDialog.Background>
     <Grid Width="650" Height="450" Margin="20">
         <ListView HorizontalContentAlignment="Stretch">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
+                <StackPanel Margin="4" Padding="8">
+                    <TextBlock FontSize="26" Margin="5">修复投票数据不存在造成的问题</TextBlock>
+                    <TextBlock  Margin="5" TextWrapping="Wrap">插入图片不再遮挡“添加正版图片”</TextBlock>
+                </StackPanel>
+            </StackPanel>
+            <ListViewItem>
+                <TextBlock FontSize="20">版本日志：1.9.0 版本增加功能</TextBlock>
+            </ListViewItem>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Margin="8" FontSize="42">⭐</TextBlock>
                 <StackPanel Margin="4" Padding="8">

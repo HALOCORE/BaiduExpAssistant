@@ -572,9 +572,8 @@ namespace 百度经验个人助手
             MatchCollection mcCollect = Regex.Matches(html, regexContentExpCollect);
             MatchCollection mcDate = Regex.Matches(html, regexContentExpDate);
 
-            if (!(mcTitleAndUrl.Count == mcView.Count &&
-                  mcView.Count == mcVote.Count &&
-                  mcVote.Count == mcCollect.Count &&
+            if (!(mcTitleAndUrl.Count == mcView.Count && //remove vote count
+                  mcView.Count == mcCollect.Count &&
                   mcCollect.Count == mcDate.Count))
             {
                 return false;
@@ -595,7 +594,7 @@ namespace 百度经验个人助手
                     mcTitleAndUrl[i].Groups[1].Value,
                     urlPrefix + mcTitleAndUrl[i].Groups[2].Value,
                     int.Parse(mcView[i].Groups[1].Value),
-                    int.Parse(mcVote[i].Groups[1].Value),
+                    -1, //vote
                     int.Parse(mcCollect[i].Groups[1].Value),
                     mcDate[i].Groups[1].Value
                 ));
