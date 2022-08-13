@@ -1,0 +1,26 @@
+{
+    "name": "百度经验个人助手.Lite",
+    "version": "0.2",
+    "description": "辅助百度经验的编写",
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+    },
+    "permissions": ["activeTab", "declarativeContent"],
+    "page_action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "images/16.png",
+        "32": "images/32.png",
+        "48": "images/48.png",
+        "128": "images/128.png"
+      }
+    },
+    "icons": {
+      "16": "images/16.png",
+      "32": "images/32.png",
+      "48": "images/48.png",
+      "128": "images/128.png"
+    },
+    "manifest_version": 2
+  }

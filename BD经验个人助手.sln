@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BD经验个人助手", "百度经验个人助手\BD经验个人助手.csproj", "{C0B517E5-373A-4ACD-96DF-213ADB60F3C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BD经验个人助手", "BD经验个人助手\BD经验个人助手.csproj", "{C0B517E5-373A-4ACD-96DF-213ADB60F3C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

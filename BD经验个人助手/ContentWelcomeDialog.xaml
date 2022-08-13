@@ -1,0 +1,45 @@
+﻿<ContentDialog
+    x:Class="BD经验个人助手.ContentWelcomeDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BD经验个人助手"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="欢迎进入设置流程！"
+    PrimaryButtonText="新手教程"
+    SecondaryButtonText="老司机通道"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    BorderBrush="AliceBlue"
+    >
+    <ContentDialog.Background>
+        <LinearGradientBrush>
+            <LinearGradientBrush.Transform>
+                <CompositeTransform TranslateY="1"/>
+            </LinearGradientBrush.Transform>
+            <GradientStop Color="SkyBlue"  Offset="0.7"/>
+            <GradientStop Color="{ThemeResource SystemAltMediumHighColor}"/>
+
+        </LinearGradientBrush>
+    </ContentDialog.Background>
+    <Grid Width="600" Height="200" Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <TextBlock FontSize="20" Margin="10">如果要统计检索经验数据、编写经验，需要进行Cookie设置。</TextBlock>
+        
+        <TextBlock FontSize="20" Margin="10" Grid.Row="1">第一次使用，请从新手教程开始。</TextBlock>
+        <TextBlock FontSize="18" Margin="10" Grid.Row="3" Foreground="Gray">如果只搜索悬赏令，不在这里领取悬赏，无需这个设置流程。</TextBlock>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="4">
+            <TextBlock FontSize="18" Margin="10" FontWeight="Bold">若希望设定 “多个账号”, 需使用特殊的设置方式. </TextBlock>
+            <Button x:Name="buttonMultiHelp" Tapped="buttonMultiHelp_Tapped">多个账号如何设置?</Button>
+        </StackPanel>
+    </Grid>
+</ContentDialog>
