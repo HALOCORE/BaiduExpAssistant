@@ -7,8 +7,8 @@
     <ProjectGuid>{C0B517E5-373A-4ACD-96DF-213ADB60F3C9}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>百度经验个人助手</RootNamespace>
-    <AssemblyName>百度经验个人助手</AssemblyName>
+    <RootNamespace>BD经验个人助手</RootNamespace>
+    <AssemblyName>BD经验个人助手</AssemblyName>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
